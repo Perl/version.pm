@@ -143,7 +143,7 @@ to the right of the decimal place) that contains less than three digits
 will have trailing zeros added to make up the difference.  For example:
 
   $v = new version       1.2;    # 1.200.0
-  $v = new version      1.02;    # 1.2.0    See "CPAN Style Versions"
+  $v = new version      1.02;    # 1.2.0    See "CPAN-Style Versions"
   $v = new version     1.020;    # 1.20.0
   $v = new version     1.002;    # 1.2.0
   $v = new version    1.0023;    # 1.2.300
@@ -155,20 +155,30 @@ All of the preceeding examples except the second to last are true
 whether or not the input value is quoted.  The important feature is that
 the input value contains only a single decimal.
 
-=head2 CPAN Style Versions
+=head2 CPAN-Style Versions
 
 In order to more accurately reflect the style of most modules released 
-to CPAN (blah blah blah), if the version contains a single decimal point
-followed by exactly two digits, i.e. "1.23", the version will be 1.23.0
-and not as if there were an implied zero present ("1.230").  This method
-will mean that the conventional alpha version used on CPAN will sort with
-the non-alpha versions:
+to CPAN (The Comprehensive Perl Archive Network), if the version contains
+a single decimal point followed by exactly two digits, i.e. "1.23", the
+version will be 1.23.0 and not as if there were an implied zero present
+("1.230").  This method will mean that the conventional alpha version
+used on CPAN will sort with the non-alpha versions:
 
   $v = version->new("1.22");	# 1.22.0 Release
-  $v = version->new("1.23_01");	# 1.23_1 Alpha Release for 1.23
+  $v = version->new("1.22_01");	# 1.22_1 Alpha Release for 1.23
   $v = version->new("1.23");	# 1.23.0 Release
 
 See also L<"Alpha Versions"> for information on sorting order.
+
+B<NOTE>: One significant drawback to CPAN-Style versions has always been
+when the version falls on a multiple of 10, i.e. "1.30".  Perl's
+normal behavior with regard to bare floating-point numbers is to strip the
+trailing zero which will make it unavailable for later processing (this is
+actually a consequence of storing the decimal in an NV slot).  The only way
+to get around this is to initialize the $VERSION scalar with a quoted number
+(not the same thing as L<Quoted Versions> below).  This is also necessary to
+produce the CPAN distribution file with the appropriate name (i.e. something
+like my-module-1.30.tar.gz).
 
 =head2 Quoted Versions
 

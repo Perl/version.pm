@@ -29,8 +29,8 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
     char *pos = s;
     I32 saw_period = 0;
     bool saw_under = 0;
-    SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
-    (void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
+    AV* av = (AV *)newSVrv(rv, "version"); /* create an SV and upgrade the RV */
+    (void)sv_upgrade((SV *)av, SVt_PVAV); /* needs to be an AV type */
 
     /* pre-scan the imput string to check for decimals */
     while ( *pos == '.' || *pos == '_' || isDIGIT(*pos) )
@@ -77,7 +77,13 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 		 * floating point number, i.e. not quoted in any way
 		 */
  		if ( !qv && s > start+1 && saw_period == 1 && !saw_under ) {
-		    if ( end - s == 2 )
+		    /* Test for whether this is the second term and whether
+		     * the subsequent digits are exactly two, which
+		     * triggers the special CPAN version processing.  This
+		     * will not trigger for the Perl version 5.005_03,
+		     * which should be interpreted at 5.5.30, not 5.5.3.
+		     */
+		    if ( (av_len(av) == 0 ) && ( end - s == 2 ) )
 			mult = 10;   /* CPAN-style */
 		    else
 			mult = 100;  /* Perl-style */
@@ -103,7 +109,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
   	    }
   
   	    /* Append revision */
-	    av_push((AV *)sv, newSViv(rev));
+	    av_push(av, newSViv(rev));
 	    if ( (*pos == '.' || *pos == '_') && isDIGIT(pos[1]))
 		s = ++pos;
 	    else if ( isDIGIT(*pos) )

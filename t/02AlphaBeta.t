@@ -16,7 +16,7 @@ BaseTests("version::AlphaBeta");
 package version::AlphaBeta::Empty;
 use vars qw($VERSION @ISA);
 use Exporter;
-use version 0.30;
+use version 0.32;
 @ISA = qw(Exporter version::AlphaBeta);
 $VERSION = 0.01;
 

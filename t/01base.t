@@ -16,7 +16,7 @@ diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 package version::Empty;
 use vars qw($VERSION @ISA);
 use Exporter;
-use version 0.30;
+use version 0.32;
 @ISA = qw(Exporter version);
 $VERSION = 0.01;
 
@@ -43,7 +43,7 @@ sub BaseTests {
 	$version = $CLASS->new(5.005_03);
 	is ( "$version" , "5.5.30" , '5.005_03 eq 5.5.30' );
 	$version = $CLASS->new(1.23);
-	is ( "$version" , "1.230.0" , '1.23 eq "1.230.0"' );
+	is ( "$version" , "1.23.0" , '1.23 eq "1.23.0" CPAN-style' );
 	
 	# Test quoted number processing
 	diag "tests with quoted numbers" unless $ENV{PERL_CORE};
