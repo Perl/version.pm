@@ -2,7 +2,10 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
+
+#ifndef PERL_ABS
 #define PERL_ABS(x) ((x) < 0 ? -(x) : (x))
+#endif
 
 char * Perl_scan_version(pTHX_ char *s, SV *rv);
 SV * Perl_new_version(pTHX_ SV *ver);

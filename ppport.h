@@ -249,6 +249,10 @@ __DATA__
 #    define aTHX_
 #endif         
 
+#ifndef IVSIZE
+#   define IVSIZE INTSIZE
+#endif
+
 #ifndef UVSIZE
 #   define UVSIZE IVSIZE
 #endif
