@@ -1,6 +1,6 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
-# $Revision: 1.3 $
+# $Revision: 1.4 $
 
 #########################
 
@@ -27,13 +27,16 @@ is ( "$version" , "1.2.3_4" , 'beta version 1.2.3_4 eq 1.2.3_4' );
 # test illegal formats
 diag "test illegal formats" unless $ENV{PERL_CORE};
 eval {my $version = new version "1.2_3_4";};
-like($@, qr/multiple underscores/,$@);
+like($@, qr/multiple underscores/,
+    "Invalid version format (multiple underscores)");
 
 eval {my $version = new version "1.2_3.4";};
-like($@, qr/underscores before decimal/,$@);
+like($@, qr/underscores before decimal/,
+    "Invalid version format (underscores before decimal)");
 
 eval {my $version = new version 100/9;};
-like($@, qr/Integer overflow in version/, $@);
+like($@, qr/Integer overflow in version/,
+    "Integer overflow in version");
 
 # Test boolean operator
 ok ($version, 'boolean');
