@@ -7,7 +7,7 @@ use version;
 use Exporter;
 
 use overload (
-    '""'  => \&_stringify,
+    '""'  => \&stringify,
     '<=>' => \&spaceship,
     'cmp' => \&spaceship,
 );
@@ -16,14 +16,14 @@ use vars qw(@ISA $VERSION %IB %OB $TYPE);
 
 @ISA = qw(Exporter version);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 %IB = (
-    'a' => 1,
-    'b' => 2,
-    'rc'=> 3,
-    ''  => 4,
-    'pl'=> 5
+    'a' => -3,
+    'b' => -2,
+    'rc'=> -1,
+    ''  => 0,
+    'pl'=> 1
 );
 
 %OB = reverse %IB;
@@ -58,45 +58,55 @@ sub new {
 	(defined $value[2] ? $value[2] : "")
     }; 
 
-    my $self = version->new('v'.join(".",@value));
+    my $self = \@value;
     bless $self, $class;
 
     return $self;
 }
 
-sub _stringify {
+sub stringify {
     my $self = shift;
-    my @value = split /\./, $self->stringify();
+    my @values = @$self;
 
-    $value[2] = $OB{$value[2]} if defined $value[2];
-    my $fmt = "v%d.%d".
-    	(defined $value[2] ? "%s" : "").
-    	(defined $value[3] ? "%d" : "");
-    return sprintf($fmt,@value);
+    $values[2] = $OB{$values[2]} if defined $values[2];
+    my $fmt = "%d.%d".
+    	(defined $values[2] ? "%s" : "").
+    	(defined $values[3] ? "%d" : "");
+    return sprintf($fmt,@values);
 }
 
 sub spaceship {
     my ($left, $right, $swap) = @_;
+    my $test;
     
     unless ( UNIVERSAL::isa($right, ref($left)) ) {
 	$right = $left->new($right);
     }
 
-    return version::vcmp($left, $right,$swap);
+    my $max = $#$left > $#$right ? $#$left : $#$right;
+
+    for ( my $i=0; $i <= $max; $i++ ) {
+	$test = $$left[$i] <=> $$right[$i];
+	$test *= -1 if $swap;
+	return $test if $test;
+    }
+
+    $test = $#$left <=> $#$right;
+    $test *= -1 if $swap;
+
+    return $test;
 }
 
 sub is_alpha {
     my $self = shift;
-    my @value = split /\./, $self->stringify();
 
-    return ($value[2] == $IB{'a'});
+    return ($$self[2] == $IB{'a'});
 }
 
 sub is_beta {
     my $self = shift;
-    my @value = split /\./, $self->stringify();
 
-    return ($value[2] == $IB{'b'});
+    return ($$self[2] == $IB{'b'});
 }
 
 1;

@@ -29,22 +29,22 @@ sub BaseTests {
     my $class = shift;
 
     my $v = new $class "1.2rc1";
-    ok ("v1.2rc1" eq "$v", "Release candidate: [$v]");
+    ok ("1.2rc1" eq "$v", "Release candidate: [$v]");
     
     $v = new $class "1.3a";
-    ok ("v1.3a" eq "$v", "Alpha: [$v]");
-    ok ("v1.3a" eq  $v, "v1.3a eq Alpha");
-    ok ("v1.3a" == $v, "v1.3a == Alpha");
+    ok ("1.3a" eq "$v", "Alpha: [$v]");
+    ok ("1.3a" eq  $v, "1.3a eq Alpha");
+    ok ("1.3a" == $v, "1.3a == Alpha");
     ok ($v->is_alpha, "$v->is_alpha");
     
     $v = new $class "1.2b";
-    ok ("v1.2b" eq "$v", "Beta: [$v]");
-    ok ("v1.2b" eq  $v, "v1.2b eq Beta");
-    ok ("v1.2b" == $v, "v1.2b == Beta");
+    ok ("1.2b" eq "$v", "Beta: [$v]");
+    ok ("1.2b" eq  $v, "1.2b eq Beta");
+    ok ("1.2b" == $v, "1.2b == Beta");
     ok ($v->is_beta, "$v->is_beta");
     
-    $v = new $class "v1.2";
-    ok ("v1.2" eq "$v", "Release: [$v]");
+    $v = new $class "1.2";
+    ok ("1.2" eq "$v", "Release: [$v]");
     ok ("1.2a" < $v , "Alpha < Release");
     
     my $v2 = new $class "1.2rc1";
