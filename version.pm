@@ -22,7 +22,7 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION $CLASS);
 @EXPORT = qw(
 );
 
-$VERSION = (qw$Revision: 1.7 $)[1]/10;
+$VERSION = (qw$Revision: 1.8 $)[1]/10;
 
 $CLASS = 'version';
 
@@ -58,7 +58,69 @@ version - Perl extension for Version Objects
 
 Overloaded version objects for all versions of Perl.  This module
 implments all of the features of version objects which will be part
-of Perl v5.10 except automatic v-string handling.  See L<"Quoting">.
+of Perl 5.10.0 except automatic v-string handling.  See L<"Quoting">.
+
+=head2 What IS a version
+
+For the purposes of this module, a version "number" is a sequence of
+positive integral values separated by decimal points and optionally a
+single underscore.  This corresponds to what Perl itself uses for a
+version, as well as including the "version as number" that is discussed
+in the various editions of the Camel book.
+
+=head2 Object Methods
+
+Overloading has been used with version objects to provide a natural
+interface for their use.  All mathematical operations are forbidden,
+since they don't make any sense for versions.  For the subsequent
+examples, the following two objects will be used:
+
+  $ver  = new version "1.2.3"; # see "Quoting" below
+  $beta = new version "1.2_3"; # see "Beta versions" below
+
+=item * Stringification - Any time a version object is used as a string,
+a stringified representation is returned in reduced form (no extraneous
+zeros): 
+
+  print $ver->stringify;      # prints 1.2.3
+  print $ver;                 # same thing
+
+=item * Numification - although all mathematical operations on version
+objects are forbidden by default, it is possible to retrieve a number
+which roughly corresponds to the version object through the use of the
+$obj->numify method.  For formatting purposes, when displaying a number
+which corresponds a version object, all sub versions are assumed to have
+three decimal places.  So for example:
+
+  print $ver->numify;         # prints 1.002003
+
+=item * Comparison operators - Both cmp and <=> operators perform the
+same comparison between terms (upgrading to a version object
+automatically).  Perl automatically generates all of the other comparison
+operators based on those two.  For example, the following relations hold:
+
+  As Number       As String       Truth Value
+  ---------       ------------    -----------
+  $ver >  1.0     $ver gt "1.0"      true
+  $ver <  2.5     $ver lt            true
+  $ver != 1.3     $ver ne "1.3"      true
+  $ver == 1.2     $ver eq "1.2"      false
+  $ver == 1.2.3   $ver eq "1.2.3"    see discussion below
+  $ver == v1.2.3  $ver eq "v1.2.3"   ditto
+
+In versions of Perl prior to the 5.9.0 development releases, it is not
+permitted to use bare v-strings in either form, due to the nature of Perl's
+parsing operation.  After that version (and in the stable 5.10.0 release),
+v-strings can be used with version objects without problem, see L<"Quoting">
+for more discussion of this topic.  In the case of the last two lines of 
+the table above, only the string comparison will be true; the numerical
+comparison will test false.  However, you can do this:
+
+  $ver == "1.2.3" or $ver = "v.1.2.3"	# both true
+
+even though you are doing a "numeric" comparison with a "string" value.
+It is probably best to chose either the numeric notation or the string 
+notation and stick with it, to reduce confusion.  See also L<"Quoting">.
 
 =head2 Quoting
 
@@ -78,19 +140,19 @@ but other operations are not likely to be what you intend.  For example:
   $V2 = new version 100/9; # Integer overflow in decimal number
   print $V2;               # yields 11_1285418553
 
-You can use a bare number, if you only have a major and minor version,
+You B<can> use a bare number, if you only have a major and minor version,
 since this should never in practice yield a floating point notation
 error.  For example:
 
   $VERSION = new version  10.2;  # almost certainly ok
   $VERSION = new version "10.2"; # guaranteed ok
 
-Perl v5.9 and beyond will be able to automatically quote v-strings
-(which will become the recommended notation), but that is not possible in
+Perl 5.9.0 and beyond will be able to automatically quote v-strings
+(which may become the recommended notation), but that is not possible in
 earlier versions of Perl.  In other words:
 
-  $version = new version "v2.5.4";	# legal in all versions of Perl
-  $newvers = new version v2.5.4;	# legal only in Perl > v5.9 
+  $version = new version "v2.5.4";  # legal in all versions of Perl
+  $newvers = new version v2.5.4;    # legal only in Perl > 5.9.0
 
 
 =head2 Types of Versions Objects
@@ -99,9 +161,10 @@ There are three basic types of Version Objects:
 
 =item * Ordinary versions - These are the versions that normal
 modules will use.  Can contain as many subversions as required.
-In particular, those using RCS/CVS can use the following code:
+In particular, those using RCS/CVS can use one of the following:
 
-  $VERSION = new version (qw$Revision: 1.7 $)[1];
+  $VERSION = new version (qw$Revision: 1.8 $)[1]; # all Perls
+  $VERSION = new version qw$Revision: 1.8 $[1];   # Perl >= 5.6.0
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the
@@ -134,20 +197,23 @@ were only used by Perl releases prior to 5.6.0.  If a version
 string contains an underscore immediately followed by a zero followed
 by a non-zero number, the version is processed according to the rules
 described in L<perldelta/Improved Perl version numbering system>
-released with Perl v5.6.  As an example:
+released with Perl 5.6.0.  As an example:
 
   $perlver = new version "5.005_03";
 
 is interpreted, not as a beta release, but as the version 5.5.30,  NOTE
 that the major and minor versions are unchanged but the subversion is
 multiplied by 10, since the above was implicitely read as 5.005.030.
+There are modules currently on CPAN which may fall under of this rule, so
+module authors are urged to pay close attention to what version they are
+specifying.
 
 =head2 Replacement UNIVERSAL::VERSION
 
 In addition to the version objects, this modules also replaces the core
 UNIVERSAL::VERSION function with one that uses version objects for its
-comparisons.  So, for example, with all existing versions of Perl, the
-something like the following is an error:
+comparisons.  So, for example, with all existing versions of Perl,
+something like the following pseudocode would fail:
 
 	package vertest;
 	$VERSION = 0.45;
@@ -157,7 +223,7 @@ something like the following is an error:
 
 even though those versions are meant to be read as 0.045 and 0.005 
 respectively.  The UNIVERSAL::VERSION replacement function included
-with this module makes that B<not> be an error, as it should.
+with this module changes that behavior so that it will B<not> fail.
 
 =head1 EXPORT
 
