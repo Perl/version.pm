@@ -9,29 +9,32 @@ scan_version(pTHX_ char *s, SV *rv)
     char *pos = s;
     char *start = s;
     AV* av = (AV *)newSVrv(rv, "version"); /* create an SV and upgrade the RV */
-    if ( SvTYPE(av) != SVt_PVAV )
+    if ( SvTYPE(av) != SVt_PVAV )	/* it's not really an AV yet */
 	SvUPGRADE((SV *)av, SVt_PVAV);
 
     if (*pos == 'v') pos++;  /* get past 'v' */
     while (isDIGIT(*pos) || *pos == '_')
     pos++;
     if (!isALPHA(*pos)) {
-	UV rev;
-	U8 tmpbuf[UTF8_MAXLEN+1];
-	U8 *tmpend;
+	I32 rev;
 
 	if (*s == 'v') s++;  /* get past 'v' */
 
 	for (;;) {
 	    rev = 0;
 	    {
-		/* this is atoi() that tolerates underscores */
+		/* this is atoi() that delimits on underscores */
 		char *end = pos;
-		UV mult = 1;
+		I32 mult = 1;
+		if ( s < pos && *(s-1) == '_' ) {
+		    if ( *s == '0' )
+			mult = 10;	/* perl-style */
+		    else
+			mult = -1;	/* beta version */
+		}
 		while (--end >= s) {
-		    UV orev;
-		    if (*end == '_')
-			continue;
+
+		    I32 orev;
 		    orev = rev;
 		    rev += (*end - '0') * mult;
 		    mult *= 10;
@@ -43,13 +46,13 @@ scan_version(pTHX_ char *s, SV *rv)
 
 	    /* Append revision */
 	    av_push(av, newSViv(rev));
-	    if (*pos == '.' && isDIGIT(pos[1]))
+	    if ( (*pos == '.' || *pos == '_') && isDIGIT(pos[1]))
 		 s = ++pos;
 	    else {
 		 s = pos;
 		 break;
 	    }
-	    while (isDIGIT(*pos) || *pos == '_')
+	    while ( isDIGIT(*pos) )
 		 pos++;
 	}
     }
@@ -193,11 +196,11 @@ vnumify(pTHX_ SV *sv, SV *vs)
     I32 i;
     I32 len = av_len((AV *)vs);
     I32 digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv,"%d.",digit);
+    Perl_sv_setpvf(aTHX_ sv,"%d.",abs(digit));
     for ( i = 1 ; i <= len ; i++ )
     {
 	digit = SvIVX(*av_fetch((AV *)vs, i, 0));
-	Perl_sv_catpvf(aTHX_ sv,"%03d",digit);
+	Perl_sv_catpvf(aTHX_ sv,"%03d",abs(digit));
     }
     return sv;
 }
@@ -252,11 +255,11 @@ vcmp(pTHX_ AV *lsv, AV *rsv)
     I32 i = 0;
     while ( i <= m && retval == 0 )
     {
-	SV *left  = (SV *)av_fetch(lsv,i,0);
-	SV *right = (SV *)av_fetch(rsv,i,0);
-	if ( SvIV(left) < SvIV(right) )
+	I32 left  = abs( SvIV((SV *)av_fetch(lsv,i,0)) );
+	I32 right = abs( SvIV((SV *)av_fetch(rsv,i,0)) );
+	if ( left < right )
 	    retval = -1;
-	if ( SvIV(left) > SvIV(right) )
+	if ( left > right )
 	    retval = +1;
 	i++;
     }

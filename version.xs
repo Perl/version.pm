@@ -4,7 +4,7 @@
 #include "util.h"
 
 /* --------------------------------------------------
- * $Revision: 1.2 $
+ * $Revision: 1.3 $
  * --------------------------------------------------*/
 
 typedef     SV *version;
@@ -76,11 +76,11 @@ PPCODE:
 
     if ( swap )
     {
-        rs = newSViv(vcmp(rvs,lobj));
+        rs = newSViv(vcmp((AV *)rvs,(AV *)lobj));
     }
     else
     {
-        rs = newSViv(vcmp(lobj,rvs));
+        rs = newSViv(vcmp((AV *)lobj,(AV *)rvs));
     }
 
     PUSHs(rs);
@@ -92,7 +92,7 @@ boolean(lobj,...)
 PPCODE:
 {
     SV	*rs;
-    rs = newSViv(sv_cmp(lobj,Nullsv));
+    rs = newSViv(1);
     PUSHs(rs);
 }
 
