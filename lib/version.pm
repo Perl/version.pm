@@ -9,7 +9,7 @@ use vars qw(@ISA $VERSION $CLASS);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = 0.29; # stop using CVS and switch to subversion
+$VERSION = 0.28; # stop using CVS and switch to subversion
 
 $CLASS = 'version';
 
@@ -38,7 +38,7 @@ version - Perl extension for Version Objects
 
   $alphaver = new version "1.2_3"; # must be quoted!
   print $alphaver;		# 1.2_3
-  print $alphaver->is_alpha();	# true
+  print $alphaver->is_alpha();  # true
 
   $perlver = new version 5.005_03; # must not be quoted!
   print $perlver;		# 5.5.30
@@ -61,12 +61,16 @@ There are actually two distinct ways to initialize versions:
 
 =over 4
 
-=item * Numeric Versions - any initial parameter which "looks like
-a number", see L<Numeric Versions>.
+=item * Numeric Versions
 
-=item * V-String Versions - any initial parameter which contains more
-than one decimal point, contains an embedded underscore, or has a
-leading 'v' see L<V-String Versions>.
+Any initial parameter which "looks like a number", see L<Numeric
+Versions>.
+
+=item * V-String Versions
+
+Any initial parameter which contains more than one decimal point,
+contains an embedded underscore, or has a leading 'v' see L<V-String
+Versions>.
 
 =back
 
@@ -78,7 +82,7 @@ the default stringification will always be in a reduced form, i.e.:
   $v3 = new version   v1.2.3;  # 1.2.3 for Perl > v5.8.0
   $v4 = new version    1.2.3;  # 1.2.3 for Perl > v5.8.0
 
-Please see L<Quoting> for more details on how Perl will parse various
+Please see L<"Quoting"> for more details on how Perl will parse various
 input values.
 
 Any value passed to the new() operator will be parsed only so far as it
@@ -106,10 +110,10 @@ will have trailing zeros added to make up the difference.  For example:
   $v = new version     1.002;    # 1.2
   $v = new version    1.0023;    # 1.2.300
   $v = new version   1.00203;    # 1.2.30
-  $v = new version  1.002_03;    # 1.2.30   See L<Quoting>
+  $v = new version  1.002_03;    # 1.2.30   See L<"Quoting">
   $v = new version  1.002003;    # 1.2.3
 
-All of the preceeding examples except the second to last are true 
+All of the preceeding examples except the second to last are true
 whether or not the input value is quoted.  The important feature is that
 the input value contains only a single decimal.
 
@@ -118,7 +122,7 @@ the input value contains only a single decimal.
 These are the newest form of versions, and correspond to Perl's own
 version style beginning with v5.6.0.  Starting with Perl v5.10.0,
 this is likely to be the preferred form.  This method requires that
-the input parameter be quoted, although Perl > v5.9.0 can use bare 
+the input parameter be quoted, although Perl > v5.9.0 can use bare
 v-strings as a special form of quoting.
 
 Unlike L<Numeric Versions>, V-String Versions must either have more than
@@ -127,7 +131,7 @@ like this "v5.6" (much like v-string notation).  In fact, with the
 newest Perl v-strings themselves can be used to initialize version
 objects.  Also unlike L<Numeric Versions>, leading zeros are B<not>
 significant, and trailing zeros must be explicitely specified (i.e.
-will not be automatically added).  In addition, the subversions are 
+will not be automatically added).  In addition, the subversions are
 not enforced to be three decimal places.
 
 So, for example:
@@ -142,7 +146,7 @@ In additional to conventional versions, V-String Versions can be
 used to create L<Alpha Versions>.
 
 In general, V-String Versions permit the greatest amount of freedom
-to specify a version, whereas Numeric Versions enforce a certain 
+to specify a version, whereas Numeric Versions enforce a certain
 uniformity.  See also L<New Operator> for an additional method of
 initializing version objects.
 
@@ -150,17 +154,18 @@ initializing version objects.
 
 Overloading has been used with version objects to provide a natural
 interface for their use.  All mathematical operations are forbidden,
-since they don't make any sense for versions.
+since they don't make any sense for base version objects.
 
 =over 4
 
-=item * New Operator - Like all OO interfaces, the new() operator is
-used to initialize version objects.  One way to increment versions
-when programming is to use the CVS variable $Revision, which is
-automatically incremented by CVS every time the file is committed to
-the repository.
+=item * New Operator
 
-=back 
+Like all OO interfaces, the new() operator is used to initialize
+version objects.  One way to increment versions when programming is to
+use the CVS variable $Revision, which is automatically incremented by
+CVS every time the file is committed to the repository.
+
+=back
 
 In order to facilitate this feature, the following
 code can be employed:
@@ -170,7 +175,7 @@ code can be employed:
 and the version object will be created as if the following code
 were used:
 
-  $VERSION = new version "v2.7";
+  $VERSION = new version "v2.6";
 
 In other words, the version will be automatically parsed out of the
 string, and it will be quoted to preserve the meaning CVS normally
@@ -183,9 +188,10 @@ For the subsequent examples, the following two objects will be used:
 
 =over 4
 
-=item * Stringification - Any time a version object is used as a string,
-a stringified representation is returned in reduced form (no extraneous
-zeros): 
+=item * Stringification
+
+Any time a version object is used as a string, a stringified
+representation is returned in reduced form (no extraneous zeros):
 
 =back
 
@@ -194,28 +200,25 @@ zeros):
 
 =over 4
 
-=item * Numification - although all mathematical operations on version
-objects are forbidden by default, it is possible to retrieve a number
-which roughly corresponds to the version object through the use of the
-$obj->numify method.  For formatting purposes, when displaying a number
-which corresponds a version object, all sub versions are assumed to have
-three decimal places.  So for example:
+=item * Numification
 
-=back
+Although all mathematical operations on version objects are forbidden
+by default, it is possible to retrieve a number which roughly
+corresponds to the version object through the use of the $obj->numify
+method.  For formatting purposes, when displaying a number which
+corresponds a version object, all sub versions are assumed to have
+three decimal places.  So for example:
 
   print $ver->numify;         # prints 1.002003
 
-=over 4
+=item * Comparison operators
 
-=item * Comparison operators - Both cmp and <=> operators perform the
-same comparison between terms (upgrading to a version object
-automatically).  Perl automatically generates all of the other comparison
-operators based on those two.  In addition to the obvious equalities
-listed below, appending a single trailing 0 term does not change the
-value of a version for comparison purposes.  In other words "v1.2" and
-"v1.2.0" are identical versions.
-
-=back
+Both cmp and <=> operators perform the same comparison between terms
+(upgrading to a version object automatically).  Perl automatically
+generates all of the other comparison operators based on those two.
+In addition to the obvious equalities listed below, appending a single
+trailing 0 term does not change the value of a version for comparison
+purposes.  In other words "v1.2" and "v1.2.0" are identical versions.
 
 For example, the following relations hold:
 
@@ -232,37 +235,37 @@ In versions of Perl prior to the 5.9.0 development releases, it is not
 permitted to use bare v-strings in either form, due to the nature of Perl's
 parsing operation.  After that version (and in the stable 5.10.0 release),
 v-strings can be used with version objects without problem, see L<"Quoting">
-for more discussion of this topic.  In the case of the last two lines of 
+for more discussion of this topic.  In the case of the last two lines of
 the table above, only the string comparison will be true; the numerical
 comparison will test false.  However, you can do this:
 
   $ver == "1.2.3" or $ver == "v1.2.3"	# both true
 
 even though you are doing a "numeric" comparison with a "string" value.
-It is probably best to chose either the numeric notation or the string 
+It is probably best to chose either the numeric notation or the string
 notation and stick with it, to reduce confusion.  See also L<"Quoting">.
 
-=over 4
+=item * Logical Operators 
 
-=item * Logical Operators - If you need to test whether a version object
+If you need to test whether a version object
 has been initialized, you can simply test it directly:
-
-=back
 
   $vobj = new version $something;
   if ( $vobj )   # true only if $something was non-blank
 
 You can also test whether a version object is a L<Alpha version>, for
-example to prevent the use of some feature not present in the main 
+example to prevent the use of some feature not present in the main
 release:
 
   $vobj = new version "1.2_3"; # MUST QUOTE
   ...later...
   if ( $vobj->is_alpha )       # True
 
+=back
+
 =head2 Quoting
 
-Because of the nature of the Perl parsing and tokenizing routines, 
+Because of the nature of the Perl parsing and tokenizing routines,
 certain initialization values B<must> be quoted in order to correctly
 parse as the intended version, and additionally, some initial values
 B<must not> be quoted to obtain the intended version.
@@ -306,30 +309,27 @@ There are two types of Version Objects:
 
 =over 4
 
-=item * Ordinary versions - These are the versions that normal
-modules will use.  Can contain as many subversions as required.
-In particular, those using RCS/CVS can use one of the following:
+=item * Ordinary versions
 
-=back
+These are the versions that normal modules will use.  Can contain as
+many subversions as required.  In particular, those using RCS/CVS can
+use one of the following:
 
-  $VERSION = new version qw$Revision: 2.7 $; 
+  $VERSION = new version qw$Revision: 2.7 $;
 
-and the current RCS Revision for that file will be inserted 
-automatically.  If the file has been moved to a branch, the
-Revision will have three or more elements; otherwise, it will
-have only two.  This allows you to automatically increment
-your module version by using the Revision number from the primary
-file in a distribution, see L<ExtUtils::MakeMaker/"VERSION_FROM">.
+and the current RCS Revision for that file will be inserted
+automatically.  If the file has been moved to a branch, the Revision
+will have three or more elements; otherwise, it will have only two.
+This allows you to automatically increment your module version by
+using the Revision number from the primary file in a distribution, see
+L<ExtUtils::MakeMaker/"VERSION_FROM">.
 
-=over 4
+=item * alpha versions
 
-=item * Alpha versions - For module authors using CPAN, the 
-convention has been to note unstable releases with an underscore
-in the version string, see L<CPAN>.  Alpha releases will test as being
-newer than the more recent stable release, and less than the next
-stable release.  For example:
-
-=back
+For module authors using CPAN, the convention has been to note
+unstable releases with an underscore in the version string, see
+L<CPAN>.  Alpha releases will test as being newer than the more recent
+stable release, and less than the next stable release.  For example:
 
   $alphaver = new version "12.3_1"; # must quote
 
