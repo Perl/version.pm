@@ -4,14 +4,23 @@
 
 #########################
 
-use Test::More tests => 151;
+use Test::More tests => 150;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
+
+use_ok("version"); # If we made it this far, we are ok.
 BaseTests("version");
 
 diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 
-use_ok("version::Empty"); 
+package version::Empty;
+use vars qw($VERSION @ISA);
+use Exporter;
+use version 0.30;
+@ISA = qw(Exporter version);
+$VERSION = 0.01;
+
+package main;
 my $testobj = new version::Empty 1.002_003;
 isa_ok( $testobj, "version::Empty" );
 ok( $testobj->numify == 1.002003, "Numified correctly" );
@@ -19,12 +28,12 @@ ok( $testobj->stringify eq "1.2.3", "Stringified correctly" );
 
 my $verobj = new version "1.2.4";
 ok( $verobj > $testobj, "Comparison vs parent class" );
+ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");
 
 sub BaseTests {
 
 	my $CLASS = shift;
-	use_ok($CLASS); # If we made it this far, we are ok.
 	
 	# Insert your test code below, the Test module is use()ed here so read
 	# its man page ( perldoc Test ) for help writing this test script.
@@ -34,19 +43,19 @@ sub BaseTests {
 	$version = new $CLASS 5.005_03;
 	is ( "$version" , "5.5.30" , '5.005_03 eq 5.5.30' );
 	$version = new $CLASS 1.23;
-	is ( "$version" , "1.230" , '1.23 eq "1.230"' );
+	is ( "$version" , "1.230.0" , '1.23 eq "1.230.0"' );
 	
 	# Test quoted number processing
 	diag "tests with quoted numbers" unless $ENV{PERL_CORE};
 	$version = new $CLASS "5.005_03";
 	is ( "$version" , "5.5_3" , '"5.005_03" eq "5.5_3"' );
 	$version = new $CLASS "v1.23";
-	is ( "$version" , "1.23" , '"v1.23" eq "1.23"' );
+	is ( "$version" , "1.23.0" , '"v1.23" eq "1.23.0"' );
 	
 	# Test stringify operator
 	diag "tests with stringify" unless $ENV{PERL_CORE};
 	$version = new $CLASS "5.005";
-	is ( "$version" , "5.5" , '5.005 eq 5.5' );
+	is ( "$version" , "5.5.0" , '5.005 eq 5.5' );
 	$version = new $CLASS "5.006.001";
 	is ( "$version" , "5.6.1" , '5.006.001 eq 5.6.1' );
 	$version = new $CLASS "1.2.3_4";
@@ -63,7 +72,7 @@ sub BaseTests {
 	    "Invalid version format (underscores before decimal)");
 	
 	$version = new $CLASS "99 and 44/100 pure";
-	ok ("$version" eq "99.0", '$version eq "99.0"');
+	ok ("$version" eq "99.0.0", '$version eq "99.0.0"');
 	ok ($version->numify == 99.0, '$version->numify == 99.0');
 	
 	$version = new $CLASS "something";
@@ -190,8 +199,8 @@ sub BaseTests {
 	
 	# that which is not expressly permitted is forbidden
 	diag "forbidden operations" unless $ENV{PERL_CORE};
-	ok ( !eval { $version++ }, "noop ++" );
-	ok ( !eval { $version-- }, "noop --" );
+	ok ( !eval { ++$version }, "noop ++" );
+	ok ( !eval { --$version }, "noop --" );
 	ok ( !eval { $version/1 }, "noop /" );
 	ok ( !eval { $version*3 }, "noop *" );
 	ok ( !eval { abs($version) }, "noop abs" );

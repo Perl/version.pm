@@ -255,8 +255,12 @@ Perl_vstringify(pTHX_ SV *vs)
 	else
 	    Perl_sv_catpvf(aTHX_ sv,".%"IVdf,(IV)digit);
     }
-    if ( len == 0 )
-	 Perl_sv_catpv(aTHX_ sv,".0");
+    
+    if ( len <= 2 ) { /* short version, must be at least three */
+	for ( len = 2 - len; len != 0; len-- )
+	    Perl_sv_catpv(aTHX_ sv,".0");
+    }
+
     return sv;
 } 
 

@@ -4,12 +4,11 @@ MANIFEST
 README
 t/01base.t
 t/02AlphaBeta.t
-t/03emptyclass.t
-t/basetests.inc
 lib/version.pm
 lib/version/AlphaBeta.pm
 lib/version/Empty.pm
 version.xs
 util.c
 util.h
+ppport.h
 typemap
