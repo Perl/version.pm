@@ -89,7 +89,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
 		break;
 	    }
 	    while ( isDIGIT(*pos) ) {
-		if ( saw_period == 1 && pos-s == 3 )
+		if ( !saw_under && saw_period == 1 && pos-s == 3 )
 		    break;
 		pos++;
 	    }
@@ -215,6 +215,7 @@ Perl_vstringify(pTHX_ SV *vs)
     if ( SvROK(vs) )
 	vs = SvRV(vs);
     len = av_len((AV *)vs);
+    sv_dump(vs);
     if ( len == -1 )
     {
 	Perl_sv_catpv(aTHX_ sv,"");

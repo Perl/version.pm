@@ -9,10 +9,11 @@ use vars qw(@ISA $VERSION $CLASS);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = (qw$Revision: 2.2 $)[1]/10;
+$VERSION = (qw$Revision: 2.3 $)[1]/10;
 
 $CLASS = 'version';
 
+local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
 bootstrap version if $] < 5.009;
 
 # Preloaded methods go here.
@@ -44,7 +45,7 @@ version - Perl extension for Version Objects
 =head1 DESCRIPTION
 
 Overloaded version objects for all versions of Perl.  This module
-implments all of the features of version objects which will be part
+implements all of the features of version objects which will be part
 of Perl 5.10.0 except automatic v-string handling.  See L<"Quoting">.
 
 =head2 What IS a version
@@ -57,8 +58,8 @@ in the various editions of the Camel book.
 
 However, in order to be compatible with earlier Perl version styles,
 any use of versions of the form 5.006001 will be translated as 5.6.1,
-In other words a version with a single decimal place will be parsed
-as implicitely having three places between subversion.
+In other words, a version with a single decimal place will be parsed
+as implicitly having three places between subversion.
 
 Any value passed to the new() operator will be parsed only so far as it
 contains a numeric, decimal, or underscore character.  So, for example:
@@ -102,8 +103,8 @@ same comparison between terms (upgrading to a version object
 automatically).  Perl automatically generates all of the other comparison
 operators based on those two.  For example, the following relations hold:
 
-  As Number       As String       Truth Value
-  ---------       ------------    -----------
+  As Number       As String          Truth Value
+  ---------       ------------       -----------
   $ver >  1.0     $ver gt "1.0"      true
   $ver <  2.5     $ver lt            true
   $ver != 1.3     $ver ne "1.3"      true
@@ -119,7 +120,7 @@ for more discussion of this topic.  In the case of the last two lines of
 the table above, only the string comparison will be true; the numerical
 comparison will test false.  However, you can do this:
 
-  $ver == "1.2.3" or $ver = "v.1.2.3"	# both true
+  $ver == "1.2.3" or $ver == "v1.2.3"	# both true
 
 even though you are doing a "numeric" comparison with a "string" value.
 It is probably best to chose either the numeric notation or the string 
@@ -166,8 +167,8 @@ There are three basic types of Version Objects:
 modules will use.  Can contain as many subversions as required.
 In particular, those using RCS/CVS can use one of the following:
 
-  $VERSION = new version (qw$Revision: 2.2 $)[1]; # all Perls
-  $VERSION = new version qw$Revision: 2.2 $[1];   # Perl >= 5.6.0
+  $VERSION = new version (qw$Revision: 2.3 $)[1]; # all Perls
+  $VERSION = new version qw$Revision: 2.3 $[1];   # Perl >= 5.6.0
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the
@@ -206,7 +207,7 @@ released with Perl 5.6.0.  As an example:
 
 is interpreted, not as a beta release, but as the version 5.5.30,  NOTE
 that the major and minor versions are unchanged but the subversion is
-multiplied by 10, since the above was implicitely read as 5.005.030.
+multiplied by 10, since the above was implicitly read as 5.005.030.
 There are modules currently on CPAN which may fall under of this rule, so
 module authors are urged to pay close attention to what version they are
 specifying.

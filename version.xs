@@ -4,7 +4,7 @@
 #include "util.h"
 
 /* --------------------------------------------------
- * $Revision: 2.0 $
+ * $Revision: 2.1 $
  * --------------------------------------------------*/
 
 typedef     SV *version;
@@ -94,7 +94,7 @@ noop(lobj,...)
     version		lobj
 CODE:
 {
-    croak("operation not supported with version object");
+    Perl_croak("operation not supported with version object");
 }
 
 void
