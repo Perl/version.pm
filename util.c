@@ -145,23 +145,26 @@ Perl_upg_version(pTHX_ SV *ver)
 /*
 =for apidoc vnumify
 
-Accepts a version (or vstring) object and returns the
-normalized floating point representation.  Call like:
+Accepts a version object and returns the normalized floating
+point representation.  Call like:
 
-    sv = vnumify(sv,SvRV(rv));
+    sv = vnumify(rv);
 
-NOTE: no checking is done to see if the object is of the
-correct type (for speed).
+NOTE: you can pass either the object directly or the SV
+contained within the RV.
 
 =cut
 */
 
 SV *
-Perl_vnumify(pTHX_ SV *sv, SV *vs)
+Perl_vnumify(pTHX_ SV *vs)
 {
-    I32 i;
-    I32 len = av_len((AV *)vs);
-    I32 digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
+    I32 i, len, digit;
+    SV *sv = NEWSV(92,0);
+    if ( SvROK(vs) )
+	vs = SvRV(vs);
+    len = av_len((AV *)vs);
+    digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
     Perl_sv_setpvf(aTHX_ sv,"%d.",abs(digit));
     for ( i = 1 ; i <= len ; i++ )
     {
@@ -176,23 +179,26 @@ Perl_vnumify(pTHX_ SV *sv, SV *vs)
 /*
 =for apidoc vstringify
 
-Accepts a version (or vstring) object and returns the
-normalized representation.  Call like:
+Accepts a version object and returns the normalized string
+representation.  Call like:
 
-    sv = vstringify(sv,SvRV(rv));
+    sv = vstringify(rv);
 
-NOTE: no checking is done to see if the object is of the
-correct type (for speed).
+NOTE: you can pass either the object directly or the SV
+contained within the RV.
 
 =cut
 */
 
 SV *
-Perl_vstringify(pTHX_ SV *sv, SV *vs)
+Perl_vstringify(pTHX_ SV *vs)
 {
-    I32 i;
-    I32 len = av_len((AV *)vs);
-    I32 digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
+    I32 i, len, digit;
+    SV *sv = NEWSV(92,0);
+    if ( SvROK(vs) )
+	vs = SvRV(vs);
+    len = av_len((AV *)vs);
+    digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
     Perl_sv_setpvf(aTHX_ sv,"%d",digit);
     for ( i = 1 ; i <= len ; i++ )
     {
@@ -211,8 +217,7 @@ Perl_vstringify(pTHX_ SV *sv, SV *vs)
 =for apidoc vcmp
 
 Version object aware cmp.  Both operands must already have been 
-converted into version objects and passed as SV's already extracted
-from the RV object.  XS_version_vcmp takes care of this already.
+converted into version objects.
 
 =cut
 */
@@ -220,11 +225,16 @@ from the RV object.  XS_version_vcmp takes care of this already.
 int
 Perl_vcmp(pTHX_ SV *lsv, SV *rsv)
 {
-    I32 l = av_len((AV *)lsv);
-    I32 r = av_len((AV *)rsv);
-    I32 m = l < r ? l : r;
-    I32 retval = 0;
-    I32 i = 0;
+    I32 i,l,m,r,retval;
+    if ( SvROK(lsv) )
+	lsv = SvRV(lsv);
+    if ( SvROK(rsv) )
+	rsv = SvRV(rsv);
+    l = av_len((AV *)lsv);
+    r = av_len((AV *)rsv);
+    m = l < r ? l : r;
+    retval = 0;
+    i = 0;
     while ( i <= m && retval == 0 )
     {
 	I32 left  = SvIV(*av_fetch((AV *)lsv,i,0));

@@ -4,7 +4,7 @@
 #include "util.h"
 
 /* --------------------------------------------------
- * $Revision: 1.8 $
+ * $Revision: 1.9 $
  * --------------------------------------------------*/
 
 typedef     SV *version;
@@ -40,14 +40,7 @@ stringify (lobj,...)
     version		lobj
 PPCODE:
 {
-    SV  *vs = NEWSV(92,5);
-#ifdef SvVOK
-    if ( lobj == SvRV(PL_patchlevel) )
-	sv_setsv(vs,lobj);
-    else
-#endif
-	vstringify(vs,lobj);
-    PUSHs(vs);
+    PUSHs(vstringify(lobj));
 }
 
 void
@@ -55,9 +48,7 @@ numify (lobj,...)
     version		lobj
 PPCODE:
 {
-    SV  *vs = NEWSV(92,5);
-    vnumify(vs,lobj);
-    PUSHs(vs);
+    PUSHs(vnumify(lobj));
 }
 
 void
@@ -161,7 +152,7 @@ PPCODE:
 	if ( !sv_derived_from(req, "version"))
 	    req = new_version(req); /* req is R/O so we gave to use new */
 
-	if ( vcmp( SvRV(req), SvRV(sv) ) > 0 )
+	if ( vcmp( req, sv ) > 0 )
 	    Perl_croak(aTHX_ "%s version %s required--this is only version %s",
 		       HvNAME(pkg), SvPV(req,PL_na), SvPV(sv,PL_na));
     }

@@ -22,7 +22,7 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION $CLASS);
 @EXPORT = qw(
 );
 
-$VERSION = (qw$Revision: 1.8 $)[1]/10;
+$VERSION = (qw$Revision: 1.9 $)[1]/10;
 
 $CLASS = 'version';
 
@@ -65,7 +65,7 @@ of Perl 5.10.0 except automatic v-string handling.  See L<"Quoting">.
 For the purposes of this module, a version "number" is a sequence of
 positive integral values separated by decimal points and optionally a
 single underscore.  This corresponds to what Perl itself uses for a
-version, as well as including the "version as number" that is discussed
+version, as well as extending the "version as number" that is discussed
 in the various editions of the Camel book.
 
 =head2 Object Methods
@@ -163,8 +163,8 @@ There are three basic types of Version Objects:
 modules will use.  Can contain as many subversions as required.
 In particular, those using RCS/CVS can use one of the following:
 
-  $VERSION = new version (qw$Revision: 1.8 $)[1]; # all Perls
-  $VERSION = new version qw$Revision: 1.8 $[1];   # Perl >= 5.6.0
+  $VERSION = new version (qw$Revision: 1.9 $)[1]; # all Perls
+  $VERSION = new version qw$Revision: 1.9 $[1];   # Perl >= 5.6.0
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the
