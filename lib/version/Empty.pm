@@ -7,6 +7,6 @@ use version 0.30;
 
 @ISA = qw(Exporter version);
 
-$VERSION = new version 0.01;
+$VERSION = 0.01;
 
 1;

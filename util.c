@@ -9,7 +9,7 @@ an RV.
 
 Function must be called with an already existing SV like
 
-    sv = NEWSV(92,0);
+    sv = newSV(0);
     s = scan_version(s,sv);
 
 Performs some preprocessing to the string to ensure that
@@ -77,7 +77,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
  			orev = rev;
  			rev += (*s - '0') * mult;
  			mult /= 10;
- 			if ( abs(orev) > abs(rev) )
+ 			if ( PERL_ABS(orev) > PERL_ABS(rev) )
  			    Perl_croak(aTHX_ "Integer overflow in version");
  			s++;
  		    }
@@ -87,7 +87,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
  			orev = rev;
  			rev += (*end - '0') * mult;
  			mult *= 10;
- 			if ( abs(orev) > abs(rev) )
+ 			if ( PERL_ABS(orev) > PERL_ABS(rev) )
  			    Perl_croak(aTHX_ "Integer overflow in version");
  		    }
  		} 
@@ -196,7 +196,7 @@ SV *
 Perl_vnumify(pTHX_ SV *vs)
 {
     I32 i, len, digit;
-    SV *sv = NEWSV(92,0);
+    SV *sv = newSV(0);
     if ( SvROK(vs) )
 	vs = SvRV(vs);
     len = av_len((AV *)vs);
@@ -206,11 +206,11 @@ Perl_vnumify(pTHX_ SV *vs)
 	return sv;
     }
     digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv,"%d.",abs(digit));
+    Perl_sv_setpvf(aTHX_ sv,"%d.", PERL_ABS(digit));
     for ( i = 1 ; i <= len ; i++ )
     {
 	digit = SvIVX(*av_fetch((AV *)vs, i, 0));
-	Perl_sv_catpvf(aTHX_ sv,"%03d",abs(digit));
+	Perl_sv_catpvf(aTHX_ sv,"%03d", PERL_ABS(digit));
     }
     if ( len == 0 )
 	 Perl_sv_catpv(aTHX_ sv,"000");
@@ -236,7 +236,7 @@ SV *
 Perl_vstringify(pTHX_ SV *vs)
 {
     I32 i, len, digit;
-    SV *sv = NEWSV(92,0);
+    SV *sv = newSV(0);
     if ( SvROK(vs) )
 	vs = SvRV(vs);
     len = av_len((AV *)vs);
@@ -246,14 +246,14 @@ Perl_vstringify(pTHX_ SV *vs)
 	return sv;
     }
     digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv,"%d",digit);
+    Perl_sv_setpvf(aTHX_ sv,"%"IVdf,(IV)digit);
     for ( i = 1 ; i <= len ; i++ )
     {
 	digit = SvIVX(*av_fetch((AV *)vs, i, 0));
 	if ( digit < 0 )
-	    Perl_sv_catpvf(aTHX_ sv,"_%d",-digit);
+	    Perl_sv_catpvf(aTHX_ sv,"_%"IVdf,(IV)-digit);
 	else
-	    Perl_sv_catpvf(aTHX_ sv,".%d",digit);
+	    Perl_sv_catpvf(aTHX_ sv,".%"IVdf,(IV)digit);
     }
     if ( len == 0 )
 	 Perl_sv_catpv(aTHX_ sv,".0");

@@ -87,7 +87,7 @@ PPCODE:
         rs = newSViv(vcmp(lobj,rvs));
     }
 
-    PUSHs(rs);
+    PUSHs(sv_2mortal(rs));
 }
 
 void
@@ -97,7 +97,7 @@ PPCODE:
 {
     SV	*rs;
     rs = newSViv( vcmp(lobj,new_version(newSVpvn("0",1))) );
-    PUSHs(rs);
+    PUSHs(sv_2mortal(rs));
 }
 
 void
@@ -172,7 +172,7 @@ PPCODE:
 	    upg_version(sv);
 
 	if ( !sv_derived_from(req, "version"))
-	    req = new_version(req); /* req is R/O so we gave to use new */
+	    req = new_version(req); /* req is R/O so we have to use new */
 
 	if ( vcmp( req, sv ) > 0 )
 	    Perl_croak(aTHX_ "%s version %_ required--this is only version %_",
