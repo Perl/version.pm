@@ -7,3 +7,4 @@ version.pm
 version.xs
 util.c
 util.h
+typemap

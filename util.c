@@ -3,17 +3,36 @@
 #include "XSUB.h"
 #include "util.h"
 
+/*
+=for apidoc scan_version
+
+Returns a pointer to the next character after the parsed
+version string, as well as upgrading the passed in SV to
+an RV.
+
+Function must be called with an already existing SV like
+
+    sv = NEWSV(92,0);
+    s = scan_version(s,sv);
+
+Performs some preprocessing to the string to ensure that
+it has the correct characteristics of a version.  Flags the
+object if it contains an underscore (which denotes this
+is a beta version).
+
+=cut
+*/
 char *
 scan_version(pTHX_ char *s, SV *rv)
 {
     char *pos = s;
-    char *start = s;
-    AV* av = (AV *)newSVrv(rv, "version"); /* create an SV and upgrade the RV */
-    if ( SvTYPE(av) != SVt_PVAV )	/* it's not really an AV yet */
-	SvUPGRADE((SV *)av, SVt_PVAV);
+    bool saw_period = 0;
+    bool saw_under  = 0;
+    SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
+    SvUPGRADE(sv, SVt_PVAV); /* needs to be an AV type */
 
     if (*pos == 'v') pos++;  /* get past 'v' */
-    while (isDIGIT(*pos) || *pos == '_')
+    while (isDIGIT(*pos))
     pos++;
     if (!isALPHA(*pos)) {
 	I32 rev;
@@ -38,14 +57,14 @@ scan_version(pTHX_ char *s, SV *rv)
 		    orev = rev;
 		    rev += (*end - '0') * mult;
 		    mult *= 10;
-/*		    if (orev > rev && ckWARN_d(WARN_OVERFLOW))
-			Perl_warner(aTHX_ packWARN(WARN_OVERFLOW),
-				    "Integer overflow in decimal number"); */
+		    if (abs(orev) > abs(rev) && ckWARN_d(WARN_OVERFLOW))
+			Perl_warner(aTHX_ WARN_OVERFLOW,
+				    "Integer overflow in decimal number"); 
 		}
 	    }
 
 	    /* Append revision */
-	    av_push(av, newSViv(rev));
+	    av_push((AV *)sv, newSViv(rev));
 	    if ( (*pos == '.' || *pos == '_') && isDIGIT(pos[1]))
 		 s = ++pos;
 	    else {
@@ -54,69 +73,21 @@ scan_version(pTHX_ char *s, SV *rv)
 	    }
 	    while ( isDIGIT(*pos) )
 		 pos++;
+	    if ( *pos == '.' )
+	    {
+		if ( saw_under )
+		    Perl_croak(aTHX_ "Invalid version format (underscores before decimal)");
+		saw_period = 1;
+	    }
+	    else if ( *pos == '_' )
+	    {
+		if ( saw_under )
+		    Perl_croak(aTHX_ "Invalid version format (multiple underscores)");
+		saw_under = 1;
+	    }
 	}
     }
     return s;
-}
-
-/*
-=for apidoc scan_version
-
-Returns a pointer to the next character after the parsed
-version string, as well as upgrading the passed in SV to
-an RV.
-
-Function must be called with an already existing SV like
-
-    sv = NEWSV(92,0);
-    s = scan_version(s,sv);
-
-Performs some preprocessing to the string to ensure that
-it has the correct characteristics of a version.  Flags the
-object if it contains an underscore (which denotes this
-is a beta version).
-
-=cut
-*/
-
-char *
-scan_version2(pTHX_ char *version, SV *rv)
-{
-    char* d;
-    int beta = 0;
-    SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
-    d = version;
-    if (*d == 'v')
-	d++;
-    if (isDIGIT(*d)) {
-	while (isDIGIT(*d) || *d == '.' || *d == '\0')
-	    d++;
-	if (*d == '_') {
-	    *d = '.';
-	    if (*(d+1) == '0' && *(d+2) != '0') { /* perl-style version */
-		*(d+1) = *(d+2);
-		*(d+2) = '0';
-/*		if (ckWARN(WARN_PORTABLE))
-		    Perl_warner(aTHX_ packWARN(WARN_PORTABLE),
-				"perl-style version not portable"); */
-	    }
-	    else {
-		beta = -1;
-	    }
-	}
-	while (isDIGIT(*d) || *d == '.' || *d == '\0')
-	    d++;
-	if (*d == '_')
-	    Perl_croak(aTHX_ "Invalid version format (multiple underscores)");
-    }
-/*    version = scan_vstring(version, sv);*/ /* store the v-string in the object */
-    if ( beta < 0 )
-    {
-	SV *last = (SV *)av_fetch((AV *)sv,av_len((AV *)sv),0);
-	SvIVX(last) *= -1;
-	av_store((AV *)sv,av_len((AV *)sv),last);
-    }
-    return version;
 }
 
 /*
@@ -136,15 +107,14 @@ SV *
 new_version(pTHX_ SV *ver)
 {
     SV *rv = NEWSV(92,5);
-    char *version;
+    char *version = (char *)SvPV_nolen(ver);
 
-    if ( SvMAGICAL(ver) ) { /* already a v-string */
+#ifdef SvVOK
+    if ( SvVOK(ver) ) { /* already a v-string */
 	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
 	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
     }
-    else {
-	version = (char *)SvPV_nolen(ver);
-    }
+#endif
     version = scan_version(version,rv);
     return rv;
 }
@@ -165,11 +135,14 @@ SV *
 upg_version(pTHX_ SV *sv)
 {
     char *version = (char *)SvPV_nolen(sv_mortalcopy(sv));
+#ifdef SvVOK
     if ( SvVOK(sv) ) { /* already a v-string */
 	SV * ver = newSVrv(sv, "version");
 	sv_setpv(ver,version);
     }
-    else {
+    else
+#endif
+    {
 	version = scan_version(version,sv);
     }
     return sv;
@@ -202,6 +175,8 @@ vnumify(pTHX_ SV *sv, SV *vs)
 	digit = SvIVX(*av_fetch((AV *)vs, i, 0));
 	Perl_sv_catpvf(aTHX_ sv,"%03d",abs(digit));
     }
+    if ( len == 0 )
+	 Perl_sv_catpv(aTHX_ sv,"000");
     return sv;
 }
 
@@ -234,6 +209,8 @@ vstringify(pTHX_ SV *sv, SV *vs)
 	else
 	    Perl_sv_catpvf(aTHX_ sv,".%d",digit);
     }
+    if ( len == 0 )
+	 Perl_sv_catpv(aTHX_ sv,".0");
     return sv;
 } 
 
@@ -246,17 +223,17 @@ Version object aware cmp
 */
 
 int
-vcmp(pTHX_ AV *lsv, AV *rsv)
+vcmp(pTHX_ SV *lsv, SV *rsv)
 {
-    I32 l = av_len(lsv);
-    I32 r = av_len(rsv);
+    I32 l = av_len((AV *)lsv);
+    I32 r = av_len((AV *)rsv);
     I32 m = l < r ? l : r;
     I32 retval = 0;
     I32 i = 0;
     while ( i <= m && retval == 0 )
     {
-	I32 left  = abs( SvIV((SV *)av_fetch(lsv,i,0)) );
-	I32 right = abs( SvIV((SV *)av_fetch(rsv,i,0)) );
+	I32 left  = abs( SvIV(*av_fetch((AV *)lsv,i,0)) );
+	I32 right = abs( SvIV(*av_fetch((AV *)rsv,i,0)) );
 	if ( left < right )
 	    retval = -1;
 	if ( left > right )
@@ -268,5 +245,3 @@ vcmp(pTHX_ AV *lsv, AV *rsv)
 	retval = l < r ? -1 : +1;
     return retval;
 }
-
-

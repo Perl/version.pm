@@ -4,7 +4,7 @@
 #include "util.h"
 
 /* --------------------------------------------------
- * $Revision: 1.3 $
+ * $Revision: 1.4 $
  * --------------------------------------------------*/
 
 typedef     SV *version;
@@ -41,9 +41,11 @@ stringify (lobj,...)
 PPCODE:
 {
     SV  *vs = NEWSV(92,5);
+#ifdef PERL_MAGIC_vstring
     if ( lobj == SvRV(PL_patchlevel) )
 	sv_setsv(vs,lobj);
     else
+#endif
 	vstringify(vs,lobj);
     PUSHs(vs);
 }
@@ -76,11 +78,11 @@ PPCODE:
 
     if ( swap )
     {
-        rs = newSViv(vcmp((AV *)rvs,(AV *)lobj));
+        rs = newSViv(vcmp(rvs,lobj));
     }
     else
     {
-        rs = newSViv(vcmp((AV *)lobj,(AV *)rvs));
+        rs = newSViv(vcmp(lobj,rvs));
     }
 
     PUSHs(rs);
@@ -92,7 +94,7 @@ boolean(lobj,...)
 PPCODE:
 {
     SV	*rs;
-    rs = newSViv(1);
+    rs = newSViv( vcmp(lobj,new_version(newSVpvn("0",1))) );
     PUSHs(rs);
 }
 
