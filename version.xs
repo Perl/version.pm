@@ -35,8 +35,9 @@ PPCODE:
     SV *rv;
     if (items == 3 )
     {
+	STRLEN n_a;
 	vs = sv_newmortal();
-	sv_setpvf(vs,"v%s",SvPV_nolen(ST(2)));
+	sv_setpvf(vs,"v%s",SvPV(ST(2),n_a));
     }
 
     rv = new_version(vs);
@@ -126,22 +127,41 @@ qv(ver)
     SV *ver
 PPCODE:
 {
-    SV *vs = sv_newmortal();
-    char *version;
-    if ( SvNOK(ver) ) /* may get too much accuracy */
-    {
-	char tbuf[64];
-	sprintf(tbuf,"%.9"NVgf, SvNVX(ver));
-	version = savepv(tbuf);
+#ifdef SvVOK
+    if ( !SvVOK(ver) ) { /* not already a v-string */
+#endif
+	SV *vs = sv_newmortal();
+	char *version;
+	if ( SvNOK(ver) ) /* may get too much accuracy */
+	{
+	    char tbuf[64];
+	    sprintf(tbuf,"%.9"NVgf, SvNVX(ver));
+	    version = savepv(tbuf);
+	}
+	else
+	{
+	    STRLEN n_a;
+	    version = savepv(SvPV(ver,n_a));
+	}
+	(void)scan_version(version,vs,TRUE);
+	Safefree(version);
+
+	PUSHs(vs);
+#ifdef SvVOK
     }
     else
     {
-	version = savepv(SvPV_nolen(ver));
+	PUSHs(sv_2mortal(new_version(ver)));
     }
-    (void)scan_version(version,vs,TRUE);
-    Safefree(version);
+#endif
+}
 
-    PUSHs(vs);
+void
+normal(ver)
+    SV *ver
+PPCODE:
+{
+    PUSHs(sv_2mortal(vnormal(ver)));
 }
 
 void
@@ -203,11 +223,15 @@ PPCODE:
 	}
 
 	if ( vcmp( req, sv ) > 0 )
-	    Perl_croak(aTHX_ "%s version %_ required--this is only version %_",
-		       HvNAME(pkg), req, sv);
+	    Perl_croak(aTHX_ "%s version %"SVf" (%"SVf") required--"
+		    "this is only version %"SVf" (%"SVf")", HvNAME(pkg),
+		    vnumify(req),vnormal(req),vnumify(sv),vnormal(sv));
     }
 
-    PUSHs(sv);
+    if ( sv_derived_from(sv, "version") )
+	PUSHs(vnumify(sv));
+    else
+	PUSHs(sv);
 
     XSRETURN(1);
 }

@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 156;
+use Test::More tests => 168;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
@@ -16,7 +16,7 @@ diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 package version::Empty;
 use vars qw($VERSION @ISA);
 use Exporter;
-use version 0.32;
+use version 0.30;
 @ISA = qw(Exporter version);
 $VERSION = 0.01;
 
@@ -43,19 +43,19 @@ sub BaseTests {
 	$version = $CLASS->new(5.005_03);
 	is ( "$version" , "5.5.30" , '5.005_03 eq 5.5.30' );
 	$version = $CLASS->new(1.23);
-	is ( "$version" , "1.23.0" , '1.23 eq "1.23.0" CPAN-style' );
+	is ( "$version" , "1.230" , '1.23 eq "1.230"' );
 	
 	# Test quoted number processing
 	diag "tests with quoted numbers" unless $ENV{PERL_CORE};
 	$version = $CLASS->new("5.005_03");
-	is ( "$version" , "5.5_3" , '"5.005_03" eq "5.5_3"' );
+	is ( "$version" , "5.5_30" , '"5.005_03" eq "5.5_30"' );
 	$version = $CLASS->new("v1.23");
 	is ( "$version" , "1.23.0" , '"v1.23" eq "1.23.0"' );
 	
 	# Test stringify operator
 	diag "tests with stringify" unless $ENV{PERL_CORE};
 	$version = $CLASS->new("5.005");
-	is ( "$version" , "5.5.0" , '5.005 eq 5.5' );
+	is ( "$version" , "5.005" , '5.005 eq "5.005"' );
 	$version = $CLASS->new("5.006.001");
 	is ( "$version" , "5.6.1" , '5.006.001 eq 5.6.1' );
 	$version = $CLASS->new("1.2.3_4");
@@ -72,7 +72,7 @@ sub BaseTests {
 	    "Invalid version format (underscores before decimal)");
 	
 	$version = $CLASS->new("99 and 44/100 pure");
-	ok ("$version" eq "99.0.0", '$version eq "99.0.0"');
+	ok ("$version" eq "99.000", '$version eq "99.000"');
 	ok ($version->numify == 99.0, '$version->numify == 99.0');
 	
 	$version = $CLASS->new("something");
@@ -177,22 +177,22 @@ sub BaseTests {
 	ok ( $new_version < $version, '$new_version < $version' );
 	ok ( $version != $new_version, '$version != $new_version' );
 	
-	$version = $CLASS->new("1.2.4");
-	$new_version = $CLASS->new("1.2_4");
+	$version = $CLASS->new("1.2.3.4");
+	$new_version = $CLASS->new("1.2.3_4");
 	diag "tests with alpha-style objects with same subversion" unless $ENV{PERL_CORE};
 	ok ( $version > $new_version, '$version > $new_version' );
 	ok ( $new_version < $version, '$new_version < $version' );
 	ok ( $version != $new_version, '$version != $new_version' );
 	
 	diag "test implicit [in]equality" unless $ENV{PERL_CORE};
-	$version = $CLASS->new("v1.2");
-	$new_version = $CLASS->new("1.2.0");
+	$version = $CLASS->new("v1.2.3");
+	$new_version = $CLASS->new("1.2.3.0");
 	ok ( $version == $new_version, '$version == $new_version' );
-	$new_version = $CLASS->new("1.2_0");
+	$new_version = $CLASS->new("1.2.3_0");
 	ok ( $version == $new_version, '$version == $new_version' );
-	$new_version = $CLASS->new("1.2.1");
+	$new_version = $CLASS->new("1.2.3.1");
 	ok ( $version < $new_version, '$version < $new_version' );
-	$new_version = $CLASS->new("1.2_1");
+	$new_version = $CLASS->new("1.2.3_1");
 	ok ( $version < $new_version, '$version < $new_version' );
 	$new_version = $CLASS->new("1.1.999");
 	ok ( $version > $new_version, '$version > $new_version' );
@@ -212,8 +212,14 @@ sub BaseTests {
 	$version = qv(1.2);
 	ok ( $version eq "1.2.0", 'qv(1.2) eq "1.2.0"' );
 
+	# test creation from existing version object
+	diag "create new from existing version" unless $ENV{PERL_CORE};
+	ok (eval {$new_version = version->new($version)},
+		"new from existing object");
+	ok ($new_version == $version, "duped object identical");
+
 	# test the CVS revision mode
-	diag "testing CVS Revision";
+	diag "testing CVS Revision" unless $ENV{PERL_CORE};
 	$version = new version qw$Revision: 1.2$;
 	ok ( $version eq "1.2.0", 'qw$Revision: 1.2$ eq 1.2.0' );
 	
@@ -221,27 +227,38 @@ sub BaseTests {
 	diag "Replacement UNIVERSAL::VERSION tests" unless $ENV{PERL_CORE};
 	
 	# we know this file is here since we require it ourselves
-	$version = $CLASS->new( $Test::More::VERSION );
+	$version = $Test::More::VERSION;
 	eval "use Test::More $version";
-	unlike($@, qr/Test::More version $version required/,
+	unlike($@, qr/Test::More version $version/,
 		'Replacement eval works with exact version');
 	
-	$version = $CLASS->new( $Test::More::VERSION+0.01 ); # this should fail even with old UNIVERSAL::VERSION
-	my $testeval = "use Test::More ".
-	(	$]<5.6	? $version->numify() #why is this a problem???
-			: $version );
-	eval $testeval;
-	like($@, qr/Test::More version $version required/,
+	$version = $Test::More::VERSION+0.01; # this should fail even with old UNIVERSAL::VERSION
+	eval "use Test::More $version";
+	like($@, qr/Test::More version $version/,
 		'Replacement eval works with incremented version');
 	
-	$version =~ s/...$//; #convert to string and remove trailing '.0'
+	$version =~ s/\.0$//; #convert to string and remove trailing '.0'
 	chop($version);	# shorten by 1 digit, should still succeed
 	eval "use Test::More $version";
-	unlike($@, qr/Test::More version $version required/,
+	unlike($@, qr/Test::More version $version/,
 		'Replacement eval works with single digit');
 	
 	$version += 0.1; # this would fail with old UNIVERSAL::VERSION
 	eval "use Test::More $version";
-	unlike($@, qr/Test::More version $version required/,
+	like($@, qr/Test::More version $version/,
 		'Replacement eval works with incremented digit');
+	
+SKIP: 	{
+	    skip 'Cannot test v-strings with Perl < 5.8.1', 4
+		    if $] < 5.008_001; 
+	    diag "Tests with v-strings" unless $ENV{PERL_CORE};
+	    $version = $CLASS->new(1.2.3);
+	    ok("$version" eq "1.2.3", '"$version" eq 1.2.3');
+	    $version = $CLASS->new(1.0.0);
+	    $new_version = $CLASS->new(1);
+	    ok($version == $new_version, '$version == $new_version');
+	    ok($version eq $new_version, '$version eq $new_version');
+	    $version = qv(1.2.3);
+	    ok("$version" eq "1.2.3", 'v-string initialized qv()');
+	}
 }

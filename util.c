@@ -29,8 +29,8 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
     char *pos = s;
     I32 saw_period = 0;
     bool saw_under = 0;
-    AV* av = (AV *)newSVrv(rv, "version"); /* create an SV and upgrade the RV */
-    (void)sv_upgrade((SV *)av, SVt_PVAV); /* needs to be an AV type */
+    SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
+    (void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
 
     /* pre-scan the imput string to check for decimals */
     while ( *pos == '.' || *pos == '_' || isDIGIT(*pos) )
@@ -76,18 +76,8 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 		 * point of a version originally created with a bare
 		 * floating point number, i.e. not quoted in any way
 		 */
- 		if ( !qv && s > start+1 && saw_period == 1 && !saw_under ) {
-		    /* Test for whether this is the second term and whether
-		     * the subsequent digits are exactly two, which
-		     * triggers the special CPAN version processing.  This
-		     * will not trigger for the Perl version 5.005_03,
-		     * which should be interpreted at 5.5.30, not 5.5.3.
-		     */
-		    if ( (av_len(av) == 0 ) && ( end - s == 2 ) )
-			mult = 10;   /* CPAN-style */
-		    else
-			mult = 100;  /* Perl-style */
-
+ 		if ( !qv && s > start+1 && saw_period == 1 ) {
+		    mult *= 100;
  		    while ( s < end ) {
  			orev = rev;
  			rev += (*s - '0') * mult;
@@ -109,7 +99,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
   	    }
   
   	    /* Append revision */
-	    av_push(av, newSViv(rev));
+	    av_push((AV *)sv, newSViv(rev));
 	    if ( (*pos == '.' || *pos == '_') && isDIGIT(pos[1]))
 		s = ++pos;
 	    else if ( isDIGIT(*pos) )
@@ -119,11 +109,16 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 		break;
 	    }
 	    while ( isDIGIT(*pos) ) {
-		if ( !saw_under && saw_period == 1 && pos-s == 3 )
+		if ( saw_period == 1 && pos-s == 3 )
 		    break;
 		pos++;
 	    }
 	}
+    }
+    if ( qv ) { /* quoted versions always become full version objects */
+	I32 len = av_len((AV *)sv);
+	for ( len = 2 - len; len != 0; len-- )
+	    av_push((AV *)sv, newSViv(0));
     }
     return s;
 }
@@ -145,7 +140,33 @@ SV *
 Perl_new_version(pTHX_ SV *ver)
 {
     SV *rv = newSV(0);
+    if ( sv_derived_from(ver,"version") ) /* can just copy directly */
+    {
+	I32 key;
+	AV *av = (AV *)SvRV(ver);
+	SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
+	(void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
+	for ( key = 0; key <= av_len(av); key++ )
+	{
+	    I32 rev = SvIV(*av_fetch(av, key, FALSE));
+	    av_push((AV *)sv, newSViv(rev));
+	}
+	return rv;
+    }
+#ifdef SvVOK
+    if ( SvVOK(ver) ) { /* already a v-string */
+	char *version;
+	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
+	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
+	sv_setpv(rv,version);
+	Safefree(version);
+    }
+    else {
+#endif
     sv_setsv(rv,ver); /* make a duplicate */
+#ifdef SvVOK
+    }
+#endif
     upg_version(rv);
     return rv;
 }
@@ -183,7 +204,8 @@ Perl_upg_version(pTHX_ SV *ver)
 #endif
     else /* must be a string or something like a string */
     {
-	version = savepv(SvPV_nolen(ver));
+	STRLEN n_a;
+	version = savepv(SvPV(ver,n_a));
     }
     (void)scan_version(version, ver, qv);
     Safefree(version);
@@ -219,25 +241,35 @@ Perl_vnumify(pTHX_ SV *vs)
 	return sv;
     }
     digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv,"%d.", PERL_ABS(digit));
-    for ( i = 1 ; i <= len ; i++ )
+    Perl_sv_setpvf(aTHX_ sv,"%d.", (int)PERL_ABS(digit));
+    for ( i = 1 ; i < len ; i++ )
     {
 	digit = SvIVX(*av_fetch((AV *)vs, i, 0));
-	Perl_sv_catpvf(aTHX_ sv,"%03d", PERL_ABS(digit));
+	Perl_sv_catpvf(aTHX_ sv,"%03d", (int)PERL_ABS(digit));
     }
-    if ( len == 0 )
+    if ( len > 0 )
+    {
+	digit = SvIVX(*av_fetch((AV *)vs, len, 0));
+	if ( (int)PERL_ABS(digit) != 0 || len == 1 )
+	{
+	    /* Don't display additional trailing zeros */
+	    Perl_sv_catpvf(aTHX_ sv,"%03d", (int)PERL_ABS(digit));
+	}
+    }
+    else /* len == 0 */
+    {
 	 Perl_sv_catpv(aTHX_ sv,"000");
-    sv_setnv(sv, SvNV(sv));
+    }
     return sv;
 }
 
 /*
-=for apidoc vstringify
+=for apidoc vnormal
 
 Accepts a version object and returns the normalized string
 representation.  Call like:
 
-    sv = vstringify(rv);
+    sv = vnormal(rv);
 
 NOTE: you can pass either the object directly or the SV
 contained within the RV.
@@ -246,7 +278,7 @@ contained within the RV.
 */
 
 SV *
-Perl_vstringify(pTHX_ SV *vs)
+Perl_vnormal(pTHX_ SV *vs)
 {
     I32 i, len, digit;
     SV *sv = newSV(0);
@@ -276,6 +308,31 @@ Perl_vstringify(pTHX_ SV *vs)
 
     return sv;
 } 
+
+/*
+=for apidoc vstringify
+
+In order to maintain maximum compatibility with earlier versions
+of Perl, this function will return either the floating point
+notation or the multiple dotted notation, depending on whether
+the original version contained 1 or more dots, respectively
+
+=cut
+*/
+
+SV *
+Perl_vstringify(pTHX_ SV *vs)
+{
+    I32 i, len, digit;
+    if ( SvROK(vs) )
+	vs = SvRV(vs);
+    len = av_len((AV *)vs);
+    
+    if ( len < 2 )
+	return vnumify(vs);
+    else
+	return vnormal(vs);
+}
 
 /*
 =for apidoc vcmp
@@ -314,12 +371,25 @@ Perl_vcmp(pTHX_ SV *lsv, SV *rsv)
 	i++;
     }
 
-    if ( l != r && retval == 0 ) /* possible match except for trailing 0 */
+    if ( l != r && retval == 0 ) /* possible match except for trailing 0's */
     {
-	if ( !( l < r && r-l == 1 && SvIV(*av_fetch((AV *)rsv,r,0)) == 0 ) &&
-	     !( l-r == 1 && SvIV(*av_fetch((AV *)lsv,l,0)) == 0 ) )
+	if ( l < r )
 	{
-	    retval = l < r ? -1 : +1; /* not a match after all */
+	    while ( i <= r && retval == 0 )
+	    {
+		if ( SvIV(*av_fetch((AV *)rsv,i,0)) != 0 )
+		    retval = -1; /* not a match after all */
+		i++;
+	    }
+	}
+	else
+	{
+	    while ( i <= l && retval == 0 )
+	    {
+		if ( SvIV(*av_fetch((AV *)lsv,i,0)) != 0 )
+		    retval = +1; /* not a match after all */
+		i++;
+	    }
 	}
     }
     return retval;
