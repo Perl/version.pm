@@ -23,10 +23,29 @@ char *
 Perl_scan_version(pTHX_ char *s, SV *rv)
 {
     char *pos = s;
-    bool saw_period = 0;
-    bool saw_under  = 0;
+    I32 saw_period = 0;
+    bool saw_under = 0;
     SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
+
+    /* pre-scan the imput string to check for decimals */
+    while ( *pos == '.' || *pos == '_' || isDIGIT(*pos) )
+    {
+	if ( *pos == '.' )
+	{
+	    if ( saw_under )
+		croak(aTHX_ "Invalid version format (underscores before decimal)");
+	    saw_period++ ;
+	}
+	else if ( *pos == '_' )
+	{
+	    if ( saw_under )
+		croak(aTHX_ "Invalid version format (multiple underscores)");
+	    saw_under = 1;
+	}
+	pos++;
+    }
+    pos = s;
 
     if (*pos == 'v') pos++;  /* get past 'v' */
     while (isDIGIT(*pos))
@@ -62,24 +81,17 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
 	    /* Append revision */
 	    av_push((AV *)sv, newSViv(rev));
 	    if ( (*pos == '.' || *pos == '_') && isDIGIT(pos[1]))
-		 s = ++pos;
+		s = ++pos;
+	    else if ( isDIGIT(*pos) )
+		s = pos;
 	    else {
-		 s = pos;
-		 break;
+		s = pos;
+		break;
 	    }
-	    while ( isDIGIT(*pos) )
-		 pos++;
-	    if ( *pos == '.' )
-	    {
-		if ( saw_under )
-		    croak(aTHX_ "Invalid version format (underscores before decimal)");
-		saw_period = 1;
-	    }
-	    else if ( *pos == '_' )
-	    {
-		if ( saw_under )
-		    croak(aTHX_ "Invalid version format (multiple underscores)");
-		saw_under = 1;
+	    while ( isDIGIT(*pos) ) {
+		if ( saw_period == 1 && pos-s == 3 )
+		    break;
+		pos++;
 	    }
 	}
     }
