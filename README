@@ -1,12 +1,16 @@
-version 0.25
+version 0.27
 ====================
 
-WARNING: This module is still considered experimental, since it uses features
-from the Perl development release 5.9.0 which have not been finalized yet.  DO
-NOT USE THIS MODULE IN PRODUCTION CODE!
+WARNING: This module is considered highly experimental, since it uses features 
+from the Perl development release v5.9.0 which have not been finalized yet.  
+DO NOT USE THIS MODULE IN PRODUCTION CODE!
 
-Provides the same version objects as included in Perl 5.9.0 (and hopefully in
-the 5.10.0 release).  Please read the POD documentation for details.
+Provides the same version objects as included in Perl v5.9.0 (and hopefully in
+the 5.10.0 release).  In fact, if you attempt to use this module with a version
+of Perl >= v5.9.0, this module's code will not be used, since the code already
+exists in the Perl core.
+
+Please read the POD documentation for usage/details.
 
 INSTALLATION
 
