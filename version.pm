@@ -22,7 +22,7 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION $CLASS);
 @EXPORT = qw(
 );
 
-$VERSION = (qw$Revision: 1.6 $)[1]/10;
+$VERSION = (qw$Revision: 1.7 $)[1]/10;
 
 $CLASS = 'version';
 
@@ -82,7 +82,7 @@ You can use a bare number, if you only have a major and minor version,
 since this should never in practice yield a floating point notation
 error.  For example:
 
-  $VERSION = new version  10.2;  # ok
+  $VERSION = new version  10.2;  # almost certainly ok
   $VERSION = new version "10.2"; # guaranteed ok
 
 Perl v5.9 and beyond will be able to automatically quote v-strings
@@ -101,7 +101,7 @@ There are three basic types of Version Objects:
 modules will use.  Can contain as many subversions as required.
 In particular, those using RCS/CVS can use the following code:
 
-  $VERSION = new version (qw$Revision: 1.6 $)[1];
+  $VERSION = new version (qw$Revision: 1.7 $)[1];
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the
@@ -131,8 +131,8 @@ the non-beta release.
 
 =item * Perl-style versions - an exceptional case is versions that
 were only used by Perl releases prior to 5.6.0.  If a version
-string contains an underscore immediately followed by a zero then a
-non-zero number, the version is processed according to the rules
+string contains an underscore immediately followed by a zero followed
+by a non-zero number, the version is processed according to the rules
 described in L<perldelta/Improved Perl version numbering system>
 released with Perl v5.6.  As an example:
 
@@ -141,6 +141,23 @@ released with Perl v5.6.  As an example:
 is interpreted, not as a beta release, but as the version 5.5.30,  NOTE
 that the major and minor versions are unchanged but the subversion is
 multiplied by 10, since the above was implicitely read as 5.005.030.
+
+=head2 Replacement UNIVERSAL::VERSION
+
+In addition to the version objects, this modules also replaces the core
+UNIVERSAL::VERSION function with one that uses version objects for its
+comparisons.  So, for example, with all existing versions of Perl, the
+something like the following is an error:
+
+	package vertest;
+	$VERSION = 0.45;
+
+	package main;
+	use vertest 0.5;
+
+even though those versions are meant to be read as 0.045 and 0.005 
+respectively.  The UNIVERSAL::VERSION replacement function included
+with this module makes that B<not> be an error, as it should.
 
 =head1 EXPORT
 
