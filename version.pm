@@ -9,7 +9,7 @@ use vars qw(@ISA $VERSION $CLASS);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = (qw$Revision: 2.0 $)[1]/10;
+$VERSION = (qw$Revision: 2.1 $)[1]/10;
 
 $CLASS = 'version';
 
@@ -150,8 +150,8 @@ There are three basic types of Version Objects:
 modules will use.  Can contain as many subversions as required.
 In particular, those using RCS/CVS can use one of the following:
 
-  $VERSION = new version (qw$Revision: 2.0 $)[1]; # all Perls
-  $VERSION = new version qw$Revision: 2.0 $[1];   # Perl >= 5.6.0
+  $VERSION = new version (qw$Revision: 2.1 $)[1]; # all Perls
+  $VERSION = new version qw$Revision: 2.1 $[1];   # Perl >= 5.6.0
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the
@@ -159,6 +159,11 @@ Revision will have three or more elements; otherwise, it will
 have only two.  This allows you to automatically increment
 your module version by using the Revision number from the primary
 file in a distribution, see L<ExtUtils::MakeMaker/"VERSION_FROM">.
+
+In order to be compatible with earlier Perl version styles, any use
+of versions of the form 5.006001 will be translated as 5.6.1,  In 
+other words a version with a single decimal place will be parsed
+as implicitely having three places between subversion.
 
 =item * Beta versions - For module authors using CPAN, the 
 convention has been to note unstable releases with an underscore
