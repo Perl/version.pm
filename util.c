@@ -1,6 +1,3 @@
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
 #include "util.h"
 
 /*
@@ -136,15 +133,12 @@ upg_version(pTHX_ SV *sv)
 {
     char *version = (char *)SvPV_nolen(sv_mortalcopy(sv));
 #ifdef SvVOK
-    if ( SvVOK(sv) ) { /* already a v-string */
-	SV * ver = newSVrv(sv, "version");
-	sv_setpv(ver,version);
+    if ( SvVOK(ver) ) { /* already a v-string */
+	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
+	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
     }
-    else
 #endif
-    {
-	version = scan_version(version,sv);
-    }
+    version = scan_version(version,sv);
     return sv;
 }
 

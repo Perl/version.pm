@@ -1,3 +1,6 @@
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
 #ifndef pTHX_
   #define pTHX_
 #endif

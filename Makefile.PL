@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'version',
     'VERSION_FROM'	=> 'version.pm', # finds $VERSION
-    'PREREQ_PM'		=> {Test::More => 0.46}, # e.g., Module::Name => 1.1
+    'PREREQ_PM'		=> {Test::More => 0.45}, # e.g., Module::Name => 1.1
     'LIBS'		=> [''], # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
 	# Insert -I. if you add *.h files later:
