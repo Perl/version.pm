@@ -4,7 +4,7 @@
 #include "util.h"
 
 /* --------------------------------------------------
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  * --------------------------------------------------*/
 
 typedef     SV *version;
@@ -76,11 +76,11 @@ PPCODE:
 
     if ( swap )
     {
-        rs = newSViv(sv_cmp(rvs,lobj));
+        rs = newSViv(vcmp(rvs,lobj));
     }
     else
     {
-        rs = newSViv(sv_cmp(lobj,rvs));
+        rs = newSViv(vcmp(lobj,rvs));
     }
 
     PUSHs(rs);

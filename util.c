@@ -4,10 +4,14 @@
 #include "util.h"
 
 char *
-scan_vstring(pTHX_ char *s, SV *av)
+scan_version(pTHX_ char *s, SV *rv)
 {
     char *pos = s;
     char *start = s;
+    AV* av = (AV *)newSVrv(rv, "version"); /* create an SV and upgrade the RV */
+    if ( SvTYPE(av) != SVt_PVAV )
+	SvUPGRADE((SV *)av, SVt_PVAV);
+
     if (*pos == 'v') pos++;  /* get past 'v' */
     while (isDIGIT(*pos) || *pos == '_')
     pos++;
@@ -17,9 +21,6 @@ scan_vstring(pTHX_ char *s, SV *av)
 	U8 *tmpend;
 
 	if (*s == 'v') s++;  /* get past 'v' */
-
-	if ( SvTYPE(av) != SVt_PVAV )
-	    SvUPGRADE(av, SVt_PVAV);
 
 	for (;;) {
 	    rev = 0;
@@ -41,7 +42,7 @@ scan_vstring(pTHX_ char *s, SV *av)
 	    }
 
 	    /* Append revision */
-	    av_push( (AV *)av, newSViv(rev));
+	    av_push(av, newSViv(rev));
 	    if (*pos == '.' && isDIGIT(pos[1]))
 		 s = ++pos;
 	    else {
@@ -76,7 +77,7 @@ is a beta version).
 */
 
 char *
-scan_version(pTHX_ char *version, SV *rv)
+scan_version2(pTHX_ char *version, SV *rv)
 {
     char* d;
     int beta = 0;
@@ -105,7 +106,7 @@ scan_version(pTHX_ char *version, SV *rv)
 	if (*d == '_')
 	    Perl_croak(aTHX_ "Invalid version format (multiple underscores)");
     }
-    version = scan_vstring(version, sv); /* store the v-string in the object */
+/*    version = scan_vstring(version, sv);*/ /* store the v-string in the object */
     if ( beta < 0 )
     {
 	SV *last = (SV *)av_fetch((AV *)sv,av_len((AV *)sv),0);
@@ -232,4 +233,37 @@ vstringify(pTHX_ SV *sv, SV *vs)
     }
     return sv;
 } 
+
+/*
+=for apidoc vcmp
+
+Version object aware cmp
+
+=cut
+*/
+
+int
+vcmp(pTHX_ AV *lsv, AV *rsv)
+{
+    I32 l = av_len(lsv);
+    I32 r = av_len(rsv);
+    I32 m = l < r ? l : r;
+    I32 retval = 0;
+    I32 i = 0;
+    while ( i <= m && retval == 0 )
+    {
+	SV *left  = (SV *)av_fetch(lsv,i,0);
+	SV *right = (SV *)av_fetch(rsv,i,0);
+	if ( SvIV(left) < SvIV(right) )
+	    retval = -1;
+	if ( SvIV(left) > SvIV(right) )
+	    retval = +1;
+	i++;
+    }
+
+    if ( l != r && retval == 0 )
+	retval = l < r ? -1 : +1;
+    return retval;
+}
+
 

@@ -19,9 +19,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-
 );
-our $VERSION = qw$Revision: 1.1 $[1]/10;
+our $VERSION = qw$Revision: 1.2 $[1]/10;
 
 use overload 	'+'	=>	\&noop,
 		'-'	=>	\&noop,
