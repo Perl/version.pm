@@ -2,8 +2,10 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/version.t
-version.pm
+t/1.t
+t/2.t
+lib/version.pm
+lib/version/AlphaBeta.pm
 version.xs
 util.c
 util.h

@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'		=> 'version',
-    'VERSION_FROM'	=> 'version.pm', # finds $VERSION
+    'VERSION_FROM'	=> 'lib/version.pm', # finds $VERSION
     'PREREQ_PM'		=> {Test::More => 0.45}, # e.g., Module::Name => 1.1
     'LIBS'		=> [''], # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
