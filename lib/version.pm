@@ -142,9 +142,10 @@ between subversions.  What this means is that any subversion (digits
 to the right of the decimal place) that contains less than three digits
 will have trailing zeros added to make up the difference.  For example:
 
-  $v = new version       1.2;    # 1.200
-  $v = new version      1.02;    # 1.20
-  $v = new version     1.002;    # 1.2
+  $v = new version       1.2;    # 1.200.0
+  $v = new version      1.02;    # 1.2.0    See "CPAN Style Versions"
+  $v = new version     1.020;    # 1.20.0
+  $v = new version     1.002;    # 1.2.0
   $v = new version    1.0023;    # 1.2.300
   $v = new version   1.00203;    # 1.2.30
   $v = new version  1.002_03;    # 1.2.30   See "Quoting"
@@ -153,6 +154,21 @@ will have trailing zeros added to make up the difference.  For example:
 All of the preceeding examples except the second to last are true
 whether or not the input value is quoted.  The important feature is that
 the input value contains only a single decimal.
+
+=head2 CPAN Style Versions
+
+In order to more accurately reflect the style of most modules released 
+to CPAN (blah blah blah), if the version contains a single decimal point
+followed by exactly two digits, i.e. "1.23", the version will be 1.23.0
+and not as if there were an implied zero present ("1.230").  This method
+will mean that the conventional alpha version used on CPAN will sort with
+the non-alpha versions:
+
+  $v = version->new("1.22");	# 1.22.0 Release
+  $v = version->new("1.23_01");	# 1.23_1 Alpha Release for 1.23
+  $v = version->new("1.23");	# 1.23.0 Release
+
+See also L<"Alpha Versions"> for information on sorting order.
 
 =head2 Quoted Versions
 
@@ -392,11 +408,11 @@ unstable releases with an underscore in the version string, see
 L<CPAN>.  Alpha releases will test as being newer than the more recent
 stable release, and less than the next stable release.  For example:
 
-  $alphaver = new version "12.3_1"; # must quote
+  $alphaver = new version "12.03_1"; # must quote
 
 obeys the relationship
 
-  12.3 < $alphaver < 12.4
+  12.03 < $alphaver < 12.04
 
 As a matter of fact, if is also true that
 

@@ -77,7 +77,11 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 		 * floating point number, i.e. not quoted in any way
 		 */
  		if ( !qv && s > start+1 && saw_period == 1 && !saw_under ) {
- 		    mult = 100;
+		    if ( end - s == 2 )
+			mult = 10;   /* CPAN-style */
+		    else
+			mult = 100;  /* Perl-style */
+
  		    while ( s < end ) {
  			orev = rev;
  			rev += (*s - '0') * mult;
