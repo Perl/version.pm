@@ -1,47 +1,37 @@
 package version;
 
-use 5.006;
+use 5.005_03;
 use strict;
-use warnings;
+#use warnings;
 
 require Exporter;
 require DynaLoader;
+use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION $CLASS);
 
-our @ISA = qw(Exporter DynaLoader);
+@ISA = qw(Exporter Dynaloader);
 
 # This allows declaration	use Universal::Version ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
+%EXPORT_TAGS = ( 'all' => [ qw(
 
 ) ] );
 
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+@EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our @EXPORT = qw(
+@EXPORT = qw(
 );
-our $VERSION = qw$Revision: 1.2 $[1]/10;
 
-use overload 	'+'	=>	\&noop,
-		'-'	=>	\&noop,
-		'*'	=>	\&noop,
-		'/'	=>	\&noop,
-		'<=>'	=>	\&vcmp,
-		'cmp'	=>	\&vcmp,
-                '""'	=>	\&stringify,
-		'0+'	=>	\&numify,
-		'abs'	=>	\&noop,
-		'bool'	=>	\&boolean,
-;
+$VERSION = (qw$Revision: 1.3 $)[1]/10;
 
-our $CLASS = 'version';
+$CLASS = 'version';
 
 bootstrap version;
 
 # Preloaded methods go here.
 
 1;
-__END__
+
 # Below is stub documentation for your module. You better edit it!
 
 =head1 NAME
