@@ -15,7 +15,7 @@ Function must be called with an already existing SV like
 Performs some preprocessing to the string to ensure that
 it has the correct characteristics of a version.  Flags the
 object if it contains an underscore (which denotes this
-is a beta version).
+is a alpha version).
 
 =cut
 */
@@ -65,7 +65,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
   		I32 mult = 1;
  		I32 orev;
   		if ( s < pos && s > start && *(s-1) == '_' ) {
- 			mult *= -1;	/* beta version */
+ 			mult *= -1;	/* alpha version */
   		}
 		/* the following if() will only be true after the decimal
 		 * point of a version originally created with a bare
@@ -286,13 +286,13 @@ Perl_vcmp(pTHX_ SV *lsv, SV *rsv)
     {
 	I32 left  = SvIV(*av_fetch((AV *)lsv,i,0));
 	I32 right = SvIV(*av_fetch((AV *)rsv,i,0));
-	bool lbeta = left  < 0 ? 1 : 0;
-	bool rbeta = right < 0 ? 1 : 0;
+	bool lalpha = left  < 0 ? 1 : 0;
+	bool ralpha = right < 0 ? 1 : 0;
 	left  = abs(left);
 	right = abs(right);
-	if ( left < right || (left == right && lbeta && !rbeta) )
+	if ( left < right || (left == right && lalpha && !ralpha) )
 	    retval = -1;
-	if ( left > right || (left == right && rbeta && !lbeta) )
+	if ( left > right || (left == right && ralpha && !lalpha) )
 	    retval = +1;
 	i++;
     }

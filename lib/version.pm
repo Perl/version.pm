@@ -9,7 +9,7 @@ use vars qw(@ISA $VERSION $CLASS);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = 0.28; # stop using CVS and switch to subversion
+$VERSION = 0.29; # stop using CVS and switch to subversion
 
 $CLASS = 'version';
 
@@ -36,8 +36,9 @@ version - Perl extension for Version Objects
   $vstring = new version qw(v1.2); # must be quoted!
   print $vstring;		# 1.2
 
-  $betaver = new version "1.2_3"; # must be quoted!
-  print $betaver;		# 1.2_3
+  $alphaver = new version "1.2_3"; # must be quoted!
+  print $alphaver;		# 1.2_3
+  print $alphaver->is_alpha();	# true
 
   $perlver = new version 5.005_03; # must not be quoted!
   print $perlver;		# 5.5.30
@@ -138,7 +139,7 @@ So, for example:
   $v = new version "v1.0003";    # 1.3
 
 In additional to conventional versions, V-String Versions can be
-used to create L<Beta Versions>.
+used to create L<Alpha Versions>.
 
 In general, V-String Versions permit the greatest amount of freedom
 to specify a version, whereas Numeric Versions enforce a certain 
@@ -169,7 +170,7 @@ code can be employed:
 and the version object will be created as if the following code
 were used:
 
-  $VERSION = new version "v2.6";
+  $VERSION = new version "v2.7";
 
 In other words, the version will be automatically parsed out of the
 string, and it will be quoted to preserve the meaning CVS normally
@@ -178,7 +179,7 @@ carries for versions.
 For the subsequent examples, the following two objects will be used:
 
   $ver  = new version "1.2.3"; # see "Quoting" below
-  $beta = new version "1.2_3"; # see "Beta versions" below
+  $alpha = new version "1.2_3"; # see "Alpha versions" below
 
 =over 4
 
@@ -241,6 +242,24 @@ even though you are doing a "numeric" comparison with a "string" value.
 It is probably best to chose either the numeric notation or the string 
 notation and stick with it, to reduce confusion.  See also L<"Quoting">.
 
+=over 4
+
+=item * Logical Operators - If you need to test whether a version object
+has been initialized, you can simply test it directly:
+
+=back
+
+  $vobj = new version $something;
+  if ( $vobj )   # true only if $something was non-blank
+
+You can also test whether a version object is a L<Alpha version>, for
+example to prevent the use of some feature not present in the main 
+release:
+
+  $vobj = new version "1.2_3"; # MUST QUOTE
+  ...later...
+  if ( $vobj->is_alpha )       # True
+
 =head2 Quoting
 
 Because of the nature of the Perl parsing and tokenizing routines, 
@@ -248,7 +267,7 @@ certain initialization values B<must> be quoted in order to correctly
 parse as the intended version, and additionally, some initial values
 B<must not> be quoted to obtain the intended version.
 
-Except for L<Beta versions>, any version initialized with something
+Except for L<Alpha versions>, any version initialized with something
 that looks like a number (a single decimal place) will be parsed in
 the same way whether or not the term is quoted.  In order to be
 compatible with earlier Perl version styles, any use of versions of
@@ -260,7 +279,7 @@ The complicating factor is that in bare numbers (i.e. unquoted), the
 underscore is a legal numeric character and is automatically stripped
 by the Perl tokenizer before the version code is called.  However, if
 a number containing a single decimal and an underscore is quoted, i.e.
-not bare, that is considered a L<Beta Version> and the underscore is
+not bare, that is considered a L<Alpha Version> and the underscore is
 significant.
 
 If you use a mathematic formula that resolves to a floating point number,
@@ -304,26 +323,26 @@ file in a distribution, see L<ExtUtils::MakeMaker/"VERSION_FROM">.
 
 =over 4
 
-=item * Beta versions - For module authors using CPAN, the 
+=item * Alpha versions - For module authors using CPAN, the 
 convention has been to note unstable releases with an underscore
-in the version string, see L<CPAN>.  Beta releases will test as being
+in the version string, see L<CPAN>.  Alpha releases will test as being
 newer than the more recent stable release, and less than the next
 stable release.  For example:
 
 =back
 
-  $betaver = new version "12.3_1"; # must quote
+  $alphaver = new version "12.3_1"; # must quote
 
 obeys the relationship
 
-  12.3 < $betaver < 12.4
+  12.3 < $alphaver < 12.4
 
 As a matter of fact, if is also true that
 
-  12.3.0 < $betaver < 12.3.1
+  12.3.0 < $alphaver < 12.3.1
 
-where the subversion is identical but the beta release is less than
-the non-beta release.
+where the subversion is identical but the alpha release is less than
+the non-alpha release.
 
 =head2 Replacement UNIVERSAL::VERSION
 

@@ -103,6 +103,19 @@ CODE:
 }
 
 void
+is_alpha(lobj)
+    version		lobj	
+PPCODE:
+{
+    I32 len = av_len((AV *)lobj);
+    I32 digit = SvIVX(*av_fetch((AV *)lobj, len, 0));
+    if ( digit < 0 )
+	XSRETURN_YES;
+    else
+	XSRETURN_NO;
+}
+
+void
 VERSION(sv,...)
     SV *sv
 PPCODE:

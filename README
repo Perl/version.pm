@@ -1,9 +1,5 @@
-version 0.28
+version 0.29
 ====================
-
-WARNING: This module is considered experimental, since it uses features 
-from the Perl development release v5.9.0 which have not been finalized yet.  
-DO NOT USE THIS MODULE IN PRODUCTION CODE!
 
 Provides the same version objects as included in Perl v5.9.0 (and hopefully in
 the 5.10.0 release).  In fact, if you attempt to use this module with a version
