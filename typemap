@@ -23,8 +23,7 @@ INPUT
 
 T_PTROBJ_SPECIAL
         if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
-                SV *tmp = SvRV($arg);
-        	$var = tmp;
+	    $var = $arg;
         }
         else
-                Perl_croak(aTHX_ \"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+            Perl_croak(aTHX_ \"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")

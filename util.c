@@ -135,6 +135,26 @@ SV *
 Perl_new_version(pTHX_ SV *ver)
 {
     SV *rv = newSV(0);
+    sv_setsv(rv,ver); /* make a duplicate */
+    upg_version(rv);
+    return rv;
+}
+
+/*
+=for apidoc upg_version
+
+In-place upgrade of the supplied SV to a version object.
+
+    SV *sv = upg_version(SV *sv);
+
+Returns a pointer to the upgraded SV.
+
+=cut
+*/
+
+SV *
+Perl_upg_version(pTHX_ SV *ver)
+{
     char *version;
     bool qv = 0;
 
@@ -155,36 +175,8 @@ Perl_new_version(pTHX_ SV *ver)
     {
 	version = savepv(SvPV_nolen(ver));
     }
-    (void)scan_version(version, rv, qv);
+    (void)scan_version(version, ver, qv);
     Safefree(version);
-    return rv;
-}
-
-/*
-=for apidoc upg_version
-
-In-place upgrade of the supplied SV to a version object.
-
-    SV *sv = upg_version(SV *sv);
-
-Returns a pointer to the upgraded SV.
-
-=cut
-*/
-
-SV *
-Perl_upg_version(pTHX_ SV *ver)
-{
-    bool qv = 0;
-    char *version = savepvn(SvPVX(ver),SvCUR(ver));
-#ifdef SvVOK
-    if ( SvVOK(ver) ) { /* already a v-string */
-	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
-	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
-	qv = 1;
-    }
-#endif
-    version = scan_version(version,ver,qv);
     return ver;
 }
 

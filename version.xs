@@ -76,15 +76,14 @@ PPCODE:
     {
 	robj = sv_2mortal(new_version(robj));
     }
-    rvs = SvRV(robj);
 
     if ( swap )
     {
-        rs = newSViv(vcmp(rvs,lobj));
+        rs = newSViv(vcmp(robj,lobj));
     }
     else
     {
-        rs = newSViv(vcmp(lobj,rvs));
+        rs = newSViv(vcmp(lobj,robj));
     }
 
     PUSHs(sv_2mortal(rs));
@@ -113,8 +112,9 @@ is_alpha(lobj)
     version		lobj	
 PPCODE:
 {
-    I32 len = av_len((AV *)lobj);
-    I32 digit = SvIVX(*av_fetch((AV *)lobj, len, 0));
+    AV * av = (AV *)SvRV(lobj);
+    I32 len = av_len(av);
+    I32 digit = SvIVX(*av_fetch(av, len, 0));
     if ( digit < 0 )
 	XSRETURN_YES;
     else
@@ -136,7 +136,7 @@ PPCODE:
     }
     else
     {
-	version = savepvn(SvPVX(ver),SvCUR(ver));
+	version = savepv(SvPV_nolen(ver));
     }
     (void)scan_version(version,vs,TRUE);
     Safefree(version);
