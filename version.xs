@@ -37,13 +37,14 @@ PPCODE:
     {
 	char *version = savepvn(SvPVX(ST(2)),SvCUR(ST(2)));
 	vs = newSVpvf("v%s",version);
+	Safefree(version);
     }
 
     rv = new_version(vs);
     if ( strcmp(class,"version") != 0 ) /* inherited new() */
 	sv_bless(rv, gv_stashpv(class,TRUE));
 
-    PUSHs(rv);
+    PUSHs(sv_2mortal(rv));
 }
 
 void
@@ -51,7 +52,7 @@ stringify (lobj,...)
     version		lobj
 PPCODE:
 {
-    PUSHs(vstringify(lobj));
+    PUSHs(sv_2mortal(vstringify(lobj)));
 }
 
 void
@@ -59,7 +60,7 @@ numify (lobj,...)
     version		lobj
 PPCODE:
 {
-    PUSHs(vnumify(lobj));
+    PUSHs(sv_2mortal(vnumify(lobj)));
 }
 
 void
@@ -74,7 +75,7 @@ PPCODE:
 
     if ( ! sv_derived_from(robj, "version") )
     {
-	robj = new_version(robj);
+	robj = sv_2mortal(new_version(robj));
     }
     rvs = SvRV(robj);
 
@@ -139,8 +140,9 @@ PPCODE:
 	version = savepvn(SvPVX(ver),SvCUR(ver));
     }
     vs = sv_2mortal(newSVpvf("v%s",version));
+    Safefree(version);
 
-    PUSHs(new_version(vs));
+    PUSHs(sv_2mortal(new_version(vs)));
 }
 
 void
@@ -169,6 +171,8 @@ PPCODE:
         SV *nsv = sv_newmortal();
         sv_setsv(nsv, sv);
         sv = nsv;
+	if ( !sv_derived_from(sv, "version"))
+	    upg_version(sv);
         undef = Nullch;
     }
     else {
@@ -190,11 +194,14 @@ PPCODE:
 		  Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed", str);
 	     }
 	}
-	if ( !sv_derived_from(sv, "version"))
-	    upg_version(sv);
 
-	if ( !sv_derived_from(req, "version"))
-	    req = new_version(req); /* req is R/O so we have to use new */
+        if ( !sv_derived_from(req, "version")) {
+	    /* req may very well be R/O, so create a new object */
+	    SV *nsv = sv_newmortal();
+	    sv_setsv(nsv, req);
+	    req = nsv;
+	    upg_version(req);
+	}
 
 	if ( vcmp( req, sv ) > 0 )
 	    Perl_croak(aTHX_ "%s version %_ required--this is only version %_",
