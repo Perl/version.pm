@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!perl -w
 package version;
 
 use 5.005_03;
@@ -9,7 +9,7 @@ use vars qw(@ISA $VERSION $CLASS);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = (qw$Revision: 2.4 $)[1]/10;
+$VERSION = (qw$Revision: 2.5 $)[1]/10;
 
 $CLASS = 'version';
 
@@ -144,12 +144,27 @@ but other operations are not likely to be what you intend.  For example:
   $V2 = new version 100/9; # Integer overflow in decimal number
   print $V2;               # yields 11_1285418553
 
-You B<can> use a bare number, if you only have a major and minor version,
-since this should never in practice yield a floating point notation
-error.  For example:
+You B<can> use a bare number, since this should never in practice yield
+a floating point notation error.  However this is parsed differently
+than a quoted version.  For example:
 
-  $VERSION = new version  10.2;  # almost certainly ok
-  $VERSION = new version "10.2"; # guaranteed ok
+  $VERSION = new version  10.2;  # parsed as 10.200
+  $VERSION = new version "10.2"; # parsed as 10.2
+
+For decimal numbers used as versions, the parsing will automatically
+group the digits to the right of the decimal place in threes, and append
+trailing zeros to come out to an even three places.  So, for example:
+
+  $VERSION = new version 1.2;      # parsed as 1.200
+  $VERSION = new version 1.02;     # parsed as 1.20
+  $VERSION = new version 1.002;    # parsed as 1.2
+  $VERSION = new version 1.002003; # parsed as 1.2.3
+  $VERSION = new version 1.00203;  # parsed as 1.2.30
+  $VERSION = new version 5.005_03; # parsed as 5.5.30
+
+That last one is somewhat suprising, as it is not parsed like a
+L<Beta version> because underscores in bare numbers are automatically
+ignored by Perl itself.
 
 Perl 5.9.0 and beyond will be able to automatically quote v-strings
 (which may become the recommended notation), but that is not possible in
@@ -161,14 +176,14 @@ earlier versions of Perl.  In other words:
 
 =head2 Types of Versions Objects
 
-There are three basic types of Version Objects:
+There are two types of Version Objects:
 
 =item * Ordinary versions - These are the versions that normal
 modules will use.  Can contain as many subversions as required.
 In particular, those using RCS/CVS can use one of the following:
 
-  $VERSION = new version (qw$Revision: 2.4 $)[1]; # all Perls
-  $VERSION = new version qw$Revision: 2.4 $[1];   # Perl >= 5.6.0
+  $VERSION = new version ((qw$Revision: 2.5 $)[1]); # all Perls
+  $VERSION = new version (qw$Revision: 2.5 $[1]);   # Perl >= 5.6.0
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the
@@ -196,22 +211,6 @@ As a matter of fact, if is also true that
 where the subversion is identical but the beta release is less than
 the non-beta release.
 
-=item * Perl-style versions - an exceptional case is versions that
-were only used by Perl releases prior to 5.6.0.  If a version
-string contains an underscore immediately followed by a zero followed
-by a non-zero number, the version is processed according to the rules
-described in L<perldelta/Improved Perl version numbering system>
-released with Perl 5.6.0.  As an example:
-
-  $perlver = new version "5.005_03";
-
-is interpreted, not as a beta release, but as the version 5.5.30,  NOTE
-that the major and minor versions are unchanged but the subversion is
-multiplied by 10, since the above was implicitly read as 5.005.030.
-There are modules currently on CPAN which may fall under of this rule, so
-module authors are urged to pay close attention to what version they are
-specifying.
-
 =head2 Replacement UNIVERSAL::VERSION
 
 In addition to the version objects, this modules also replaces the core
@@ -220,14 +219,15 @@ comparisons.  So, for example, with all existing versions of Perl,
 something like the following pseudocode would fail:
 
 	package vertest;
-	$VERSION = 0.45;
+	$VERSION = "0.45";
 
 	package main;
-	use vertest 0.5;
+	use vertest "0.5";
 
-even though those versions are meant to be read as 0.045 and 0.005 
-respectively.  The UNIVERSAL::VERSION replacement function included
-with this module changes that behavior so that it will B<not> fail.
+even though those versions are meant to be read as the 45th minor
+version and the 5th minor version respectively.  The UNIVERSAL::VERSION
+replacement function included with this module changes that behavior so
+that it will B<not> fail.
 
 =head1 EXPORT
 

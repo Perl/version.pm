@@ -1,7 +1,7 @@
 
 RCS file: /var/cvs-repository/version/version.pm,v
 Working file: version.pm
-head: 2.4
+head: 2.5
 branch:
 locks: strict
 access list:
@@ -9,8 +9,12 @@ symbolic names:
 	start: 1.1.1.1
 	jpeacock: 1.1.1
 keyword substitution: kv
-total revisions: 16;	selected revisions: 16
+total revisions: 17;	selected revisions: 17
 description:
+----------------------------
+revision 2.5
+date: 2002/12/18 02:27:21;  author: jpeacock;  state: Exp;  lines: +32 -32
+New version to cope with GSAR's vision of bare number versions
 ----------------------------
 revision 2.4
 date: 2002/11/18 10:33:23;  author: jpeacock;  state: Exp;  lines: +3 -3

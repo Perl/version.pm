@@ -4,7 +4,7 @@
 #include "util.h"
 
 /* --------------------------------------------------
- * $Revision: 2.3 $
+ * $Revision: 2.4 $
  * --------------------------------------------------*/
 
 typedef     SV *version;
@@ -151,8 +151,8 @@ PPCODE:
 	    req = new_version(req); /* req is R/O so we gave to use new */
 
 	if ( vcmp( req, sv ) > 0 )
-	    Perl_croak(aTHX_ "%s version %s required--this is only version %s",
-		       HvNAME(pkg), SvPV(req,PL_na), SvPV(sv,PL_na));
+	    Perl_croak(aTHX_ "%s version %_ required--this is only version %_",
+		       HvNAME(pkg), req, sv);
     }
 
     PUSHs(sv);

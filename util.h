@@ -16,6 +16,9 @@
 #ifndef ckWARN_d
 #	define ckWARN_d(w)	1
 #endif
+#ifndef NVgf
+#	define	NVgf	"g"
+#endif
 
 char * Perl_scan_version(pTHX_ char *s, SV *rv);
 SV * Perl_new_version(pTHX_ SV *ver);
