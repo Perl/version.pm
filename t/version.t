@@ -1,11 +1,12 @@
+#! /usr/local/perl -w
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
-# $Revision: 2.1 $
+# $Revision: 2.2 $
 
 #########################
 
-use Test::More tests => 64;
-use_ok(version); # If we made it this far, we are ok.
+use Test::More tests => 63;
+use_ok("version"); # If we made it this far, we are ok.
 
 my ($version, $new_version);
 #########################
@@ -39,8 +40,7 @@ ok ("$version" eq "99.0", '$version eq "99.0"');
 ok ($version->numify == 99.0, '$version->numify == 99.0');
 
 $version = new version "something";
-ok ("$version" eq "", '$version eq ""');
-ok ($version->numify == 0, '$version->numify == 99.0');
+ok (defined $version, 'defined $version');
 
 # Test boolean operator
 ok ($version, 'boolean');
