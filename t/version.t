@@ -1,7 +1,7 @@
 #! /usr/local/perl -w
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
-# $Revision: 2.3 $
+# $Revision: 2.4 $
 
 #########################
 
@@ -25,8 +25,8 @@ is ( "$version" , "1.230" , '1.23 eq "1.230"' );
 diag "tests with quoted numbers" unless $ENV{PERL_CORE};
 $version = new version "5.005_03";
 is ( "$version" , "5.5_3" , '"5.005_03" eq "5.5_3"' );
-$version = new version "1.23";
-is ( "$version" , "1.23" , '"1.23" eq "1.23"' );
+$version = new version "v1.23";
+is ( "$version" , "1.23" , '"v1.23" eq "1.23"' );
 
 # Test stringify operator
 diag "tests with stringify" unless $ENV{PERL_CORE};
@@ -159,7 +159,7 @@ ok ( $new_version < $version, '$new_version < $version' );
 ok ( $version != $new_version, '$version != $new_version' );
 
 diag "test implicit [in]equality" unless $ENV{PERL_CORE};
-$version = new version "1.2";
+$version = new version "v1.2";
 $new_version = new version "1.2.0";
 ok ( $version == $new_version, '$version == $new_version' );
 $new_version = new version "1.2_0";
