@@ -1,7 +1,7 @@
 
 RCS file: /var/cvs-repository/version/version.pm,v
 Working file: version.pm
-head: 2.5
+head: 2.7
 branch:
 locks: strict
 access list:
@@ -9,8 +9,17 @@ symbolic names:
 	start: 1.1.1.1
 	jpeacock: 1.1.1
 keyword substitution: kv
-total revisions: 17;	selected revisions: 17
+total revisions: 19;	selected revisions: 19
 description:
+----------------------------
+revision 2.7
+date: 2003/01/05 22:43:51;  author: jpeacock;  state: Exp;  lines: +69 -51
+Rewrite POD to call a v-string a v-string
+Reformat POD to look nicer
+----------------------------
+revision 2.6
+date: 2002/12/27 15:15:29;  author: jpeacock;  state: Exp;  lines: +156 -72
+Rewrite to support new model of "Numeric Versions" and "String Versions"
 ----------------------------
 revision 2.5
 date: 2002/12/18 02:27:21;  author: jpeacock;  state: Exp;  lines: +32 -32
