@@ -4,7 +4,7 @@
 #include "util.h"
 
 /* --------------------------------------------------
- * $Revision: 1.7 $
+ * $Revision: 1.8 $
  * --------------------------------------------------*/
 
 typedef     SV *version;
@@ -42,16 +42,11 @@ PPCODE:
 {
     SV  *vs = NEWSV(92,5);
 #ifdef SvVOK
-    if ( lobj == SvRV(PL_patchlevel) ) {
+    if ( lobj == SvRV(PL_patchlevel) )
 	sv_setsv(vs,lobj);
-    }
     else
-    {
-	vstringify(vs,lobj);
-    }
-#else
-    vstringify(vs,lobj);
 #endif
+	vstringify(vs,lobj);
     PUSHs(vs);
 }
 
@@ -161,10 +156,10 @@ PPCODE:
 	     }
 	}
 	if ( !sv_derived_from(sv, "version"))
-	    sv = new_version(sv);
+	    upg_version(sv);
 
 	if ( !sv_derived_from(req, "version"))
-	    req = new_version(req);
+	    req = new_version(req); /* req is R/O so we gave to use new */
 
 	if ( vcmp( SvRV(req), SvRV(sv) ) > 0 )
 	    Perl_croak(aTHX_ "%s version %s required--this is only version %s",

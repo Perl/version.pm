@@ -20,13 +20,13 @@ is a beta version).
 =cut
 */
 char *
-scan_version(pTHX_ char *s, SV *rv)
+Perl_scan_version(pTHX_ char *s, SV *rv)
 {
     char *pos = s;
     bool saw_period = 0;
     bool saw_under  = 0;
     SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
-    SvUPGRADE(sv, SVt_PVAV); /* needs to be an AV type */
+    (void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
 
     if (*pos == 'v') pos++;  /* get past 'v' */
     while (isDIGIT(*pos))
@@ -54,9 +54,8 @@ scan_version(pTHX_ char *s, SV *rv)
 		    orev = rev;
 		    rev += (*end - '0') * mult;
 		    mult *= 10;
-		    if (abs(orev) > abs(rev) && ckWARN_d(WARN_OVERFLOW))
-			warner(aTHX_ WARN_OVERFLOW,
-				    "Integer overflow in decimal number"); 
+		    if ( abs(orev) > abs(rev) )
+			croak(aTHX_ "Integer overflow in version"); 
 		}
 	    }
 
@@ -101,7 +100,7 @@ want to upgrade the SV.
 */
 
 SV *
-new_version(pTHX_ SV *ver)
+Perl_new_version(pTHX_ SV *ver)
 {
     SV *rv = NEWSV(92,5);
     char *version = (char *)SvPV(ver,PL_na);
@@ -129,17 +128,17 @@ Returns a pointer to the upgraded SV.
 */
 
 SV *
-upg_version(pTHX_ SV *sv)
+Perl_upg_version(pTHX_ SV *ver)
 {
-    char *version = savepvn(SvPVX(sv),SvCUR(sv));
+    char *version = savepvn(SvPVX(ver),SvCUR(ver));
 #ifdef SvVOK
     if ( SvVOK(ver) ) { /* already a v-string */
 	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
 	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
     }
 #endif
-    version = scan_version(version,sv);
-    return sv;
+    version = scan_version(version,ver);
+    return ver;
 }
 
 
@@ -158,7 +157,7 @@ correct type (for speed).
 */
 
 SV *
-vnumify(pTHX_ SV *sv, SV *vs)
+Perl_vnumify(pTHX_ SV *sv, SV *vs)
 {
     I32 i;
     I32 len = av_len((AV *)vs);
@@ -189,7 +188,7 @@ correct type (for speed).
 */
 
 SV *
-vstringify(pTHX_ SV *sv, SV *vs)
+Perl_vstringify(pTHX_ SV *sv, SV *vs)
 {
     I32 i;
     I32 len = av_len((AV *)vs);
@@ -219,7 +218,7 @@ from the RV object.  XS_version_vcmp takes care of this already.
 */
 
 int
-vcmp(pTHX_ SV *lsv, SV *rsv)
+Perl_vcmp(pTHX_ SV *lsv, SV *rsv)
 {
     I32 l = av_len((AV *)lsv);
     I32 r = av_len((AV *)rsv);

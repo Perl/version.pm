@@ -1,12 +1,11 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
-# $Revision: 1.2 $
+# $Revision: 1.3 $
 
 #########################
 
-use Test::More tests => 50;
-use version; # If we made it this far, we are ok.
-ok(1);
+use Test::More tests => 58;
+use_ok(version); # If we made it this far, we are ok.
 
 my ($version, $new_version);
 #########################
@@ -15,7 +14,7 @@ my ($version, $new_version);
 # its man page ( perldoc Test ) for help writing this test script.
 
 # Test stringify operator
-diag "tests with stringify";
+diag "tests with stringify" unless $ENV{PERL_CORE};
 $version = new version "5.005";
 is ( "$version" , "5.5" , '5.005 eq 5.5' );
 $version = new version "5.005_03";
@@ -26,13 +25,15 @@ $version = new version "1.2.3_4";
 is ( "$version" , "1.2.3_4" , 'beta version 1.2.3_4 eq 1.2.3_4' );
 
 # test illegal formats
+diag "test illegal formats" unless $ENV{PERL_CORE};
 eval {my $version = new version "1.2_3_4";};
-like($@, qr/multiple underscores/,
-	'Invalid version format (multiple underscores)');
+like($@, qr/multiple underscores/,$@);
 
 eval {my $version = new version "1.2_3.4";};
-like($@, qr/underscores before decimal/,
-	'Invalid version format (underscore before decimal)');
+like($@, qr/underscores before decimal/,$@);
+
+eval {my $version = new version 100/9;};
+like($@, qr/Integer overflow in version/, $@);
 
 # Test boolean operator
 ok ($version, 'boolean');
@@ -43,7 +44,7 @@ ok (ref($version) eq 'version','ref operator');
 ok ( $version->numify == 1.002003004, '$version->numify == 1.002003004' );
 
 # Test comparison operators with self
-diag "tests with self";
+diag "tests with self" unless $ENV{PERL_CORE};
 ok ( $version eq $version, '$version eq $version' );
 is ( $version cmp $version, 0, '$version cmp $version == 0' );
 ok ( $version == $version, '$version == $version' );
@@ -51,7 +52,7 @@ ok ( $version == $version, '$version == $version' );
 # test first with non-object
 $version = new version "5.006.001";
 $new_version = "5.8.0";
-diag "tests with non-objects";
+diag "tests with non-objects" unless $ENV{PERL_CORE};
 ok ( $version ne $new_version, '$version ne $new_version' );
 ok ( $version lt $new_version, '$version lt $new_version' );
 ok ( $new_version gt $version, '$new_version gt $version' );
@@ -62,7 +63,7 @@ ok ( $new_version eq $version, '$new_version eq $version' );
 
 # now test with existing object
 $new_version = new version "5.8.0";
-diag "tests with objects";
+diag "tests with objects" unless $ENV{PERL_CORE};
 ok ( $version ne $new_version, '$version ne $new_version' );
 ok ( $version lt $new_version, '$version lt $new_version' );
 ok ( $new_version gt $version, '$new_version gt $version' );
@@ -72,7 +73,7 @@ ok ( $version eq $new_version, '$version eq $new_version' );
 # Test Numeric Comparison operators
 # test first with non-object
 $new_version = "5.8.0";
-diag "numeric tests with non-objects";
+diag "numeric tests with non-objects" unless $ENV{PERL_CORE};
 ok ( $version == $version, '$version == $version' );
 ok ( $version < $new_version, '$version < $new_version' );
 ok ( $new_version > $version, '$new_version > $version' );
@@ -80,13 +81,13 @@ ok ( $version != $new_version, '$version != $new_version' );
 
 # now test with existing object
 $new_version = new version $new_version;
-diag "numeric tests with objects";
+diag "numeric tests with objects" unless $ENV{PERL_CORE};
 ok ( $version < $new_version, '$version < $new_version' );
 ok ( $new_version > $version, '$new_version > $version' );
 ok ( $version != $new_version, '$version != $new_version' );
 
 # now test with actual numbers
-diag "numeric tests with numbers";
+diag "numeric tests with numbers" unless $ENV{PERL_CORE};
 ok ( $version->numify() == 5.006001, '$version->numify() == 5.006001' );
 ok ( $version->numify() <= 5.006001, '$version->numify() <= 5.006001' );
 ok ( $version->numify() < 5.008, '$version->numify() < 5.008' );
@@ -95,13 +96,13 @@ ok ( $version->numify() < 5.008, '$version->numify() < 5.008' );
 # now test with Beta version form with string
 $version = new version "1.2.3";
 $new_version = "1.2.3_4";
-diag "tests with beta-style non-objects";
-ok ( $version < $new_version, '$version < $new_version' );
-ok ( $new_version > $version, '$new_version > $version' );
-ok ( $version != $new_version, '$version != $new_version' );
+diag "tests with beta-style non-objects" unless $ENV{PERL_CORE};
+ok ( $version lt $new_version, '$version lt $new_version' );
+ok ( $new_version gt $version, '$new_version gt $version' );
+ok ( $version ne $new_version, '$version ne $new_version' );
 
 $version = new version "1.2.4";
-diag "numeric tests with beta-style non-objects";
+diag "numeric tests with beta-style non-objects" unless $ENV{PERL_CORE};
 ok ( $version > $new_version, '$version > $new_version' );
 ok ( $new_version < $version, '$new_version < $version' );
 ok ( $version != $new_version, '$version != $new_version' );
@@ -109,21 +110,53 @@ ok ( $version != $new_version, '$version != $new_version' );
 # now test with Beta version form with object
 $version = new version "1.2.3";
 $new_version = new version "1.2.3_4";
-diag "tests with beta-style objects";
+diag "tests with beta-style objects" unless $ENV{PERL_CORE};
 ok ( $version < $new_version, '$version < $new_version' );
 ok ( $new_version > $version, '$new_version > $version' );
 ok ( $version != $new_version, '$version != $new_version' );
 
 $version = new version "1.2.4";
-diag "numeric tests with beta-style objects";
+diag "tests with beta-style objects" unless $ENV{PERL_CORE};
+ok ( $version > $new_version, '$version > $new_version' );
+ok ( $new_version < $version, '$new_version < $version' );
+ok ( $version != $new_version, '$version != $new_version' );
+
+$version = new version "1.2.4";
+$new_version = new version "1.2_4";
+diag "tests with beta-style objects with same subversion" unless $ENV{PERL_CORE};
 ok ( $version > $new_version, '$version > $new_version' );
 ok ( $new_version < $version, '$new_version < $version' );
 ok ( $version != $new_version, '$version != $new_version' );
 
 # that which is not expressly permitted is forbidden
-diag "forbidden operations";
+diag "forbidden operations" unless $ENV{PERL_CORE};
 ok ( !eval { $version++ }, "noop ++" );
 ok ( !eval { $version-- }, "noop --" );
 ok ( !eval { $version/1 }, "noop /" );
 ok ( !eval { $version*3 }, "noop *" );
 ok ( !eval { abs($version) }, "noop abs" );
+
+# test reformed UNIVERSAL::VERSION
+diag "Replacement UNIVERSAL::VERSION tests" unless $ENV{PERL_CORE};
+
+# we know this file is here since we require it ourselves
+$version = $Test::More::VERSION;
+eval "use Test::More $version";
+unlike($@, qr/Test::More version $version required/,
+	'Replacement eval works with exact version');
+
+$version += 0.01; # this should fail even with old UNIVERSAL::VERSION
+eval "use Test::More $version";
+like($@, qr/Test::More version $version required/,
+	'Replacement eval works with incremented version');
+
+chop($version); # shorten by 1 digit, should still succeed
+eval "use Test::More $version";
+unlike($@, qr/Test::More version $version required/,
+	'Replacement eval works with single digit');
+
+$version += 0.1; # this would fail with old UNIVERSAL::VERSION
+eval "use Test::More $version";
+unlike($@, qr/Test::More version $version required/,
+	'Replacement eval works with incremented digit');
+
