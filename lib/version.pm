@@ -166,13 +166,12 @@ In addition, the subversions are not enforced to be three decimal places.
 
 So, for example:
 
-  $v = new version    "v1.2";    # 1.2
   $v = new version   "1.002";    # 1.2
   $v = new version   "1.2.3";    # 1.2.3
   $v = new version   "1.2.3";    # 1.2.3
   $v = new version  "1.0003";    # 1.3
 
-In additional to conventional versions, Quoted Versions can be
+In addition to conventional versions, Quoted Versions can be
 used to create L<Alpha Versions>.
 
 In general, Quoted Versions permit the greatest amount of freedom
@@ -269,7 +268,7 @@ Both cmp and <=> operators perform the same comparison between terms
 generates all of the other comparison operators based on those two.
 In addition to the obvious equalities listed below, appending a single
 trailing 0 term does not change the value of a version for comparison
-purposes.  In other words "v1.2" and "v1.2.0" are identical versions.
+purposes.  In other words "v1.2" and "1.2.0" will compare as identical.
 
 For example, the following relations hold:
 
@@ -281,19 +280,9 @@ For example, the following relations hold:
   $ver == 1.2     $ver eq "1.2"      false
   $ver == 1.2.3   $ver eq "1.2.3"    see discussion below
 
-In versions of Perl prior to the 5.9.0 development releases, it is not
-permitted to use bare Quoteds in either form, due to the nature of Perl's
-parsing operation.  After that version (and in the stable 5.10.0 release),
-Quoteds can be used with version objects without problem, see L<"Quoting">
-for more discussion of this topic.  In the case of the last two lines of
-the table above, only the string comparison will be true; the numerical
-comparison will test false.  However, you can do this:
-
-  $ver == "1.2.3" or $ver == "v1.2.3"	# both true
-
-even though you are doing a "numeric" comparison with a "string" value.
 It is probably best to chose either the numeric notation or the string
-notation and stick with it, to reduce confusion.  See also L<"Quoting">.
+notation and stick with it, to reduce confusion.  Perl6 version objects
+B<may> only support numeric comparisons.  See also L<"Quoting">.
 
 =back
 
@@ -307,7 +296,7 @@ has been initialized, you can simply test it directly:
   $vobj = new version $something;
   if ( $vobj )   # true only if $something was non-blank
 
-You can also test whether a version object is a L<Alpha version>, for
+You can also test whether a version object is an L<Alpha version>, for
 example to prevent the use of some feature not present in the main
 release:
 
@@ -349,12 +338,12 @@ but other operations are not likely to be what you intend.  For example:
   $V2 = new version 100/9; # Integer overflow in decimal number
   print $V2;               # yields 11_1285418553
 
-Perl 5.9.0 and beyond will be able to automatically quote Quoteds
-(which may become the recommended notation), but that is not possible in
-earlier versions of Perl.  In other words:
+Perl 5.8.1 and beyond will be able to automatically quote v-strings
+(although a warning will be issued under 5.9.x and 5.10.0), but that
+is not possible in earlier versions of Perl.  In other words:
 
   $version = new version "v2.5.4";  # legal in all versions of Perl
-  $newvers = new version v2.5.4;    # legal only in Perl > 5.9.0
+  $newvers = new version v2.5.4;    # legal only in Perl > 5.8.1
 
 
 =head2 Types of Versions Objects
