@@ -214,6 +214,7 @@ Perl_vnumify(pTHX_ SV *vs)
     }
     if ( len == 0 )
 	 Perl_sv_catpv(aTHX_ sv,"000");
+    sv_setnv(sv, SvNV(sv));
     return sv;
 }
 
