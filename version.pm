@@ -9,7 +9,7 @@ use vars qw(@ISA $VERSION $CLASS);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = (qw$Revision: 1.10 $)[1]/10;
+$VERSION = (qw$Revision: 2.0 $)[1]/10;
 
 $CLASS = 'version';
 
@@ -150,8 +150,8 @@ There are three basic types of Version Objects:
 modules will use.  Can contain as many subversions as required.
 In particular, those using RCS/CVS can use one of the following:
 
-  $VERSION = new version (qw$Revision: 1.10 $)[1]; # all Perls
-  $VERSION = new version qw$Revision: 1.10 $[1];   # Perl >= 5.6.0
+  $VERSION = new version (qw$Revision: 2.0 $)[1]; # all Perls
+  $VERSION = new version qw$Revision: 2.0 $[1];   # Perl >= 5.6.0
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the

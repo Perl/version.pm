@@ -1,6 +1,6 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
-# $Revision: 1.5 $
+# $Revision: 2.0 $
 
 #########################
 
