@@ -199,8 +199,8 @@ sub BaseTests {
 	
 	# that which is not expressly permitted is forbidden
 	diag "forbidden operations" unless $ENV{PERL_CORE};
-	ok ( !eval { ++$version }, "noop ++" );
-	ok ( !eval { --$version }, "noop --" );
+	ok ( !eval { $version++ }, "noop ++" );
+	ok ( !eval { $version++ }, "noop --" );
 	ok ( !eval { $version/1 }, "noop /" );
 	ok ( !eval { $version*3 }, "noop *" );
 	ok ( !eval { abs($version) }, "noop abs" );
