@@ -22,7 +22,7 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION $CLASS);
 @EXPORT = qw(
 );
 
-$VERSION = (qw$Revision: 1.5 $)[1]/10;
+$VERSION = (qw$Revision: 1.6 $)[1]/10;
 
 $CLASS = 'version';
 
@@ -63,14 +63,35 @@ of Perl v5.10 except automatic v-string handling.  See L<"Quoting">.
 =head2 Quoting
 
 Because of the nature of the Perl parsing and tokenizing routines, 
-you must always quote the parameter to the new() operator/method.  The
+you should always quote the parameter to the new() operator/method.  The
 exact notation is vitally important to correctly determine the version
-that is requested.  Perl 5.10 and beyond will be able to automatically 
-quote v-strings (which will be the recommended notation), but that is
-not possible in earlier versions of Perl.  In other words:
+that is requested.  You don't B<have> to quote the version parameter,
+but you should be aware of what Perl is likely to do in those cases.
+
+If you use a mathematic formula that resolves to a floating point number,
+you are dependent on Perl's conversion routines to yield the version you
+expect.  You are pretty safe by dividing by a power of 10, for example,
+but other operations are not likely to be what you intend.  For example:
+
+  $VERSION = new version (qw$Revision: 1.4)[1]/10;
+  print $VERSION;          # yields 0.14
+  $V2 = new version 100/9; # Integer overflow in decimal number
+  print $V2;               # yields 11_1285418553
+
+You can use a bare number, if you only have a major and minor version,
+since this should never in practice yield a floating point notation
+error.  For example:
+
+  $VERSION = new version  10.2;  # ok
+  $VERSION = new version "10.2"; # guaranteed ok
+
+Perl v5.9 and beyond will be able to automatically quote v-strings
+(which will become the recommended notation), but that is not possible in
+earlier versions of Perl.  In other words:
 
   $version = new version "v2.5.4";	# legal in all versions of Perl
   $newvers = new version v2.5.4;	# legal only in Perl > v5.9 
+
 
 =head2 Types of Versions Objects
 
@@ -80,7 +101,7 @@ There are three basic types of Version Objects:
 modules will use.  Can contain as many subversions as required.
 In particular, those using RCS/CVS can use the following code:
 
-  $VERSION = new version (qw$Revision: 1.5 $)[1];
+  $VERSION = new version (qw$Revision: 1.6 $)[1];
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the
