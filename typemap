@@ -27,4 +27,4 @@ T_PTROBJ_SPECIAL
         	$var = tmp;
         }
         else
-                Perl_croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+                Perl_croak(aTHX_ \"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")

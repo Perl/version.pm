@@ -115,14 +115,23 @@ SV *
 Perl_new_version(pTHX_ SV *ver)
 {
     SV *rv = NEWSV(92,5);
-    char *version = (char *)SvPV(ver,PL_na);
-
+    char *version;
+    if ( SvNOK(ver) ) /* may get too much accuracy */ 
+    {
+	char tbuf[64];
+	sprintf(tbuf,"%.9g", SvNVX(ver));
+	version = savepv(tbuf);
+    }
 #ifdef SvVOK
-    if ( SvVOK(ver) ) { /* already a v-string */
+    else if ( SvVOK(ver) ) { /* already a v-string */
 	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
 	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
     }
 #endif
+    else
+    {
+	version = (char *)SvPV(ver,PL_na);
+    }
     version = scan_version(version,rv);
     return rv;
 }
@@ -215,7 +224,6 @@ Perl_vstringify(pTHX_ SV *vs)
     if ( SvROK(vs) )
 	vs = SvRV(vs);
     len = av_len((AV *)vs);
-    sv_dump(vs);
     if ( len == -1 )
     {
 	Perl_sv_catpv(aTHX_ sv,"");

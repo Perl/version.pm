@@ -24,9 +24,9 @@ SV * Perl_vnumify(pTHX_ SV *vs);
 SV * Perl_vstringify(pTHX_ SV *vs);
 int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
 
-#define new_version        Perl_new_version
-#define scan_version       Perl_scan_version
-#define upg_version        Perl_upg_version
-#define vcmp               Perl_vcmp
-#define vnumify            Perl_vnumify
-#define vstringify         Perl_vstringify
+#define vnumify(a)		Perl_vnumify(aTHX_ a)
+#define vstringify(a)		Perl_vstringify(aTHX_ a)
+#define vcmp(a,b)		Perl_vcmp(aTHX_ a,b)
+#define scan_version(a,b)	Perl_scan_version(aTHX_ a,b)
+#define new_version(a)		Perl_new_version(aTHX_ a)
+#define upg_version(a)		Perl_upg_version(aTHX_ a)
