@@ -9,7 +9,7 @@ use vars qw(@ISA $VERSION $CLASS);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = 0.29; # stop using CVS and switch to subversion
+$VERSION = 0.30; # stop using CVS and switch to subversion
 
 $CLASS = 'version';
 

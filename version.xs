@@ -32,12 +32,18 @@ new(class,...)
 PPCODE:
 {
     SV *vs = ST(1);
+    SV *rv;
     if (items == 3 )
     {
 	char *version = savepvn(SvPVX(ST(2)),SvCUR(ST(2)));
 	vs = newSVpvf("v%s",version);
     }
-    PUSHs(new_version(vs));
+
+    rv = new_version(vs);
+    if ( strcmp(class,"version") != 0 ) /* inherited new() */
+	sv_bless(rv, gv_stashpv(class,TRUE));
+
+    PUSHs(rv);
 }
 
 void
