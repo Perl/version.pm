@@ -2,8 +2,8 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    'NAME'		=> 'version',
-    'VERSION_FROM'	=> 'lib/version.pm', # finds $VERSION
+    'NAME'		=> 'version::overloaded',
+    'VERSION_FROM'	=> 'lib/version/overloaded.pm', # finds $VERSION
     'PREREQ_PM'		=> {Test::More => 0.45}, # e.g., Module::Name => 1.1
     'LIBS'		=> [''], # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'

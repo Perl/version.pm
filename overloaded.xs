@@ -7,9 +7,9 @@
  * $Revision: 2.5 $
  * --------------------------------------------------*/
 
-typedef     SV *version;
+typedef     SV *version_overloaded;
 
-MODULE = version	PACKAGE = version
+MODULE = version::overloaded	PACKAGE = version::overloaded
 
 PROTOTYPES: DISABLE
 VERSIONCHECK: DISABLE
@@ -17,16 +17,16 @@ VERSIONCHECK: DISABLE
 BOOT:
 	/* register the overloading (type 'A') magic */
 	PL_amagic_generation++;
-	newXS("version::()", XS_version_noop, file);
-	newXS("version::(\"\"", XS_version_stringify, file);
-	newXS("version::(0+", XS_version_numify, file);
-	newXS("version::(cmp", XS_version_vcmp, file);
-	newXS("version::(<=>", XS_version_vcmp, file);
-	newXS("version::(bool", XS_version_boolean, file);
-	newXS("version::(nomethod", XS_version_noop, file);
-	newXS("UNIVERSAL::VERSION", XS_version_VERSION, file);
+	newXS("version::overloaded::()", XS_version__overloaded_noop, file);
+	newXS("version::overloaded::(\"\"", XS_version__overloaded_stringify, file);
+	newXS("version::overloaded::(0+", XS_version__overloaded_numify, file);
+	newXS("version::overloaded::(cmp", XS_version__overloaded_vcmp, file);
+	newXS("version::overloaded::(<=>", XS_version__overloaded_vcmp, file);
+	newXS("version::overloaded::(bool", XS_version__overloaded_boolean, file);
+	newXS("version::overloaded::(nomethod", XS_version__overloaded_noop, file); 
+	newXS("UNIVERSAL::VERSION", XS_version__overloaded_VERSION, file);
 
-version
+version_overloaded
 new(class,...)
     char *class
 PPCODE:
@@ -34,15 +34,15 @@ PPCODE:
     SV *vs = ST(1);
     if (items == 3 )
     {
-	char *version = savepvn(SvPVX(ST(2)),SvCUR(ST(2)));
-	vs = newSVpvf("v%s",version);
+	char *ver = savepvn(SvPVX(ST(2)),SvCUR(ST(2)));
+	vs = newSVpvf("v%s",ver);
     }
     PUSHs(new_version(vs));
 }
 
 void
 stringify (lobj,...)
-    version		lobj
+    version_overloaded		lobj
 PPCODE:
 {
     PUSHs(vstringify(lobj));
@@ -50,7 +50,7 @@ PPCODE:
 
 void
 numify (lobj,...)
-    version		lobj
+    version_overloaded		lobj
 PPCODE:
 {
     PUSHs(vnumify(lobj));
@@ -58,7 +58,7 @@ PPCODE:
 
 void
 vcmp (lobj,...)
-    version		lobj
+    version_overloaded		lobj
 PPCODE:
 {
     SV	*rs;
@@ -66,7 +66,7 @@ PPCODE:
     SV * robj = ST(1);
     IV	 swap = (IV)SvIV(ST(2));
 
-    if ( ! sv_derived_from(robj, "version") )
+    if ( ! sv_derived_from(robj, "version::overloaded") )
     {
 	robj = new_version(robj);
     }
@@ -86,7 +86,7 @@ PPCODE:
 
 void
 boolean(lobj,...)
-    version		lobj
+    version_overloaded		lobj
 PPCODE:
 {
     SV	*rs;
@@ -96,7 +96,7 @@ PPCODE:
 
 void
 noop(lobj,...)
-    version		lobj
+    version_overloaded		lobj
 CODE:
 {
     Perl_croak(aTHX_ "operation not supported with version object");
@@ -104,7 +104,7 @@ CODE:
 
 void
 is_alpha(lobj)
-    version		lobj	
+    version_overloaded		lobj	
 PPCODE:
 {
     I32 len = av_len((AV *)lobj);
@@ -162,10 +162,10 @@ PPCODE:
 		  Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed", str);
 	     }
 	}
-	if ( !sv_derived_from(sv, "version"))
+	if ( !sv_derived_from(sv, "version::overloaded"))
 	    upg_version(sv);
 
-	if ( !sv_derived_from(req, "version"))
+	if ( !sv_derived_from(req, "version::overloaded"))
 	    req = new_version(req); /* req is R/O so we gave to use new */
 
 	if ( vcmp( req, sv ) > 0 )

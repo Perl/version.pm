@@ -27,7 +27,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
     char *pos = s;
     I32 saw_period = 0;
     bool saw_under = 0;
-    SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
+    SV* sv = newSVrv(rv, "version::overloaded"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
 
     /* pre-scan the imput string to check for decimals */

@@ -1,5 +1,5 @@
 #!perl -w
-package version;
+package version::overloaded;
 
 use 5.005_03;
 use strict;
@@ -11,12 +11,36 @@ use vars qw(@ISA $VERSION $CLASS);
 
 $VERSION = 0.29; # stop using CVS and switch to subversion
 
-$CLASS = 'version';
+$CLASS = 'version::overloaded';
 
 local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
-bootstrap version if $] < 5.009;
+bootstrap version::overloaded if $] < 5.009;
 
+package version::tied;
 # Preloaded methods go here.
+
+sub new {
+    my ($tramp_class, $real_class, $init, @args) = @_;
+    my @self;
+    tie @self, $tramp_class, \@self, $init, @args;
+    bless \@self, $real_class;
+}
+
+sub _snap {
+    untie %{$_[0]{orig}};
+    $_[0]{init}->($_[0]{orig},@{$_[0]{args}});
+    return $_[0]{orig};
+}
+
+sub TIEARRAY {
+    my ($class, $orig, $init, @args) = @_;
+    bless { orig => $orig, init => $init, args => \@args },
+    	$class;
+}
+
+sub FETCH	{ &_snap->[$_[1]]; }
+sub STORE	{ &_snap->[$_[1]] = $_[2]; }
+sub FETCHSIZE	{ 3 };
 
 1;
 __END__
