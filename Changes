@@ -1,7 +1,7 @@
 
 RCS file: /var/cvs-repository/version/version.pm,v
 Working file: version.pm
-head: 2.2
+head: 2.4
 branch:
 locks: strict
 access list:
@@ -9,8 +9,18 @@ symbolic names:
 	start: 1.1.1.1
 	jpeacock: 1.1.1
 keyword substitution: kv
-total revisions: 14;	selected revisions: 14
+total revisions: 16;	selected revisions: 16
 description:
+----------------------------
+revision 2.4
+date: 2002/11/18 10:33:23;  author: jpeacock;  state: Exp;  lines: +3 -3
+Fix compile errors under threaded Perl's
+Supress {Unquoted string version} warnings
+----------------------------
+revision 2.3
+date: 2002/10/15 01:27:00;  author: jpeacock;  state: Exp;  lines: +11 -10
+Fix typos
+Fix handling of null versions
 ----------------------------
 revision 2.2
 date: 2002/10/09 00:43:50;  author: jpeacock;  state: Exp;  lines: +19 -8
