@@ -1,16 +1,12 @@
-version version 0.01
+version 0.18
 ====================
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+WARNING: This module is still considered experimental, since it uses features
+from the Perl development release 5.9.0 which have not been finalized yet.  DO
+NOT USE THIS MODULE IN PRODUCTION CODE!
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
+Provides the same version objects as included in Perl 5.9.0 (and hopefully in
+the 5.10.0 release).  Please read the POD documentation for details.
 
 INSTALLATION
 
@@ -23,13 +19,11 @@ To install this module type the following:
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
-
-  blah blah blah
+the same C compiler used to build Perl
 
 COPYRIGHT AND LICENCE
 
-Put the correct copyright and licence information here.
+This module can be distributed under the same terms as Perl.
 
-Copyright (C) 2002 A. U. Thor blah blah blah
+Copyright (C) 2002 John Peacock
 
