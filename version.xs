@@ -35,9 +35,8 @@ PPCODE:
     SV *rv;
     if (items == 3 )
     {
-	char *version = savepvn(SvPVX(ST(2)),SvCUR(ST(2)));
-	vs = newSVpvf("v%s",version);
-	Safefree(version);
+	vs = sv_newmortal();
+	sv_setpvf(vs,"v%s",SvPV_nolen(ST(2)));
     }
 
     rv = new_version(vs);
@@ -127,7 +126,7 @@ qv(ver)
     SV *ver
 PPCODE:
 {
-    SV *vs;
+    SV *vs = sv_newmortal();
     char *version;
     if ( SvNOK(ver) ) /* may get too much accuracy */
     {
@@ -139,10 +138,10 @@ PPCODE:
     {
 	version = savepvn(SvPVX(ver),SvCUR(ver));
     }
-    vs = sv_2mortal(newSVpvf("v%s",version));
+    (void)scan_version(version,vs,TRUE);
     Safefree(version);
 
-    PUSHs(sv_2mortal(new_version(vs)));
+    PUSHs(vs);
 }
 
 void

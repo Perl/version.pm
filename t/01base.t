@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 154;
+use Test::More tests => 156;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
@@ -199,8 +199,8 @@ sub BaseTests {
 	
 	# that which is not expressly permitted is forbidden
 	diag "forbidden operations" unless $ENV{PERL_CORE};
-	ok ( !eval { $version++ }, "noop ++" );
-	ok ( !eval { $version++ }, "noop --" );
+	ok ( !eval { ++$version }, "noop ++" );
+	ok ( !eval { --$version }, "noop --" );
 	ok ( !eval { $version/1 }, "noop /" );
 	ok ( !eval { $version*3 }, "noop *" );
 	ok ( !eval { abs($version) }, "noop abs" );
@@ -211,6 +211,11 @@ sub BaseTests {
 	ok ( $version eq "1.2.0", 'qv("1.2") eq "1.2.0"' );
 	$version = qv(1.2);
 	ok ( $version eq "1.2.0", 'qv(1.2) eq "1.2.0"' );
+
+	# test the CVS revision mode
+	diag "testing CVS Revision";
+	$version = new version qw$Revision: 1.2$;
+	ok ( $version eq "1.2.0", 'qw$Revision: 1.2$ eq 1.2.0' );
 	
 	# test reformed UNIVERSAL::VERSION
 	diag "Replacement UNIVERSAL::VERSION tests" unless $ENV{PERL_CORE};

@@ -153,9 +153,10 @@ Perl_new_version(pTHX_ SV *ver)
 #endif
     else /* must be a string or something like a string */
     {
-	version = (char *)SvPV(ver,PL_na);
+	version = savepv(SvPV_nolen(ver));
     }
-    version = scan_version(version, rv, qv);
+    (void)scan_version(version, rv, qv);
+    Safefree(version);
     return rv;
 }
 
