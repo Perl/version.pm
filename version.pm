@@ -8,7 +8,7 @@ require Exporter;
 require DynaLoader;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION $CLASS);
 
-@ISA = qw(Exporter Dynaloader);
+@ISA = qw(Exporter DynaLoader);
 
 # This allows declaration	use Universal::Version ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
@@ -22,7 +22,7 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION $CLASS);
 @EXPORT = qw(
 );
 
-$VERSION = (qw$Revision: 1.3 $)[1]/10;
+$VERSION = (qw$Revision: 1.4 $)[1]/10;
 
 $CLASS = 'version';
 

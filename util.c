@@ -55,7 +55,7 @@ scan_version(pTHX_ char *s, SV *rv)
 		    rev += (*end - '0') * mult;
 		    mult *= 10;
 		    if (abs(orev) > abs(rev) && ckWARN_d(WARN_OVERFLOW))
-			Perl_warner(aTHX_ WARN_OVERFLOW,
+			warner(aTHX_ WARN_OVERFLOW,
 				    "Integer overflow in decimal number"); 
 		}
 	    }
@@ -104,7 +104,7 @@ SV *
 new_version(pTHX_ SV *ver)
 {
     SV *rv = NEWSV(92,5);
-    char *version = (char *)SvPV_nolen(ver);
+    char *version = (char *)SvPV(ver,PL_na);
 
 #ifdef SvVOK
     if ( SvVOK(ver) ) { /* already a v-string */
@@ -131,7 +131,7 @@ Returns a pointer to the upgraded SV.
 SV *
 upg_version(pTHX_ SV *sv)
 {
-    char *version = (char *)SvPV_nolen(sv_mortalcopy(sv));
+    char *version = (char *)SvPV(sv_mortalcopy(sv),PL_na);
 #ifdef SvVOK
     if ( SvVOK(ver) ) { /* already a v-string */
 	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
