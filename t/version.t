@@ -1,10 +1,10 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
-# $Revision: 1.4 $
+# $Revision: 1.5 $
 
 #########################
 
-use Test::More tests => 58;
+use Test::More tests => 60;
 use_ok(version); # If we made it this far, we are ok.
 
 my ($version, $new_version);
@@ -34,17 +34,11 @@ eval {my $version = new version "1.2_3.4";};
 like($@, qr/underscores before decimal/,
     "Invalid version format (underscores before decimal)");
 
-eval {my $version = new version 100/9;};
-like($@, qr/Integer overflow in version/,
-    "Integer overflow in version");
-
 # Test boolean operator
 ok ($version, 'boolean');
 
 # Test ref operator
 ok (ref($version) eq 'version','ref operator');
-# Test numify operator
-ok ( $version->numify == 1.002003004, '$version->numify == 1.002003004' );
 
 # Test comparison operators with self
 diag "tests with self" unless $ENV{PERL_CORE};
@@ -95,6 +89,16 @@ ok ( $version->numify() == 5.006001, '$version->numify() == 5.006001' );
 ok ( $version->numify() <= 5.006001, '$version->numify() <= 5.006001' );
 ok ( $version->numify() < 5.008, '$version->numify() < 5.008' );
 #ok ( $version->numify() > v5.005_02, '$version->numify() > 5.005_02' );
+
+# test with long decimals
+diag "Tests with extended decimal versions" unless $ENV{PERL_CORE};
+$version = new version 1.002003;
+ok ( $version eq "1.2.3", '$version eq "1.2.3"');
+ok ( $version->numify == 1.002003, '$version->numify == 1.002003');
+$version = new version "2002.09.30.1";
+ok ( $version eq "2002.9.30.1",'$version eq 2002.9.30.1');
+ok ( $version->numify == 2002.009030001,
+    '$version->numify == 2002.009030001');
 
 # now test with Beta version form with string
 $version = new version "1.2.3";
