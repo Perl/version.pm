@@ -73,13 +73,13 @@ scan_version(pTHX_ char *s, SV *rv)
 	    if ( *pos == '.' )
 	    {
 		if ( saw_under )
-		    Perl_croak(aTHX_ "Invalid version format (underscores before decimal)");
+		    croak(aTHX_ "Invalid version format (underscores before decimal)");
 		saw_period = 1;
 	    }
 	    else if ( *pos == '_' )
 	    {
 		if ( saw_under )
-		    Perl_croak(aTHX_ "Invalid version format (multiple underscores)");
+		    croak(aTHX_ "Invalid version format (multiple underscores)");
 		saw_under = 1;
 	    }
 	}
@@ -211,7 +211,9 @@ vstringify(pTHX_ SV *sv, SV *vs)
 /*
 =for apidoc vcmp
 
-Version object aware cmp
+Version object aware cmp.  Both operands must already have been 
+converted into version objects and passed as SV's already extracted
+from the RV object.  XS_version_vcmp takes care of this already.
 
 =cut
 */
@@ -226,11 +228,15 @@ vcmp(pTHX_ SV *lsv, SV *rsv)
     I32 i = 0;
     while ( i <= m && retval == 0 )
     {
-	I32 left  = abs( SvIV(*av_fetch((AV *)lsv,i,0)) );
-	I32 right = abs( SvIV(*av_fetch((AV *)rsv,i,0)) );
-	if ( left < right )
+	I32 left  = SvIV(*av_fetch((AV *)lsv,i,0));
+	I32 right = SvIV(*av_fetch((AV *)rsv,i,0));
+	bool lbeta = left  < 0 ? 1 : 0;
+	bool rbeta = right < 0 ? 1 : 0;
+	left  = abs(left);
+	right = abs(right);
+	if ( left < right || (left == right && lbeta && !rbeta) )
 	    retval = -1;
-	if ( left > right )
+	if ( left > right || (left == right && rbeta && !lbeta) )
 	    retval = +1;
 	i++;
     }
