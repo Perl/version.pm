@@ -4,12 +4,15 @@ package version;
 use 5.005_03;
 use strict;
 
+require Exporter;
 require DynaLoader;
-use vars qw(@ISA $VERSION $CLASS);
+use vars qw(@ISA $VERSION $CLASS @EXPORT);
 
-@ISA = qw(DynaLoader);
+@ISA = qw(Exporter DynaLoader);
 
-$VERSION = 0.31; # stop using CVS and switch to subversion
+@EXPORT = qw(qv);
+
+$VERSION = 0.32; # stop using CVS and switch to subversion
 
 $CLASS = 'version';
 
@@ -39,6 +42,9 @@ version - Perl extension for Version Objects
   $alphaver = new version "1.2_3"; # must be quoted!
   print $alphaver;		# 1.2_3
   print $alphaver->is_alpha();  # true
+  
+  $ver = qv(1.2);               # 1.2.0
+  $ver = qv("1.2");             # 1.2.0
 
   $perlver = new version 5.005_03; # must not be quoted!
   print $perlver;		# 5.5.30
@@ -207,6 +213,18 @@ were used:
 In other words, the version will be automatically parsed out of the
 string, and it will be quoted to preserve the meaning CVS normally
 carries for versions.
+
+An alternate way to create a new version object is through the exported
+qv() sub.  This is not strictly like other q? operators (like qq, qw),
+in that the only delimiters supported are parentheses (or spaces).  It is
+the best way to initialize a short version without triggering the floating
+point interpretation.  For example:
+
+  $v1 = qv(1.2);         # 1.2.0
+  $v2 = qv("1.2");       # also 1.2.0
+
+As you can see, either a bare number or a quoted string can be used, and
+either will yield the same version number.
 
 For the subsequent examples, the following two objects will be used:
 

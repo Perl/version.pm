@@ -122,6 +122,28 @@ PPCODE:
 }
 
 void
+qv(ver)
+    SV *ver
+PPCODE:
+{
+    SV *vs;
+    char *version;
+    if ( SvNOK(ver) ) /* may get too much accuracy */
+    {
+	char tbuf[64];
+	sprintf(tbuf,"%.9"NVgf, SvNVX(ver));
+	version = savepv(tbuf);
+    }
+    else
+    {
+	version = savepvn(SvPVX(ver),SvCUR(ver));
+    }
+    vs = sv_2mortal(newSVpvf("v%s",version));
+
+    PUSHs(new_version(vs));
+}
+
+void
 VERSION(sv,...)
     SV *sv
 PPCODE:

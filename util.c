@@ -10,18 +10,20 @@ an RV.
 Function must be called with an already existing SV like
 
     sv = newSV(0);
-    s = scan_version(s,sv);
+    s = scan_version(s,SV *sv, bool qv);
 
 Performs some preprocessing to the string to ensure that
 it has the correct characteristics of a version.  Flags the
 object if it contains an underscore (which denotes this
-is a alpha version).
+is a alpha version).  The boolean qv denotes that the version
+should be interpreted as if it had multiple decimals, even if
+it doesn't.
 
 =cut
 */
 
 char *
-Perl_scan_version(pTHX_ char *s, SV *rv)
+Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 {
     const char *start = s;
     char *pos = s;
@@ -49,7 +51,10 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
     }
     pos = s;
 
-    if (*pos == 'v') pos++;  /* get past 'v' */
+    if (*pos == 'v') {
+	pos++;  /* get past 'v' */
+	qv = 1; /* force quoted version processing */
+    }
     while (isDIGIT(*pos))
 	pos++;
     if (!isALPHA(*pos)) {
@@ -71,7 +76,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
 		 * point of a version originally created with a bare
 		 * floating point number, i.e. not quoted in any way
 		 */
- 		if ( s > start+1 && saw_period == 1 && !saw_under ) {
+ 		if ( !qv && s > start+1 && saw_period == 1 && !saw_under ) {
  		    mult = 100;
  		    while ( s < end ) {
  			orev = rev;
@@ -131,6 +136,8 @@ Perl_new_version(pTHX_ SV *ver)
 {
     SV *rv = newSV(0);
     char *version;
+    bool qv = 0;
+
     if ( SvNOK(ver) ) /* may get too much accuracy */ 
     {
 	char tbuf[64];
@@ -141,13 +148,14 @@ Perl_new_version(pTHX_ SV *ver)
     else if ( SvVOK(ver) ) { /* already a v-string */
 	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
 	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
+	qv = 1;
     }
 #endif
     else /* must be a string or something like a string */
     {
 	version = (char *)SvPV(ver,PL_na);
     }
-    version = scan_version(version,rv);
+    version = scan_version(version, rv, qv);
     return rv;
 }
 
@@ -166,14 +174,16 @@ Returns a pointer to the upgraded SV.
 SV *
 Perl_upg_version(pTHX_ SV *ver)
 {
+    bool qv = 0;
     char *version = savepvn(SvPVX(ver),SvCUR(ver));
 #ifdef SvVOK
     if ( SvVOK(ver) ) { /* already a v-string */
 	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
 	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
+	qv = 1;
     }
 #endif
-    version = scan_version(version,ver);
+    version = scan_version(version,ver,qv);
     return ver;
 }
 

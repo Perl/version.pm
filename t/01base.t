@@ -1,10 +1,10 @@
-#! /usr/local/perl 
+#! /usr/local/perl -w
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
 
 #########################
 
-use Test::More tests => 150;
+use Test::More tests => 154;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
@@ -204,6 +204,13 @@ sub BaseTests {
 	ok ( !eval { $version/1 }, "noop /" );
 	ok ( !eval { $version*3 }, "noop *" );
 	ok ( !eval { abs($version) }, "noop abs" );
+
+	# test the qv() sub
+	diag "testing qv" unless $ENV{PERL_CORE};
+	$version = qv("1.2");
+	ok ( $version eq "1.2.0", 'qv("1.2") eq "1.2.0"' );
+	$version = qv(1.2);
+	ok ( $version eq "1.2.0", 'qv(1.2) eq "1.2.0"' );
 	
 	# test reformed UNIVERSAL::VERSION
 	diag "Replacement UNIVERSAL::VERSION tests" unless $ENV{PERL_CORE};
@@ -222,7 +229,8 @@ sub BaseTests {
 	like($@, qr/Test::More version $version required/,
 		'Replacement eval works with incremented version');
 	
-	chop($version); # shorten by 1 digit, should still succeed
+	$version =~ s/...$//; #convert to string and remove trailing '.0'
+	chop($version);	# shorten by 1 digit, should still succeed
 	eval "use Test::More $version";
 	unlike($@, qr/Test::More version $version required/,
 		'Replacement eval works with single digit');
