@@ -27,7 +27,6 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
     char *pos = s;
     I32 saw_period = 0;
     bool saw_under = 0;
-    bool was_string = ( SvTYPE(rv) == SVt_PV );
     SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
 
@@ -72,7 +71,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
 		 * point of a version originally created with a bare
 		 * floating point number, i.e. not quoted in any way
 		 */
- 		if ( s > start+1 && saw_period == 1 && !saw_under && !was_string) {
+ 		if ( s > start+1 && saw_period == 1 && !saw_under ) {
  		    mult = 100;
  		    while ( s < end ) {
  			orev = rev;
@@ -146,20 +145,7 @@ Perl_new_version(pTHX_ SV *ver)
 #endif
     else /* must be a string or something like a string */
     {
-	int decimal = 0;
-	char *tmpstr;
 	version = (char *)SvPV(ver,PL_na);
-	for (   tmpstr  = strchr(version,'.');
-		tmpstr != NULL;
-		tmpstr  = strchr(tmpstr,'.') )
-	{
-	    decimal++; 
-	    tmpstr++;
-	}
-	if ( decimal == 1 && !strchr(version,'_') )
-	{
-	    (void)sv_upgrade(rv,SVt_PV);
-	}
     }
     version = scan_version(version,rv);
     return rv;

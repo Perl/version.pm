@@ -4,7 +4,7 @@
 #include "util.h"
 
 /* --------------------------------------------------
- * $Revision: 2.4 $
+ * $Revision: 2.5 $
  * --------------------------------------------------*/
 
 typedef     SV *version;
@@ -27,11 +27,16 @@ BOOT:
 	newXS("UNIVERSAL::VERSION", XS_version_VERSION, file);
 
 version
-new(class,vs)
+new(class,...)
     char *class
-    SV *vs
 PPCODE:
 {
+    SV *vs = ST(1);
+    if (items == 3 )
+    {
+	char *version = savepvn(SvPVX(ST(2)),SvCUR(ST(2)));
+	vs = newSVpvf("v%s",version);
+    }
     PUSHs(new_version(vs));
 }
 
