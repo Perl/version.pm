@@ -9,7 +9,7 @@ use vars qw(@ISA $VERSION $CLASS);
 
 @ISA = qw(DynaLoader);
 
-$VERSION = 0.28; # stop using CVS and switch to subversion
+$VERSION = 0.29; # stop using CVS and switch to subversion
 
 $CLASS = 'version';
 
@@ -175,7 +175,7 @@ code can be employed:
 and the version object will be created as if the following code
 were used:
 
-  $VERSION = new version "v2.6";
+  $VERSION = new version "v2.7";
 
 In other words, the version will be automatically parsed out of the
 string, and it will be quoted to preserve the meaning CVS normally
