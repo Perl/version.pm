@@ -4,25 +4,12 @@ package version;
 use 5.005_03;
 use strict;
 
-require Exporter;
 require DynaLoader;
-use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION $CLASS);
+use vars qw(@ISA $VERSION $CLASS);
 
-@ISA = qw(Exporter DynaLoader);
+@ISA = qw(DynaLoader);
 
-# This allows declaration	use version ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-%EXPORT_TAGS = ( 'all' => [ qw(
-
-) ] );
-
-@EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-@EXPORT = qw(
-);
-
-$VERSION = (qw$Revision: 1.9 $)[1]/10;
+$VERSION = (qw$Revision: 1.10 $)[1]/10;
 
 $CLASS = 'version';
 
@@ -163,8 +150,8 @@ There are three basic types of Version Objects:
 modules will use.  Can contain as many subversions as required.
 In particular, those using RCS/CVS can use one of the following:
 
-  $VERSION = new version (qw$Revision: 1.9 $)[1]; # all Perls
-  $VERSION = new version qw$Revision: 1.9 $[1];   # Perl >= 5.6.0
+  $VERSION = new version (qw$Revision: 1.10 $)[1]; # all Perls
+  $VERSION = new version qw$Revision: 1.10 $[1];   # Perl >= 5.6.0
 
 and the current RCS Revision for that file will be inserted 
 automatically.  If the file has been moved to a branch, the
