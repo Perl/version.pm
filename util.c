@@ -43,7 +43,7 @@ scan_version(pTHX_ char *s, SV *rv)
 		char *end = pos;
 		I32 mult = 1;
 		if ( s < pos && *(s-1) == '_' ) {
-		    if ( *s == '0' )
+		    if ( *s == '0' && *(s+1) != '0')
 			mult = 10;	/* perl-style */
 		    else
 			mult = -1;	/* beta version */
@@ -131,7 +131,7 @@ Returns a pointer to the upgraded SV.
 SV *
 upg_version(pTHX_ SV *sv)
 {
-    char *version = (char *)SvPV(sv_mortalcopy(sv),PL_na);
+    char *version = savepvn(SvPVX(sv),SvCUR(sv));
 #ifdef SvVOK
     if ( SvVOK(ver) ) { /* already a v-string */
 	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
