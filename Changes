@@ -1,4 +1,26 @@
 ------------------------------------------------------------------------
+rev 88:  jpeacock | 2003-06-22 15:06:41 -0400 (Sun, 22 Jun 2003) | 3 lines
+
+Add ->is_alpha and ->is_beta to version::AlphaBeta
+Document the new methods
+
+------------------------------------------------------------------------
+rev 87:  jpeacock | 2003-06-22 11:54:02 -0400 (Sun, 22 Jun 2003) | 3 lines
+
+Rename the test files to be more descriptive
+Modify version::AlphaBeta to work with Perl 5.005_03
+
+------------------------------------------------------------------------
+rev 83:  jpeacock | 2003-06-13 21:40:10 -0400 (Fri, 13 Jun 2003) | 2 lines
+
+Attempt to merge tie()'d and overload()'d interfaces.
+
+------------------------------------------------------------------------
+rev 82:  jpeacock | 2003-06-13 21:34:50 -0400 (Fri, 13 Jun 2003) | 2 lines
+
+Forgot to commit this before releasing.
+
+------------------------------------------------------------------------
 rev 78:  jpeacock | 2003-06-13 15:02:11 -0400 (Fri, 13 Jun 2003) | 2 lines
 
 Correct the example code (again) to correct for CVS update problems

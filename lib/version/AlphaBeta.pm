@@ -1,9 +1,8 @@
 #!/usr/bin/perl -w
 package version::AlphaBeta;
 
-use 5.006;
+use 5.005_03;
 use strict;
-use warnings;
 use version;
 use Exporter;
 
@@ -17,7 +16,7 @@ use vars qw(@ISA $VERSION %IB %OB $TYPE);
 
 @ISA = qw(Exporter version);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 %IB = (
     'a' => 1,
@@ -39,7 +38,7 @@ sub new {
     my $parent = $proto if ref($proto);
     my $ival   = shift; 
 
-    my $value  = [ grep { defined $_ }
+    my @value  = ( grep { defined $_ }
         ($ival =~
 	    /^v?         # optional prefix
 	     (\d+)	# Major
@@ -49,17 +48,17 @@ sub new {
 	     ($TYPE)?   # Type
 	     (\d+)?	# Subversion
 	    $/x)
-    ];
+    );
 
     die "Illegal version string format: \"$ival\""
-	unless scalar(@$value) >= 2  # something matched
-	    and scalar(@$value) <= 4;# but not too much
+	unless scalar(@value) >= 2  # something matched
+	    and scalar(@value) <= 4;# but not too much
 
-    $value->[2] = $IB{
-	(defined $value->[2] ? $value->[2] : "")
+    $value[2] = $IB{
+	(defined $value[2] ? $value[2] : "")
     }; 
 
-    my $self = version->new('v'.join(".",@$value));
+    my $self = version->new('v'.join(".",@value));
     bless $self, $class;
 
     return $self;
@@ -86,6 +85,19 @@ sub spaceship {
     return version::vcmp($left, $right,$swap);
 }
 
+sub is_alpha {
+    my $self = shift;
+    my @value = split /\./, $self->stringify();
+
+    return ($value[2] == $IB{'a'});
+}
+
+sub is_beta {
+    my $self = shift;
+    my @value = split /\./, $self->stringify();
+
+    return ($value[2] == $IB{'b'});
+}
 
 1;
 __END__
@@ -140,6 +152,35 @@ version parameters:
   );
 
 which, if present at all, must be located in the third subversion.
+
+=head2 OBJECT METHODS
+
+This module provides two additional logical methods, apart from 
+those already exported by the base version class.
+
+=over 4
+
+=item * is_alpha
+
+Replacing the base method by the same name, this will return true
+only if the version has an 'a' in the third position, i.e.
+
+  $VERSION = new version::AlphaBeta "1.3a1";
+  print $VERSION->is_alpha; # prints 1
+
+=back
+
+=over 4
+
+=item * is_beta
+
+A new method which supplements $obj->is_alpha:
+
+  $VERSION = new version::AlphaBeta "1.3b3";
+  print $VERSION->is_alpha; # prints 0
+  print $VERSION->is_beta; # prints 1
+
+=back
 
 =head2 EXPORT
 

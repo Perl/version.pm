@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 11;
+use Test::More tests => 16;
 BEGIN { use_ok('version::AlphaBeta') };
 
 #########################
@@ -16,10 +16,17 @@ BEGIN { use_ok('version::AlphaBeta') };
 my $v = new version::AlphaBeta "1.2rc1";
 ok ("v1.2rc1" eq "$v", "Release candidate: [$v]");
 
+$v = new version::AlphaBeta "1.3a";
+ok ("v1.3a" eq "$v", "Alpha: [$v]");
+ok ("v1.3a" eq  $v, "v1.3a eq Alpha");
+ok ("v1.3a" == $v, "v1.3a == Alpha");
+ok ($v->is_alpha, "$v->is_alpha");
+
 $v = new version::AlphaBeta "1.2b";
 ok ("v1.2b" eq "$v", "Beta: [$v]");
 ok ("v1.2b" eq  $v, "v1.2b eq Beta");
 ok ("v1.2b" == $v, "v1.2b == Beta");
+ok ($v->is_beta, "$v->is_beta");
 
 $v = new version::AlphaBeta "v1.2";
 ok ("v1.2" eq "$v", "Release: [$v]");
