@@ -19,9 +19,11 @@ is a beta version).
 
 =cut
 */
+
 char *
 Perl_scan_version(pTHX_ char *s, SV *rv)
 {
+    const char *start = s;
     char *pos = s;
     I32 saw_period = 0;
     bool saw_under = 0;
@@ -49,7 +51,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
 
     if (*pos == 'v') pos++;  /* get past 'v' */
     while (isDIGIT(*pos))
-    pos++;
+	pos++;
     if (!isALPHA(*pos)) {
 	I32 rev;
 
@@ -61,14 +63,13 @@ Perl_scan_version(pTHX_ char *s, SV *rv)
 		/* this is atoi() that delimits on underscores */
 		char *end = pos;
 		I32 mult = 1;
-		if ( s < pos && *(s-1) == '_' ) {
+		if ( s < pos && s > start && *(s-1) == '_' ) {
 		    if ( *s == '0' && *(s+1) != '0')
 			mult = 10;	/* perl-style */
 		    else
 			mult = -1;	/* beta version */
 		}
 		while (--end >= s) {
-
 		    I32 orev;
 		    orev = rev;
 		    rev += (*end - '0') * mult;
@@ -119,7 +120,7 @@ Perl_new_version(pTHX_ SV *ver)
     if ( SvNOK(ver) ) /* may get too much accuracy */ 
     {
 	char tbuf[64];
-	sprintf(tbuf,"%.9g", SvNVX(ver));
+	sprintf(tbuf,"%.9"NVgf, SvNVX(ver));
 	version = savepv(tbuf);
     }
 #ifdef SvVOK
