@@ -176,6 +176,11 @@ Perl_vnumify(pTHX_ SV *vs)
     if ( SvROK(vs) )
 	vs = SvRV(vs);
     len = av_len((AV *)vs);
+    if ( len == -1 )
+    {
+	Perl_sv_catpv(aTHX_ sv,"0");
+	return sv;
+    }
     digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
     Perl_sv_setpvf(aTHX_ sv,"%d.",abs(digit));
     for ( i = 1 ; i <= len ; i++ )
@@ -210,6 +215,11 @@ Perl_vstringify(pTHX_ SV *vs)
     if ( SvROK(vs) )
 	vs = SvRV(vs);
     len = av_len((AV *)vs);
+    if ( len == -1 )
+    {
+	Perl_sv_catpv(aTHX_ sv,"");
+	return sv;
+    }
     digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
     Perl_sv_setpvf(aTHX_ sv,"%d",digit);
     for ( i = 1 ; i <= len ; i++ )

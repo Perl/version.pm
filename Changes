@@ -1,6 +1,73 @@
-Revision history for Perl extension version.
 
-0.01  Thu Sep  5 21:46:15 2002
-	- original version; created by h2xs 1.21 with options
-		-An version
+RCS file: /var/cvs-repository/version/version.pm,v
+Working file: version.pm
+head: 2.2
+branch:
+locks: strict
+access list:
+symbolic names:
+	start: 1.1.1.1
+	jpeacock: 1.1.1
+keyword substitution: kv
+total revisions: 14;	selected revisions: 14
+description:
+----------------------------
+revision 2.2
+date: 2002/10/09 00:43:50;  author: jpeacock;  state: Exp;  lines: +19 -8
+Recover gracefully to null versions (rather than core)
+----------------------------
+revision 2.1
+date: 2002/10/05 02:57:00;  author: jpeacock;  state: Exp;  lines: +8 -3
+Document extended decimal version parsing
+----------------------------
+revision 2.0
+date: 2002/10/05 01:01:35;  author: jpeacock;  state: Exp;  lines: +3 -3
+Force all files to next major revision (so the version works)
+----------------------------
+revision 1.10
+date: 2002/10/05 00:31:01;  author: jpeacock;  state: Exp;  lines: +5 -18
+Remove dependency on Exporter.pm
+----------------------------
+revision 1.9
+date: 2002/09/29 23:44:47;  author: jpeacock;  state: Exp;  lines: +4 -4
+Change vstringify and vnumify
+Reword main POD slightly
+----------------------------
+revision 1.8
+date: 2002/09/28 10:15:34;  author: jpeacock;  state: Exp;  lines: +79 -13
+POD changes
+----------------------------
+revision 1.7
+date: 2002/09/23 01:40:02;  author: jpeacock;  state: Exp;  lines: +22 -5
+Document the UNIVERSAL::VERSION replacement
+----------------------------
+revision 1.6
+date: 2002/09/16 12:12:49;  author: jpeacock;  state: Exp;  lines: +27 -6
+More POD changes
+----------------------------
+revision 1.5
+date: 2002/09/16 11:52:08;  author: jpeacock;  state: Exp;  lines: +84 -14
+Add additional testing
+Add POD
+----------------------------
+revision 1.4
+date: 2002/09/16 10:17:41;  author: jpeacock;  state: Exp;  lines: +2 -2
+Finally works in 5.005_03, 5.6.1, and 5.8.0
+----------------------------
+revision 1.3
+date: 2002/09/14 20:08:23;  author: jpeacock;  state: Exp;  lines: +10 -20
+working AV objects in 5.6.x only
+----------------------------
+revision 1.2
+date: 2002/09/14 02:28:39;  author: jpeacock;  state: Exp;  lines: +1 -2
+almost working AV style version objects
+----------------------------
+revision 1.1
+date: 2002/09/14 01:59:10;  author: jpeacock;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2002/09/14 01:59:10;  author: jpeacock;  state: Exp;  lines: +0 -0
 
+=============================================================================
