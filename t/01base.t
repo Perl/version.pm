@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 170;
+use Test::More tests => 171;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
@@ -24,7 +24,8 @@ package main;
 my $testobj = new version::Empty 1.002_003;
 isa_ok( $testobj, "version::Empty" );
 ok( $testobj->numify == 1.002003, "Numified correctly" );
-ok( $testobj->stringify eq "1.2.3", "Stringified correctly" );
+ok( $testobj->stringify eq "1.002003", "Stringified correctly" );
+ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 
 my $verobj = new version "1.2.4";
 ok( $verobj > $testobj, "Comparison vs parent class" );
@@ -41,7 +42,7 @@ sub BaseTests {
 	# Test bare number processing
 	diag "tests with bare numbers" unless $ENV{PERL_CORE};
 	$version = $CLASS->new(5.005_03);
-	is ( "$version" , "5.5.30" , '5.005_03 eq 5.5.30' );
+	is ( "$version" , "5.005030" , '5.005_03 eq 5.5.30' );
 	$version = $CLASS->new(1.23);
 	is ( "$version" , "1.230" , '1.23 eq "1.230"' );
 	
@@ -50,16 +51,16 @@ sub BaseTests {
 	$version = $CLASS->new("5.005_03");
 	is ( "$version" , "5.005_030" , '"5.005_03" eq "5.005_030"' );
 	$version = $CLASS->new("v1.23");
-	is ( "$version" , "1.23.0" , '"v1.23" eq "1.23.0"' );
+	is ( "$version" , "v1.23.0" , '"v1.23" eq "v1.23.0"' );
 	
 	# Test stringify operator
 	diag "tests with stringify" unless $ENV{PERL_CORE};
 	$version = $CLASS->new("5.005");
 	is ( "$version" , "5.005" , '5.005 eq "5.005"' );
 	$version = $CLASS->new("5.006.001");
-	is ( "$version" , "5.6.1" , '5.006.001 eq 5.6.1' );
+	is ( "$version" , "v5.6.1" , '5.006.001 eq v5.6.1' );
 	$version = $CLASS->new("1.2.3_4");
-	is ( "$version" , "1.2.3_4" , 'alpha version 1.2.3_4 eq 1.2.3_4' );
+	is ( "$version" , "v1.2.3_4" , 'alpha version 1.2.3_4 eq v1.2.3_4' );
 	
 	# test illegal formats
 	diag "test illegal formats" unless $ENV{PERL_CORE};
@@ -255,12 +256,12 @@ SKIP: 	{
 		    if $] < 5.008_001; 
 	    diag "Tests with v-strings" unless $ENV{PERL_CORE};
 	    $version = $CLASS->new(1.2.3);
-	    ok("$version" eq "1.2.3", '"$version" eq 1.2.3');
+	    ok("$version" eq "v1.2.3", '"$version" eq 1.2.3');
 	    $version = $CLASS->new(1.0.0);
 	    $new_version = $CLASS->new(1);
 	    ok($version == $new_version, '$version == $new_version');
 	    ok($version eq $new_version, '$version eq $new_version');
 	    $version = qv(1.2.3);
-	    ok("$version" eq "1.2.3", 'v-string initialized qv()');
+	    ok("$version" eq "v1.2.3", 'v-string initialized qv()');
 	}
 }

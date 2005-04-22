@@ -27,6 +27,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 {
     const char *start = s;
     char *pos = s;
+    char *last = pos;
     I32 saw_period = 0;
     bool saw_under = 0;
     SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
@@ -41,27 +42,40 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 	    if ( saw_under )
 		Perl_croak(aTHX_ "Invalid version format (underscores before decimal)");
 	    saw_period++ ;
+	    last = pos;
 	}
 	else if ( *pos == '_' )
 	{
 	    if ( saw_under )
 		Perl_croak(aTHX_ "Invalid version format (multiple underscores)");
-	    saw_under = 1;
+	    saw_under = pos - last - 1; /* natural width of subversion */
 	}
 	pos++;
     }
-    pos = s;
 
-    if (*pos == 'v') {
-	pos++;  /* get past 'v' */
+    if ( saw_period > 1 ) {
 	qv = 1; /* force quoted version processing */
     }
+
+    if (*s == 'v') {
+	s++;  /* get past 'v' */
+	qv = 1; /* force quoted version processing */
+    }
+
+    pos = s;
+
+    if ( qv )
+	av_push((AV *)sv, newSViv((IV)0));
+    else if ( saw_under )
+	av_push((AV *)sv, newSViv((IV)saw_under));
+    else
+	av_push((AV *)sv, newSViv((IV)3));
+    
     while (isDIGIT(*pos))
 	pos++;
     if (!isALPHA(*pos)) {
 	I32 rev;
 
-	if (*s == 'v') s++;  /* get past 'v' */
 
 	for (;;) {
 	    rev = 0;
@@ -71,13 +85,17 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
   		I32 mult = 1;
  		I32 orev;
   		if ( s < pos && s > start && *(s-1) == '_' ) {
- 			mult *= -1;	/* alpha version */
-  		}
+		    /* alpha version */
+		    if ( qv || saw_under == 2 ) 
+			mult *= -1;
+		    else
+ 			mult *= -10;
+		}
 		/* the following if() will only be true after the decimal
 		 * point of a version originally created with a bare
 		 * floating point number, i.e. not quoted in any way
 		 */
- 		if ( !qv && s > start+1 && saw_period == 1 ) {
+ 		if ( !qv && !saw_under && s > start+1 && saw_period == 1 ) {
 		    mult *= 100;
  		    while ( s < end ) {
  			orev = rev;
@@ -116,7 +134,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 	    }
 	}
     }
-    if ( qv ) { /* quoted versions always become full version objects */
+    if ( qv ) { /* quoted versions always get at least three terms*/
 	I32 len = av_len((AV *)sv);
 	/* This for loop appears to trigger a compiler bug on OS X, as it
 	   loops infinitely. Yes, len is negative. No, it makes no sense.
@@ -125,7 +143,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 	   for ( len = 2 - len; len > 0; len-- )
 	   av_push((AV *)sv, newSViv(0));
 	*/
-	len = 2 - len;
+	len = 3 - len;
 	while (len-- > 0)
 	    av_push((AV *)sv, newSViv(0));
     }
@@ -156,6 +174,7 @@ Perl_new_version(pTHX_ SV *ver)
 	SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
 	(void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
 	AvREAL_on((AV*)sv);
+	
 	for ( key = 0; key <= av_len(av); key++ )
 	{
 	    I32 rev = SvIV(*av_fetch(av, key, FALSE));
@@ -240,36 +259,42 @@ contained within the RV.
 SV *
 Perl_vnumify(pTHX_ SV *vs)
 {
-    I32 i, len, digit;
+    I32 i, len, digit, width; 
     SV *sv = newSV(0);
     if ( SvROK(vs) )
 	vs = SvRV(vs);
+
     len = av_len((AV *)vs);
     if ( len == -1 )
     {
 	Perl_sv_catpv(aTHX_ sv,"0");
 	return sv;
     }
-    digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
+
+    width = SvIV(*av_fetch((AV *)vs, 0, 0));
+    if ( width == 0 )
+	width = 3; /* v-formatted */
+
+    digit = SvIV(*av_fetch((AV *)vs, 1, 0));
     Perl_sv_setpvf(aTHX_ sv,"%d.", (int)PERL_ABS(digit));
-    for ( i = 1 ; i < len ; i++ )
+    for ( i = 2 ; i < len ; i++ )
     {
-	digit = SvIVX(*av_fetch((AV *)vs, i, 0));
-	Perl_sv_catpvf(aTHX_ sv,"%03d", (int)PERL_ABS(digit));
+	digit = SvIV(*av_fetch((AV *)vs, i, 0));
+	Perl_sv_catpvf(aTHX_ sv,"%0*d", width, (int)PERL_ABS(digit));
     }
 
-    if ( len > 0 )
+    if ( len > 1 )
     {
-	digit = SvIVX(*av_fetch((AV *)vs, len, 0));
-	if ( (int)PERL_ABS(digit) != 0 || len == 1 )
+	digit = SvIV(*av_fetch((AV *)vs, len, 0));
+	if ( (int)PERL_ABS(digit) != 0 || len == 2 )
 	{
 	    if ( digit < 0 ) /* alpha version */
 		Perl_sv_catpv(aTHX_ sv,"_");
 	    /* Don't display additional trailing zeros */
-	    Perl_sv_catpvf(aTHX_ sv,"%03d", (int)PERL_ABS(digit));
+	    Perl_sv_catpvf(aTHX_ sv,"%0*d", width, (int)PERL_ABS(digit));
 	}
     }
-    else /* len == 0 */
+    else /* len == 1 */
     {
 	 Perl_sv_catpv(aTHX_ sv,"000");
     }
@@ -303,19 +328,19 @@ Perl_vnormal(pTHX_ SV *vs)
 	Perl_sv_catpv(aTHX_ sv,"");
 	return sv;
     }
-    digit = SvIVX(*av_fetch((AV *)vs, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv,"%"IVdf,(IV)digit);
-    for ( i = 1 ; i <= len ; i++ )
+    digit = SvIV(*av_fetch((AV *)vs, 1, 0));
+    Perl_sv_setpvf(aTHX_ sv,"v%"IVdf,(IV)digit);
+    for ( i = 2 ; i <= len ; i++ )
     {
-	digit = SvIVX(*av_fetch((AV *)vs, i, 0));
+	digit = SvIV(*av_fetch((AV *)vs, i, 0));
 	if ( digit < 0 )
 	    Perl_sv_catpvf(aTHX_ sv,"_%"IVdf,(IV)-digit);
 	else
 	    Perl_sv_catpvf(aTHX_ sv,".%"IVdf,(IV)digit);
     }
     
-    if ( len <= 2 ) { /* short version, must be at least three */
-	for ( len = 2 - len; len != 0; len-- )
+    if ( len <= 3 ) { /* short version, must be at least three */
+	for ( len = 3 - len; len != 0; len-- )
 	    Perl_sv_catpv(aTHX_ sv,".0");
     }
 
@@ -336,13 +361,12 @@ the original version contained 1 or more dots, respectively
 SV *
 Perl_vstringify(pTHX_ SV *vs)
 {
-    I32 len, digit;
+    I32 type;
     if ( SvROK(vs) )
 	vs = SvRV(vs);
-    len = av_len((AV *)vs);
-    digit = SvIVX(*av_fetch((AV *)vs, len, 0));
+    type = SvIV(*av_fetch((AV *)vs, 0, 0));
     
-    if ( len < 2 || ( len == 2 && digit < 0 ) )
+    if ( type )
 	return vnumify(vs);
     else
 	return vnormal(vs);
@@ -369,7 +393,7 @@ Perl_vcmp(pTHX_ SV *lsv, SV *rsv)
     r = av_len((AV *)rsv);
     m = l < r ? l : r;
     retval = 0;
-    i = 0;
+    i = 1;
     while ( i <= m && retval == 0 )
     {
 	I32 left  = SvIV(*av_fetch((AV *)lsv,i,0));
