@@ -84,18 +84,12 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
   		char *end = pos;
   		I32 mult = 1;
  		I32 orev;
-  		if ( s < pos && s > start && *(s-1) == '_' ) {
-		    /* alpha version */
-		    if ( qv || saw_under == 2 ) 
-			mult *= -1;
-		    else
- 			mult *= -10;
-		}
+
 		/* the following if() will only be true after the decimal
 		 * point of a version originally created with a bare
 		 * floating point number, i.e. not quoted in any way
 		 */
- 		if ( !qv && !saw_under && s > start+1 && saw_period == 1 ) {
+ 		if ( !qv && s > start+1 && saw_period == 1 ) {
 		    mult *= 100;
  		    while ( s < end ) {
  			orev = rev;
@@ -104,6 +98,8 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
  			if ( PERL_ABS(orev) > PERL_ABS(rev) )
  			    Perl_croak(aTHX_ "Integer overflow in version");
  			s++;
+			if ( *s == '_' )
+			    s++;
  		    }
   		}
  		else {
@@ -116,10 +112,16 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
  		    }
  		} 
   	    }
+
+	    /* if this is the last term and an alpha, make it negative */
+	    if ( saw_under && !isDIGIT(*pos) && *pos != '.' && *pos != '_' )
+		rev *= -1;
   
   	    /* Append revision */
 	    av_push((AV *)sv, newSViv(rev));
-	    if ( (*pos == '.' || *pos == '_') && isDIGIT(pos[1]))
+	    if ( *pos == '.' && isDIGIT(pos[1]) )
+		s = ++pos;
+	    else if ( qv && *pos == '_' && isDIGIT(pos[1]) )
 		s = ++pos;
 	    else if ( isDIGIT(*pos) )
 		s = pos;
@@ -127,10 +129,20 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 		s = pos;
 		break;
 	    }
-	    while ( isDIGIT(*pos) ) {
-		if ( saw_period == 1 && pos-s == 3 )
-		    break;
-		pos++;
+	    if ( qv ) {
+		while ( isDIGIT(*pos) )
+		    pos++;
+	    }
+	    else {
+		while ( isDIGIT(*pos) || *pos == '_' ) {
+		    if ( *pos == '_' )
+			pos++;
+		    if ( (pos-s == 3
+		      || (pos-s == 4 && pos[-1] == '_' )) ) {
+			break;
+		    }
+		    pos++;
+		}
 	    }
 	}
     }
@@ -280,7 +292,14 @@ Perl_vnumify(pTHX_ SV *vs)
     for ( i = 2 ; i < len ; i++ )
     {
 	digit = SvIV(*av_fetch((AV *)vs, i, 0));
-	Perl_sv_catpvf(aTHX_ sv,"%0*d", width, (int)PERL_ABS(digit));
+	if ( width < 3 ) {
+	    int denom = (int)pow(10,(3-width));
+	    div_t term = div((int)PERL_ABS(digit),denom);
+	    Perl_sv_catpvf(aTHX_ sv,"%0*d_%d", width, term.quot, term.rem);
+	}
+	else {
+	    Perl_sv_catpvf(aTHX_ sv,"%0*d",width, (int)PERL_ABS(digit));
+	}
     }
 
     if ( len > 1 )
@@ -288,7 +307,7 @@ Perl_vnumify(pTHX_ SV *vs)
 	digit = SvIV(*av_fetch((AV *)vs, len, 0));
 	if ( (int)PERL_ABS(digit) != 0 || len == 2 )
 	{
-	    if ( digit < 0 ) /* alpha version */
+	    if ( digit < 0 && width == 3 ) /* alpha version */
 		Perl_sv_catpv(aTHX_ sv,"_");
 	    /* Don't display additional trailing zeros */
 	    Perl_sv_catpvf(aTHX_ sv,"%0*d", width, (int)PERL_ABS(digit));
