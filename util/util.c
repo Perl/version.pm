@@ -429,12 +429,13 @@ int
 Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
 {
     I32 i,l,m,r,retval;
-    bool lalpha, ralpha;
+    bool lalpha = FALSE;
+    bool ralpha = FALSE;
     AV *lav, *rav;
-    if ( SvROK(lsv) )
-	lsv = SvRV(lsv);
-    if ( SvROK(rsv) )
-	rsv = SvRV(rsv);
+    if ( SvROK(lhv) )
+	lhv = SvRV(lhv);
+    if ( SvROK(rhv) )
+	rhv = SvRV(rhv);
 
     /* get the left hand term */
     lav = (AV *)*hv_fetch((HV*)lhv, "version", 7, FALSE);
