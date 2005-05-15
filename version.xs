@@ -39,6 +39,12 @@ PPCODE:
 	vs = sv_newmortal();
 	sv_setpvf(vs,"v%s",SvPV(ST(2),n_a));
     }
+    if ( items == 1 )
+    {
+	/* no parameter provided */
+	vs = sv_newmortal();
+	sv_setpv(vs,"");
+    }
 
     rv = new_version(vs);
     if ( strcmp(class,"version") != 0 ) /* inherited new() */
