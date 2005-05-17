@@ -12,7 +12,7 @@ use vars qw(@ISA $VERSION $CLASS @EXPORT);
 
 @EXPORT = qw(qv);
 
-$VERSION = 0.42; # stop using CVS and switch to subversion
+$VERSION = "0.42_05"; 
 
 $CLASS = 'version';
 
@@ -36,15 +36,15 @@ version - Perl extension for Version Objects
   print $version->numify; 	# 12.002001
   if ( $version gt  "12.2" )	# true
 
-  $alphaver = version->new("1.2_3"); # must be quoted!
-  print $alphaver;		# 1.2_3
+  $alphaver = version->new("1.02_03"); # must be quoted!
+  print $alphaver;		# 1.02_030
   print $alphaver->is_alpha();  # true
   
   $ver = qv(1.2);               # 1.2.0
   $ver = qv("1.2");             # 1.2.0
 
   $perlver = version->new(5.005_03); # must not be quoted!
-  print $perlver;		# 5.5.30
+  print $perlver;		# 5.005030
 
 =head1 DESCRIPTION
 
@@ -72,11 +72,7 @@ Versions>.
 =item * Quoted Versions
 
 Any initial parameter which contains more than one decimal point
-or contains an embedded underscore, see L<Quoted Versions>.  The
-most recent development version of Perl (5.9.x) and the next major
-release (5.10.0) will automatically create version objects for bare
-numbers containing more than one decimal point in the appropriate
-context.
+or contains an embedded underscore, see L<Quoted Versions>.
 
 =back
 
@@ -85,11 +81,16 @@ the default stringification will yield the version L<Normal Form> only
 if required:
 
   $v  = version->new(1.002);     # 1.002, but compares like 1.2.0
-  $v  = version->new(1.002003);  # 1.2.3
-  $v2 = version->new( "1.2.3");  # 1.2.3
-  $v3 = version->new(  1.2.3);   # 1.2.3 for Perl >= 5.8.1
+  $v  = version->new(1.002003);  # 1.002003
+  $v2 = version->new( "1.2.3");  # v1.2.3
+  $v3 = version->new(  1.2.3);   # v1.2.3 for Perl >= 5.8.1
 
-Please see L<"Quoting"> for more details on how Perl will parse various
+In specific, version numbers initialized as L<Numeric Versions> will
+stringify in Numeric form.  Version numbers initialized as L<Quoted Versions>
+will be stringified as L<Normal Form> except for L<Numeric Alpha> versions,
+which follow their own stringification rules.
+
+Please see L<Quoting> for more details on how Perl will parse various
 input values.
 
 Any value passed to the new() operator will be parsed only so far as it
@@ -186,6 +187,29 @@ In general, Quoted Versions permit the greatest amount of freedom
 to specify a version, whereas Numeric Versions enforce a certain
 uniformity.  See also L<New Operator> for an additional method of
 initializing version objects.
+
+=head2 Numeric Alpha
+
+The one time that a numeric version must be quoted is when a alpha form is
+used with an otherwise numeric version (i.e. a single decimal place).  This
+is commonly used for CPAN releases, where CPAN or CPANPLUS will ignore alpha
+versions for automatic updating purposes.  Since some developers have used
+only two significant decimal places for their non-alpha releases, the
+version object will automatically take that into account if the initializer
+is quoted.  For example Module::Example was released to CPAN with the
+following sequence of $VERSION's:
+
+  # $VERSION    Stringified
+  0.01          0.010
+  0.02          0.020
+  0.02_01       0.02_010
+  0.02_02       0.02_020
+  0.03          0.030
+  etc.
+
+As you can see, the version object created from the values in the first
+column may contain a trailing 0, but will otherwise be both mathematically
+equivalent and will sort alpha-numerically as would be expected.
 
 =head2 Object Methods
 

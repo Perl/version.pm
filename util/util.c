@@ -451,6 +451,8 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
     I32 i,l,m,r,retval;
     bool lalpha = FALSE;
     bool ralpha = FALSE;
+    I32 left = 0;
+    I32 right = 0;
     AV *lav, *rav;
     if ( SvROK(lhv) )
 	lhv = SvRV(lhv);
@@ -471,16 +473,29 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
     r = av_len(rav);
     m = l < r ? l : r;
     retval = 0;
-    i = 1;
+    i = 0;
     while ( i <= m && retval == 0 )
     {
-	I32 left  = SvIV(*av_fetch(lav,i,0));
-	I32 right = SvIV(*av_fetch(rav,i,0));
-	if ( left < right || (left == right && lalpha && !ralpha) )
+	left  = SvIV(*av_fetch(lav,i,0));
+	right = SvIV(*av_fetch(rav,i,0));
+	if ( left < right  )
 	    retval = -1;
-	if ( left > right || (left == right && ralpha && !lalpha) )
+	if ( left > right )
 	    retval = +1;
 	i++;
+    }
+
+    /* tiebreaker for alpha with identical terms */
+    if ( retval == 0 && l == r && left == right && ( lalpha || ralpha ) )
+    {
+	if ( lalpha && !ralpha )
+	{
+	    retval = -1;
+	}
+	else if ( ralpha && !lalpha)
+	{
+	    retval = +1;
+	}
     }
 
     if ( l != r && retval == 0 ) /* possible match except for trailing 0's */
