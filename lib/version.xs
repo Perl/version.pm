@@ -118,10 +118,7 @@ is_alpha(lobj)
     version		lobj	
 PPCODE:
 {
-    AV * av = (AV *)SvRV(lobj);
-    I32 len = av_len(av);
-    I32 digit = SvIVX(*av_fetch(av, len, 0));
-    if ( digit < 0 )
+    if ( hv_exists((HV*)SvRV(lobj), "alpha", 5 ) )
 	XSRETURN_YES;
     else
 	XSRETURN_NO;

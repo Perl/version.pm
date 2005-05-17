@@ -58,7 +58,6 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 		Perl_croak(aTHX_ "Invalid version format (multiple underscores)");
 	    saw_under = 1;
 	    width = pos - last - 1; /* natural width of sub-version */
-	    printf("width = %d", width);
 	}
 	pos++;
     }
@@ -189,16 +188,37 @@ Perl_new_version(pTHX_ SV *ver)
     if ( sv_derived_from(ver,"version") ) /* can just copy directly */
     {
 	I32 key;
-	AV *av = (AV *)SvRV(ver);
-	SV* sv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
-	(void)sv_upgrade(sv, SVt_PVAV); /* needs to be an AV type */
-	AvREAL_on((AV*)sv);
+	AV *av = newAV();
+	AV *sav;
+	/* This will get reblessed later if a derived class*/
+	SV* hv = newSVrv(rv, "version"); 
+	(void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
+
+	if ( SvROK(ver) )
+	    ver = SvRV(ver);
+
+	/* Begin copying all of the elements */
+	if ( hv_exists((HV *)ver, "qv", 2) )
+	    hv_store((HV *)hv, "qv", 2, &PL_sv_yes, 0);
+
+	if ( hv_exists((HV *)ver, "alpha", 5) )
+	    hv_store((HV *)hv, "alpha", 5, &PL_sv_yes, 0);
 	
-	for ( key = 0; key <= av_len(av); key++ )
+	if ( hv_exists((HV*)ver, "width", 5 ) )
 	{
-	    I32 rev = SvIV(*av_fetch(av, key, FALSE));
-	    av_push((AV *)sv, newSViv(rev));
+	    I32 width = SvIV(*hv_fetch((HV*)ver, "width", 5, FALSE));
+	    hv_store((HV *)hv, "width", 5, newSViv(width), 0);
 	}
+
+	sav = (AV *)*hv_fetch((HV*)ver, "version", 7, FALSE);
+	/* This will get reblessed later if a derived class*/
+	for ( key = 0; key <= av_len(sav); key++ )
+	{
+	    I32 rev = SvIV(*av_fetch(sav, key, FALSE));
+	    av_push(av, newSViv(rev));
+	}
+
+	hv_store((HV *)hv, "version", 7, (SV *)av, 0);
 	return rv;
     }
 #ifdef SvVOK
@@ -322,7 +342,7 @@ Perl_vnumify(pTHX_ SV *vs)
 	}
     }
 
-    if ( len > 1 )
+    if ( len > 0 )
     {
 	digit = SvIV(*av_fetch(av, len, 0));
 	if ( alpha && width == 3 ) /* alpha version */
