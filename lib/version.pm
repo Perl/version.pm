@@ -283,12 +283,12 @@ For the subsequent examples, the following three objects will be used:
 For any version object which is initialized with multiple decimal
 places (either quoted or if possible v-string), or initialized using
 the L<qv()> operator, the stringified representation is returned in
-a normalized or reduced form (no extraneous zeros):
+a normalized or reduced form (no extraneous zeros), and with a leading 'v':
 
-  print $ver->normal;         # prints as 1.2.3
+  print $ver->normal;         # prints as v1.2.3
   print $ver->stringify;      # ditto
   print $ver;                 # ditto
-  print $nver->normal;        # prints as 1.2.0
+  print $nver->normal;        # prints as v1.2.0
   print $nver->stringify;     # prints as 1.2, see "Stringification" 
 
 In order to preserve the meaning of the processed version, the 
@@ -342,7 +342,7 @@ form will be the L<Normal Form>.  The $obj->normal operation can always be
 used to produce the L<Normal Form>, even if the version was originally a
 L<Numeric Version>.
 
-  print $ver->stringify;    # prints 1.2.3
+  print $ver->stringify;    # prints v1.2.3
   print $nver->stringify;   # prints 1.2
 
 =back
@@ -436,9 +436,8 @@ but other operations are not likely to be what you intend.  For example:
   $V2 = version->new(100/9); # Integer overflow in decimal number
   print $V2;               # yields something like 11.111.111.100
 
-Perl 5.8.1 and beyond will be able to automatically quote v-strings
-(although a warning may be issued under 5.9.x and 5.10.0), but that
-is not possible in earlier versions of Perl.  In other words:
+Perl 5.8.1 and beyond will be able to automatically quote v-strings but
+that is not possible in earlier versions of Perl.  In other words:
 
   $version = version->new("v2.5.4");  # legal in all versions of Perl
   $newvers = version->new(v2.5.4);    # legal only in Perl >= 5.8.1
@@ -465,39 +464,35 @@ This allows you to automatically increment your module version by
 using the Revision number from the primary file in a distribution, see
 L<ExtUtils::MakeMaker/"VERSION_FROM">.
 
-=item * Alpha versions
+=item * Alpha Versions
 
 For module authors using CPAN, the convention has been to note
 unstable releases with an underscore in the version string, see
 L<CPAN>.  Alpha releases will test as being newer than the more recent
 stable release, and less than the next stable release.  For example:
 
-  $alphaver = version->new("12.3_1"); # must quote
+  $alphaver = version->new("12.03_01"); # must be quoted
 
 obeys the relationship
 
-  12.3 < $alphaver < 12.4
-
-As a matter of fact, if is also true that
-
-  12.3.0 < $alphaver < 12.3.1
-
-where the subversion is identical but the alpha release is less than
-the non-alpha release.
+  12.03 < $alphaver < 12.04
 
 Alpha versions with a single decimal place will be treated exactly as if
 they were L<Numeric Versions>, for parsing purposes.  The stringification for
 alpha versions with a single decimal place may seem suprising, since any
 trailing zeros will visible.  For example, the above $alphaver will print as
 
-  12.300_100
+  12.03_010
+
+which is mathematically equivalent and ASCII sorts exactly the same as
+without the trailing zero.
 
 Alpha versions with more than a single decimal place will be treated 
 exactly as if they were L<Quoted Versions>, and will display without any
 trailing (or leading) zeros, in the L<Version Normal> form.  For example,
 
   $newver = version->new("12.3.1_1");
-  print $newver; # 12.3.1_1
+  print $newver; # v12.3.1_1
 
 =head2 Replacement UNIVERSAL::VERSION
 
@@ -533,12 +528,9 @@ The replacement UNIVERSAL::VERSION, when used as a function, like this:
 
   print $module->VERSION;
 
-will follow the stringification rules; i.e. Numeric versions will be displayed
-with the numified format, and the rest will be displayed with the Normal
-format.  Technically, the $module->VERSION function returns a string (PV) that
-can be converted to a number following the normal Perl rules, when used in a
-numeric context.
-
+will also exclusively return the numified form.  Technically, the 
+$module->VERSION function returns a string (PV) that can be converted to a 
+number following the normal Perl rules, when used in a numeric context.
 
 =head1 EXPORT
 
@@ -546,7 +538,7 @@ qv - quoted version initialization operator
 
 =head1 AUTHOR
 
-John Peacock E<lt>jpeacock@rowman.comE<gt>
+John Peacock E<lt>jpeacock@cpan.orgE<gt>
 
 =head1 SEE ALSO
 

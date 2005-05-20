@@ -27,12 +27,21 @@ BOOT:
 	newXS("UNIVERSAL::VERSION", XS_version_VERSION, file);
 
 void
-new(class,...)
-    char *class
+new(...)
 PPCODE:
 {
     SV *vs = ST(1);
     SV *rv;
+    char *class;
+
+    /* get the class if called as an object method */
+    if ( sv_isobject(ST(0)) ) {
+	class = HvNAME(SvSTASH(SvRV(ST(0))));
+    }
+    else {
+	class = (char *)SvPV_nolen(ST(0));
+    }
+
     if (items == 3 )
     {
 	STRLEN n_a;
@@ -42,8 +51,17 @@ PPCODE:
     if ( items == 1 )
     {
 	/* no parameter provided */
-	vs = sv_newmortal();
-	sv_setpv(vs,"");
+	if ( sv_isobject(ST(0)) )
+	{
+	    /* copy existing object */
+	    vs = ST(0);
+	}
+	else
+	{
+	    /* create empty object */
+	    vs = sv_newmortal();
+	    sv_setpv(vs,"");
+	}
     }
 
     rv = new_version(vs);
