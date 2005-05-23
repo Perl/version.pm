@@ -121,7 +121,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 	    av_push(av, newSViv(rev));
 	    if ( *pos == '.' && isDIGIT(pos[1]) )
 		s = ++pos;
-	    else if ( qv && *pos == '_' && isDIGIT(pos[1]) )
+	    else if ( *pos == '_' && isDIGIT(pos[1]) )
 		s = ++pos;
 	    else if ( isDIGIT(*pos) )
 		s = pos;
@@ -134,13 +134,10 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 		    pos++;
 	    }
 	    else {
-		while ( isDIGIT(*pos) || *pos == '_' ) {
-		    if ( *pos == '_' )
-			pos++;
-		    if ( (pos-s == 3
-		      || (pos-s == 4 && pos[-1] == '_' )) ) {
-			break;
-		    }
+		int digits = 0;
+		while ( ( isDIGIT(*pos) || *pos == '_' ) && digits < 3 ) {
+		    if ( *pos != '_' )
+			digits++;
 		    pos++;
 		}
 	    }

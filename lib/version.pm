@@ -67,12 +67,14 @@ There are actually two distinct ways to initialize versions:
 =item * Numeric Versions
 
 Any initial parameter which "looks like a number", see L<Numeric
-Versions>.
+Versions>.  This also covers versions with a single decimal place and
+a single embedded underscore, see L<Numeric Alpha Versions>, even though
+these must be quoted to preserve the underscore formatting.
 
 =item * Quoted Versions
 
 Any initial parameter which contains more than one decimal point
-or contains an embedded underscore, see L<Quoted Versions>.
+and an optional embedded underscore, see L<Quoted Versions>.
 
 =back
 
@@ -87,8 +89,7 @@ if required:
 
 In specific, version numbers initialized as L<Numeric Versions> will
 stringify in Numeric form.  Version numbers initialized as L<Quoted Versions>
-will be stringified as L<Normal Form> except for L<Numeric Alpha> versions,
-which follow their own stringification rules.
+will be stringified as L<Normal Form>.
 
 Please see L<Quoting> for more details on how Perl will parse various
 input values.
@@ -188,7 +189,7 @@ to specify a version, whereas Numeric Versions enforce a certain
 uniformity.  See also L<New Operator> for an additional method of
 initializing version objects.
 
-=head2 Numeric Alpha
+=head2 Numeric Alpha Versions
 
 The one time that a numeric version must be quoted is when a alpha form is
 used with an otherwise numeric version (i.e. a single decimal place).  This
@@ -202,14 +203,14 @@ following sequence of $VERSION's:
   # $VERSION    Stringified
   0.01          0.010
   0.02          0.020
-  0.02_01       0.02_010
-  0.02_02       0.02_020
+  0.02_01       0.02_0100
+  0.02_02       0.02_0200
   0.03          0.030
   etc.
 
 As you can see, the version object created from the values in the first
 column may contain a trailing 0, but will otherwise be both mathematically
-equivalent and will sort alpha-numerically as would be expected.
+equivalent and sorts alpha-numerically as would be expected.
 
 =head2 Object Methods
 
@@ -242,13 +243,18 @@ carries for versions.  The CVS $Revision$ increments differently from
 numeric versions (i.e. 1.10 follows 1.9), so it must be handled as if
 it were a L<Quoted Version>.
 
-New in 0.38, a new version object can be created as a copy of an existing
-version object:
+A new version object can be created as a copy of an existing version
+object, either as a class method:
 
   $v1 = version->new(12.3);
   $v2 = version->new($v1);
 
-and $v1 and $v2 will be identical.
+or as an object method:
+
+  $v1 = version->new(12.3);
+  $v2 = $v1->new();
+
+and in each case, $v1 and $v2 will be identical.
 
 =back
 
@@ -274,7 +280,7 @@ For the subsequent examples, the following three objects will be used:
 
   $ver   = version->new("1.2.3.4"); # see "Quoting" below
   $alpha = version->new("1.2.3_4"); # see "Alpha versions" below
-  $nver  = version->new(1.2);       # see "Numeric Versions" above
+  $nver  = version->new(1.002);       # see "Numeric Versions" above
 
 =over 4
 
@@ -289,7 +295,7 @@ a normalized or reduced form (no extraneous zeros), and with a leading 'v':
   print $ver->stringify;      # ditto
   print $ver;                 # ditto
   print $nver->normal;        # prints as v1.2.0
-  print $nver->stringify;     # prints as 1.2, see "Stringification" 
+  print $nver->stringify;     # prints as 1.002, see "Stringification" 
 
 In order to preserve the meaning of the processed version, the 
 normalized representation will always contain at least three sub terms.
@@ -313,7 +319,7 @@ corresponds a version object, all sub versions are assumed to have
 three decimal places.  So for example:
 
   print $ver->numify;         # prints 1.002003
-  print $nver->numify;        # prints 1.2
+  print $nver->numify;        # prints 1.002
 
 Unlike the stringification operator, there is never any need to append
 trailing zeros to preserve the correct version value.
@@ -343,7 +349,7 @@ used to produce the L<Normal Form>, even if the version was originally a
 L<Numeric Version>.
 
   print $ver->stringify;    # prints v1.2.3
-  print $nver->stringify;   # prints 1.2
+  print $nver->stringify;   # prints 1.002
 
 =back
 
@@ -482,10 +488,10 @@ they were L<Numeric Versions>, for parsing purposes.  The stringification for
 alpha versions with a single decimal place may seem suprising, since any
 trailing zeros will visible.  For example, the above $alphaver will print as
 
-  12.03_010
+  12.03_0100
 
 which is mathematically equivalent and ASCII sorts exactly the same as
-without the trailing zero.
+without the trailing zeros.
 
 Alpha versions with more than a single decimal place will be treated 
 exactly as if they were L<Quoted Versions>, and will display without any

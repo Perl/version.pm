@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 171;
+use Test::More tests => 181;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
@@ -217,7 +217,11 @@ sub BaseTests {
 	diag "create new from existing version" unless $ENV{PERL_CORE};
 	ok (eval {$new_version = version->new($version)},
 		"new from existing object");
-	ok ($new_version == $version, "duped object identical");
+	ok ($new_version == $version, "class->new($version) identical");
+	$new_version = $version->new();
+	ok ($new_version == $version, "$version->new() also identical");
+	$new_version = $version->new("1.2.3");
+	is ($new_version, "v1.2.3" , '$version->new("1.2.3") works too');
 
 	# test the CVS revision mode
 	diag "testing CVS Revision" unless $ENV{PERL_CORE};
@@ -226,6 +230,13 @@ sub BaseTests {
 	$version = new version qw$Revision: 1.2.3.4$;
 	ok ( $version eq "1.2.3.4", 'qw$Revision: 1.2.3.4$ eq 1.2.3.4' );
 	
+	# test the CPAN style reduced significant digit form
+	diag "testing CPAN-style versions" unless $ENV{PERL_CORE};
+	$version = $CLASS->new("1.23_01");
+	is ( "$version" , "1.23_0100", "CPAN-style alpha version" );
+	ok ( $version > 1.23, "1.23_01 > 1.23");
+	ok ( $version < 1.24, "1.23_01 < 1.24");
+
 	# test reformed UNIVERSAL::VERSION
 	diag "Replacement UNIVERSAL::VERSION tests" unless $ENV{PERL_CORE};
 	
