@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 181;
+use Test::More tests => 183;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
@@ -15,9 +15,8 @@ diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 
 package version::Empty;
 use vars qw($VERSION @ISA);
-use Exporter;
 use version 0.30;
-@ISA = qw(Exporter version);
+@ISA = qw(version);
 $VERSION = 0.01;
 
 package main;
@@ -75,6 +74,7 @@ sub BaseTests {
 	$version = $CLASS->new("99 and 44/100 pure");
 	ok ("$version" eq "99.000", '$version eq "99.000"');
 	ok ($version->numify == 99.0, '$version->numify == 99.0');
+	ok ($version->normal eq "v99.0.0", '$version->normal eq v99.0.0');
 	
 	$version = $CLASS->new("something");
 	ok (defined $version, 'defined $version');

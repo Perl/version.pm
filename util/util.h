@@ -11,7 +11,7 @@
 #define SVf "_"
 #endif
 
-char * Perl_scan_version(pTHX_ char *s, SV *rv, bool qv);
+const char * Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv);
 SV * Perl_new_version(pTHX_ SV *ver);
 SV * Perl_upg_version(pTHX_ SV *sv);
 SV * Perl_vnumify(pTHX_ SV *vs);

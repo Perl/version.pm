@@ -22,12 +22,12 @@ it doesn't.
 =cut
 */
 
-char *
-Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
+const char *
+Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 {
     const char *start = s;
-    char *pos;
-    char *last;
+    const char *pos;
+    const char *last;
     int saw_period = 0;
     int saw_under = 0;
     int width = 3;
@@ -85,7 +85,7 @@ Perl_scan_version(pTHX_ char *s, SV *rv, bool qv)
 	    rev = 0;
 	    {
   		/* this is atoi() that delimits on underscores */
-  		char *end = pos;
+  		const char *end = pos;
   		I32 mult = 1;
  		I32 orev;
 
@@ -211,7 +211,7 @@ Perl_new_version(pTHX_ SV *ver)
 	/* This will get reblessed later if a derived class*/
 	for ( key = 0; key <= av_len(sav); key++ )
 	{
-	    I32 rev = SvIV(*av_fetch(sav, key, FALSE));
+	    const I32 rev = SvIV(*av_fetch(sav, key, FALSE));
 	    av_push(av, newSViv(rev));
 	}
 
@@ -269,8 +269,7 @@ Perl_upg_version(pTHX_ SV *ver)
 #endif
     else /* must be a string or something like a string */
     {
-	STRLEN n_a;
-	version = savepv(SvPV(ver,n_a));
+	version = savepv(SvPV_nolen(ver));
     }
     (void)scan_version(version, ver, qv);
     Safefree(version);
@@ -295,7 +294,8 @@ contained within the RV.
 SV *
 Perl_vnumify(pTHX_ SV *vs)
 {
-    I32 i, len, digit, width; 
+    I32 i, len, digit;
+    int width; 
     bool alpha = FALSE;
     SV *sv = newSV(0);
     AV *av;
@@ -335,7 +335,7 @@ Perl_vnumify(pTHX_ SV *vs)
 	    Perl_sv_catpvf(aTHX_ sv,"%0*d_%d", width, term.quot, term.rem);
 	}
 	else {
-	    Perl_sv_catpvf(aTHX_ sv,"%0*d",width, digit);
+	    Perl_sv_catpvf(aTHX_ sv,"%0*d",width, (int)digit);
 	}
     }
 
@@ -345,7 +345,8 @@ Perl_vnumify(pTHX_ SV *vs)
 	if ( alpha && width == 3 ) /* alpha version */
 	    Perl_sv_catpv(aTHX_ sv,"_");
 	/* Don't display additional trailing zeros */
-	Perl_sv_catpvf(aTHX_ sv,"%0*d", width, digit);
+	if ( digit > 0 )
+	    Perl_sv_catpvf(aTHX_ sv,"%0*d", width, (int)digit);
     }
     else /* len == 1 */
     {
@@ -396,12 +397,20 @@ Perl_vnormal(pTHX_ SV *vs)
 	Perl_sv_catpvf(aTHX_ sv,".%"IVdf,(IV)digit);
     }
 
-    /* handle last digit specially */
-    digit = SvIV(*av_fetch(av, len, 0));
-    if ( alpha )
-	Perl_sv_catpvf(aTHX_ sv,"_%"IVdf,(IV)digit);
-    else
-	Perl_sv_catpvf(aTHX_ sv,".%"IVdf,(IV)digit);
+    if ( len > 0 )
+    {
+	/* handle last digit specially */
+	digit = SvIV(*av_fetch(av, len, 0));
+	if ( alpha )
+	    Perl_sv_catpvf(aTHX_ sv,"_%"IVdf,(IV)digit);
+	else
+	    Perl_sv_catpvf(aTHX_ sv,".%"IVdf,(IV)digit);
+    }
+
+    if ( len <= 2 ) { /* short version, must be at least three */
+	for ( len = 2 - len; len != 0; len-- )
+	    Perl_sv_catpv(aTHX_ sv,".0");
+    }
     
     return sv;
 } 

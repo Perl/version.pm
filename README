@@ -1,4 +1,4 @@
-version 0.42_05
+version 0.43
 ====================
 
 Provides the same version objects as included in Perl v5.9.0 (and hopefully in
@@ -12,8 +12,8 @@ inconsistent with prior releases.
 
 In particular, if a version object is created as a "Quoted Version"
 (multiple decimal places, using qv(), or as a v-string), it will always
-stringify with at least 2 decimal places, as well as with a leading 'v'
-character.  This may lead to inconsistencies with Perl < 5.8.1 if the
+stringify with at least 3 terms (2 decimal places), as well as with a leading
+'v' character.  This may lead to inconsistencies with Perl < 5.8.1 if the
 stringified version is eval()'d (so don't do that!).  This may more closely
 approximate the version object behavior in Perl6 (where the leading 'v'
 notation will mean version instead of v-string).  There is no guarantee
@@ -43,5 +43,5 @@ COPYRIGHT AND LICENCE
 
 This module can be distributed under the same terms as Perl.
 
-Copyright (C) 2004 John Peacock
+Copyright (C) 2004,2005 John Peacock
 
