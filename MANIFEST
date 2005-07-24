@@ -8,6 +8,6 @@ MANIFEST
 META.yml
 README
 t/01base.t
-util/util.c
-util/util.h
-util/ppport.h
+vutil/vutil.c
+vutil/vutil.h
+vutil/ppport.h

@@ -1,7 +1,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include "util.h"
+#include "vutil.h"
 
 /* --------------------------------------------------
  * $Revision: 2.5 $

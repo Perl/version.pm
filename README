@@ -1,12 +1,17 @@
-version 0.43
-====================
+version 0.44 - the GCC 4.0 Release
+==================================
 
 Provides the same version objects as included in Perl v5.9.0 (and hopefully in
 the 5.10.0 release).  In fact, if you attempt to use this module with a version
 of Perl >= v5.9.0, this module will not do anything, since the code already
 exists in the Perl core.
 
-IMPORTANT NOTE: This release is a major rewrite of the internal code and
+GCC 4.0 and 4.1 have broken multiple -I include file behavior, see
+L<http://gcc.gnu.org/bugzilla/show_bug.cgi?id=20348> for details.  This
+release only renames some files to prevent this bug from occurring.  No
+other changes were made.
+
+IMPORTANT NOTE: The 0.43 release was a major rewrite of the internal code and
 also changes how different version objects are stringified in a way that is
 inconsistent with prior releases.
 

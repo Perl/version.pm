@@ -16,6 +16,6 @@ my $class = Module::Build->subclass
 my $m = $class->new(
     module_name     => 'version',
     license         => 'perl',
-    c_source        => './util',
+    c_source        => './vutil',
 );
 $m->create_build_script;
