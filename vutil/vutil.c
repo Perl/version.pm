@@ -344,9 +344,7 @@ Perl_vnumify(pTHX_ SV *vs)
 	digit = SvIV(*av_fetch(av, len, 0));
 	if ( alpha && width == 3 ) /* alpha version */
 	    Perl_sv_catpv(aTHX_ sv,"_");
-	/* Don't display additional trailing zeros */
-	if ( digit > 0 )
-	    Perl_sv_catpvf(aTHX_ sv,"%0*d", width, (int)digit);
+	Perl_sv_catpvf(aTHX_ sv,"%0*d", width, (int)digit);
     }
     else /* len == 1 */
     {

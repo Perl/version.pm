@@ -1,4 +1,4 @@
-version 0.44 - the GCC 4.0 Release
+version 0.45
 ==================================
 
 Provides the same version objects as included in Perl v5.9.0 (and hopefully in
@@ -6,8 +6,11 @@ the 5.10.0 release).  In fact, if you attempt to use this module with a version
 of Perl >= v5.9.0, this module will not do anything, since the code already
 exists in the Perl core.
 
+Numification was stripping trailing zeros unnecessarily (noticed by Andreas
+Koenig).
+
 GCC 4.0 and 4.1 have broken multiple -I include file behavior, see
-L<http://gcc.gnu.org/bugzilla/show_bug.cgi?id=20348> for details.  This
+L<http://gcc.gnu.org/bugzilla/show_bug.cgi?id=20348> for details.  The 0.44
 release only renames some files to prevent this bug from occurring.  No
 other changes were made.
 

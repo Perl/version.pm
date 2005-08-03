@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 183;
+use Test::More tests => 191;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
@@ -275,4 +275,15 @@ SKIP: 	{
 	    $version = qv(1.2.3);
 	    ok("$version" eq "v1.2.3", 'v-string initialized qv()');
 	}
+
+	# trailing zero testing
+	$version = $CLASS->new("1");
+	ok($version->numify eq"1.000", "trailing zeros preserved");
+	$version = $CLASS->new("1.0");
+	ok($version->numify eq "1.000", "trailing zeros preserved");
+	$version = $CLASS->new("1.0.0");
+	ok($version->numify eq "1.000000", "trailing zeros preserved");
+	$version = $CLASS->new("1.0.0.0");
+	ok($version->numify eq "1.000000000", "trailing zeros preserved");
+
 }
