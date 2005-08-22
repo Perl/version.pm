@@ -17,5 +17,8 @@ my $m = $class->new(
     module_name     => 'version',
     license         => 'perl',
     c_source        => './vutil',
+    requires        => {
+	perl => '> 5.005, !=5.9.1, !=5.9.2',
+    },
 );
 $m->create_build_script;

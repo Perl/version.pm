@@ -1,47 +1,32 @@
-version 0.45
+version 0.46
 ==================================
 
-Provides the same version objects as included in Perl v5.9.0 (and hopefully in
+Provides the same version objects as included in Perl v5.9.x (and hopefully in
 the 5.10.0 release).  In fact, if you attempt to use this module with a version
 of Perl >= v5.9.0, this module will not do anything, since the code already
-exists in the Perl core.
+exists in the Perl core.  Note that the CPAN release cannot be installed
+with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
+in the core).  If you are testing bleadperl, you will need to check out the
+latest release of 5.9.x to get the changes included in 0.46.
 
-Numification was stripping trailing zeros unnecessarily (noticed by Andreas
-Koenig).
 
-GCC 4.0 and 4.1 have broken multiple -I include file behavior, see
-L<http://gcc.gnu.org/bugzilla/show_bug.cgi?id=20348> for details.  The 0.44
-release only renames some files to prevent this bug from occurring.  No
-other changes were made.
+Major changes in this release:
+==================================
 
-IMPORTANT NOTE: The 0.43 release was a major rewrite of the internal code and
-also changes how different version objects are stringified in a way that is
-inconsistent with prior releases.
+Leading whitespace or lack of leading zero caused the the object to be
+initialized incorrectly (reported by Andreas Koenig).
 
-In particular, if a version object is created as a "Quoted Version"
-(multiple decimal places, using qv(), or as a v-string), it will always
-stringify with at least 3 terms (2 decimal places), as well as with a leading
-'v' character.  This may lead to inconsistencies with Perl < 5.8.1 if the
-stringified version is eval()'d (so don't do that!).  This may more closely
-approximate the version object behavior in Perl6 (where the leading 'v'
-notation will mean version instead of v-string).  There is no guarantee
-that this behavior will persist.
-
-In addition, the use of two significant digits with an alpha release
-(e.g. 1.23_01, common with some CPAN releases) is now fully supported and
-will stringify in the same way as was input (with the possible addition of
-trailing zeros, e.g. 1.23_010, to make up multiples of three digits).
-
-Please read the POD documentation for usage/details.
+Please read the POD documentation for usage/details.  See the CHANGES file
+for full details of all changes to the module behavior.
 
 INSTALLATION
 
 To install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+   $ perl Build.PL
+   $ ./Build
+   $ ./Build test
+   # ./Build install
 
 DEPENDENCIES
 

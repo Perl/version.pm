@@ -25,7 +25,7 @@ it doesn't.
 const char *
 Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 {
-    const char *start = s;
+    const char *start;
     const char *pos;
     const char *last;
     int saw_period = 0;
@@ -35,12 +35,15 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     SV* hv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
 
+    while (isSPACE(*s)) /* leading whitespace is OK */
+	s++;
+
     if (*s == 'v') {
 	s++;  /* get past 'v' */
 	qv = 1; /* force quoted version processing */
     }
 
-    last = pos = s;
+    start = last = pos = s;
 
     /* pre-scan the input string to check for decimals/underbars */
     while ( *pos == '.' || *pos == '_' || isDIGIT(*pos) )
@@ -93,7 +96,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 		 * point of a version originally created with a bare
 		 * floating point number, i.e. not quoted in any way
 		 */
- 		if ( !qv && s > start+1 && saw_period == 1 ) {
+ 		if ( !qv && s > start && saw_period == 1 ) {
 		    mult *= 100;
  		    while ( s < end ) {
  			orev = rev;

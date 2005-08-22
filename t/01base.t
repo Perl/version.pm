@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 191;
+use Test::More tests => 195;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
@@ -20,13 +20,13 @@ use version 0.30;
 $VERSION = 0.01;
 
 package main;
-my $testobj = new version::Empty 1.002_003;
+my $testobj = version::Empty->new(1.002_003);
 isa_ok( $testobj, "version::Empty" );
 ok( $testobj->numify == 1.002003, "Numified correctly" );
 ok( $testobj->stringify eq "1.002003", "Stringified correctly" );
 ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 
-my $verobj = new version "1.2.4";
+my $verobj = version->new("1.2.4");
 ok( $verobj > $testobj, "Comparison vs parent class" );
 ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");
@@ -276,14 +276,24 @@ SKIP: 	{
 	    ok("$version" eq "v1.2.3", 'v-string initialized qv()');
 	}
 
-	# trailing zero testing
+	diag "Tests with real-world (malformed) data" unless $ENV{PERL_CORE};
+
+	# trailing zero testing (reported by Andreas Koenig).
 	$version = $CLASS->new("1");
-	ok($version->numify eq"1.000", "trailing zeros preserved");
+	ok($version->numify eq "1.000", "trailing zeros preserved");
 	$version = $CLASS->new("1.0");
 	ok($version->numify eq "1.000", "trailing zeros preserved");
 	$version = $CLASS->new("1.0.0");
 	ok($version->numify eq "1.000000", "trailing zeros preserved");
 	$version = $CLASS->new("1.0.0.0");
 	ok($version->numify eq "1.000000000", "trailing zeros preserved");
+	
+	# leading zero testing (reported by Andreas Koenig).
+	$version = $CLASS->new(".7");
+	ok($version->numify eq "0.700", "leading zero inferred");
+
+	# leading space testing (reported by Andreas Koenig).
+	$version = $CLASS->new(" 1.7");
+	ok($version->numify eq "1.700", "leading space ignored");
 
 }
