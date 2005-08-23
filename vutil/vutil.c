@@ -34,6 +34,9 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     AV *av = newAV();
     SV* hv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
+#ifndef NODEFAULT_SHAREKEYS
+    HvSHAREKEYS_on(hv);         /* key-sharing on by default */
+#endif
 
     while (isSPACE(*s)) /* leading whitespace is OK */
 	s++;
@@ -65,17 +68,15 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 	pos++;
     }
 
-    if ( saw_period > 1 ) {
+    if ( saw_period > 1 )
 	qv = 1; /* force quoted version processing */
-    }
 
     pos = s;
 
     if ( qv )
 	hv_store((HV *)hv, "qv", 2, &PL_sv_yes, 0);
-    if ( saw_under ) {
+    if ( saw_under )
 	hv_store((HV *)hv, "alpha", 5, &PL_sv_yes, 0);
-    }
     if ( !qv && width < 3 )
 	hv_store((HV *)hv, "width", 5, newSViv(width), 0);
     
@@ -184,15 +185,18 @@ want to upgrade the SV.
 SV *
 Perl_new_version(pTHX_ SV *ver)
 {
-    SV *rv = newSV(0);
+    SV * const rv = newSV(0);
     if ( sv_derived_from(ver,"version") ) /* can just copy directly */
     {
 	I32 key;
-	AV *av = newAV();
+	AV * const av = newAV();
 	AV *sav;
 	/* This will get reblessed later if a derived class*/
-	SV* hv = newSVrv(rv, "version"); 
+	SV * const hv = newSVrv(rv, "version"); 
 	(void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
+#ifndef NODEFAULT_SHAREKEYS
+	HvSHAREKEYS_on(hv);         /* key-sharing on by default */
+#endif
 
 	if ( SvROK(ver) )
 	    ver = SvRV(ver);
@@ -206,7 +210,7 @@ Perl_new_version(pTHX_ SV *ver)
 	
 	if ( hv_exists((HV*)ver, "width", 5 ) )
 	{
-	    I32 width = SvIV(*hv_fetch((HV*)ver, "width", 5, FALSE));
+	    const I32 width = SvIV(*hv_fetch((HV*)ver, "width", 5, FALSE));
 	    hv_store((HV *)hv, "width", 5, newSViv(width), 0);
 	}
 
@@ -223,10 +227,10 @@ Perl_new_version(pTHX_ SV *ver)
     }
 #ifdef SvVOK
     if ( SvVOK(ver) ) { /* already a v-string */
-	char *version;
-	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
-	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
-	sv_setpv(rv,version);
+	const MAGIC* const mg = mg_find(ver,PERL_MAGIC_vstring);
+	const STRLEN len = mg->mg_len;
+	char * const version = savepvn( (const char*)mg->mg_ptr, len);
+	sv_setpvn(rv,version,len);
 	Safefree(version);
     }
     else {
@@ -265,7 +269,7 @@ Perl_upg_version(pTHX_ SV *ver)
     }
 #ifdef SvVOK
     else if ( SvVOK(ver) ) { /* already a v-string */
-	MAGIC* mg = mg_find(ver,PERL_MAGIC_vstring);
+	const MAGIC* const mg = mg_find(ver,PERL_MAGIC_vstring);
 	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
 	qv = 1;
     }
@@ -279,6 +283,45 @@ Perl_upg_version(pTHX_ SV *ver)
     return ver;
 }
 
+/*
+=for apidoc vverify
+
+Validates that the SV contains a valid version object.
+
+    bool vverify(SV *vobj);
+
+Note that it only confirms the bare minimum structure (so as not to get
+confused by derived classes which may contain additional hash entries):
+
+=over 4
+
+=item * The SV contains a hash (or a reference to one)
+
+=item * The hash contains a "version" key
+
+=item * The "version" key has an AV as its value
+
+=back
+
+=cut
+*/
+
+bool
+Perl_vverify(pTHX_ SV *vs)
+{
+    SV *sv;
+    if ( SvROK(vs) )
+	vs = SvRV(vs);
+
+    /* see if the appropriate elements exist */
+    if ( SvTYPE(vs) == SVt_PVHV
+	 && hv_exists((HV*)vs, "version", 7)
+	 && (sv = *hv_fetch((HV*)vs, "version", 7, FALSE))
+	 && SvTYPE(sv) == SVt_PVAV )
+	return TRUE;
+    else
+	return FALSE;
+}
 
 /*
 =for apidoc vnumify
@@ -298,12 +341,15 @@ SV *
 Perl_vnumify(pTHX_ SV *vs)
 {
     I32 i, len, digit;
-    int width; 
+    int width;
     bool alpha = FALSE;
-    SV *sv = newSV(0);
+    SV * const sv = newSV(0);
     AV *av;
     if ( SvROK(vs) )
 	vs = SvRV(vs);
+
+    if ( !vverify(vs) )
+	Perl_croak(aTHX_ "Invalid version object");
 
     /* see if various flags exist */
     if ( hv_exists((HV*)vs, "alpha", 5 ) )
@@ -316,29 +362,29 @@ Perl_vnumify(pTHX_ SV *vs)
 
     /* attempt to retrieve the version array */
     if ( !(av = (AV *)*hv_fetch((HV*)vs, "version", 7, FALSE) ) ) {
-	Perl_sv_catpv(aTHX_ sv,"0");
+	sv_catpvn(sv,"0",1);
 	return sv;
     }
 
     len = av_len(av);
     if ( len == -1 )
     {
-	Perl_sv_catpv(aTHX_ sv,"0");
+	sv_catpvn(sv,"0",1);
 	return sv;
     }
 
     digit = SvIV(*av_fetch(av, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv,"%d.", (int)PERL_ABS(digit));
+    sv_setpvf(sv, "%d.", (int)PERL_ABS(digit));
     for ( i = 1 ; i < len ; i++ )
     {
 	digit = SvIV(*av_fetch(av, i, 0));
 	if ( width < 3 ) {
-	    int denom = (int)pow(10,(3-width));
-	    div_t term = div((int)PERL_ABS(digit),denom);
-	    Perl_sv_catpvf(aTHX_ sv,"%0*d_%d", width, term.quot, term.rem);
+	    const int denom = (int)pow(10,(3-width));
+	    const div_t term = div((int)PERL_ABS(digit),denom);
+	    sv_catpvf(sv, "%0*d_%d", width, term.quot, term.rem);
 	}
 	else {
-	    Perl_sv_catpvf(aTHX_ sv,"%0*d",width, (int)digit);
+	    sv_catpvf(sv, "%0*d", width, (int)digit);
 	}
     }
 
@@ -346,12 +392,12 @@ Perl_vnumify(pTHX_ SV *vs)
     {
 	digit = SvIV(*av_fetch(av, len, 0));
 	if ( alpha && width == 3 ) /* alpha version */
-	    Perl_sv_catpv(aTHX_ sv,"_");
-	Perl_sv_catpvf(aTHX_ sv,"%0*d", width, (int)digit);
+	    sv_catpvn(sv,"_",1);
+	sv_catpvf(sv, "%0*d", width, (int)digit);
     }
-    else /* len == 1 */
+    else /* len == 0 */
     {
-	Perl_sv_catpv(aTHX_ sv,"000");
+	sv_catpvn(sv,"000",3);
     }
     return sv;
 }
@@ -375,10 +421,13 @@ Perl_vnormal(pTHX_ SV *vs)
 {
     I32 i, len, digit;
     bool alpha = FALSE;
-    SV *sv = newSV(0);
+    SV * const sv = newSV(0);
     AV *av;
     if ( SvROK(vs) )
 	vs = SvRV(vs);
+
+    if ( !vverify(vs) )
+	Perl_croak(aTHX_ "Invalid version object");
 
     if ( hv_exists((HV*)vs, "alpha", 5 ) )
 	alpha = TRUE;
@@ -387,15 +436,14 @@ Perl_vnormal(pTHX_ SV *vs)
     len = av_len(av);
     if ( len == -1 )
     {
-	Perl_sv_catpv(aTHX_ sv,"");
+	sv_catpvn(sv,"",0);
 	return sv;
     }
     digit = SvIV(*av_fetch(av, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv,"v%"IVdf,(IV)digit);
-    for ( i = 1 ; i <= len-1 ; i++ )
-    {
+    sv_setpvf(sv, "v%"IVdf, (IV)digit);
+    for ( i = 1 ; i <= len-1 ; i++ ) {
 	digit = SvIV(*av_fetch(av, i, 0));
-	Perl_sv_catpvf(aTHX_ sv,".%"IVdf,(IV)digit);
+	sv_catpvf(sv, ".%"IVdf, (IV)digit);
     }
 
     if ( len > 0 )
@@ -403,18 +451,17 @@ Perl_vnormal(pTHX_ SV *vs)
 	/* handle last digit specially */
 	digit = SvIV(*av_fetch(av, len, 0));
 	if ( alpha )
-	    Perl_sv_catpvf(aTHX_ sv,"_%"IVdf,(IV)digit);
+	    sv_catpvf(sv, "_%"IVdf, (IV)digit);
 	else
-	    Perl_sv_catpvf(aTHX_ sv,".%"IVdf,(IV)digit);
+	    sv_catpvf(sv, ".%"IVdf, (IV)digit);
     }
 
     if ( len <= 2 ) { /* short version, must be at least three */
 	for ( len = 2 - len; len != 0; len-- )
-	    Perl_sv_catpv(aTHX_ sv,".0");
+	    sv_catpvn(sv,".0",2);
     }
-    
     return sv;
-} 
+}
 
 /*
 =for apidoc vstringify
@@ -434,6 +481,9 @@ Perl_vstringify(pTHX_ SV *vs)
     if ( SvROK(vs) )
 	vs = SvRV(vs);
     
+    if ( !vverify(vs) )
+	Perl_croak(aTHX_ "Invalid version object");
+
     if ( hv_exists((HV *)vs, "qv", 2) )
 	qv = 1;
     
@@ -465,6 +515,12 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
 	lhv = SvRV(lhv);
     if ( SvROK(rhv) )
 	rhv = SvRV(rhv);
+
+    if ( !vverify(lhv) )
+	Perl_croak(aTHX_ "Invalid version object");
+
+    if ( !vverify(rhv) )
+	Perl_croak(aTHX_ "Invalid version object");
 
     /* get the left hand term */
     lav = (AV *)*hv_fetch((HV*)lhv, "version", 7, FALSE);

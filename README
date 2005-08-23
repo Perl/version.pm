@@ -13,8 +13,8 @@ latest release of 5.9.x to get the changes included in 0.46.
 Major changes in this release:
 ==================================
 
-Leading whitespace or lack of leading zero caused the the object to be
-initialized incorrectly (reported by Andreas Koenig).
+Badly written subclasses could SEGV (reported by Andreas Koenig).  Now all
+version objects are validated before use.
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.
