@@ -10,21 +10,21 @@ require "t/coretests.pm";
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
 BEGIN {
-    use_ok("version::vxs", 0.47); # If we made it this far, we are ok.
+    use_ok("version", 0.47); # If we made it this far, we are ok.
 }
 
-BaseTests("version::vxs");
+BaseTests("version");
 
 diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 
 package version::Empty;
 use vars qw($VERSION @ISA);
-use version::vxs;
-@ISA = qw(version::vxs);
+use version;
+@ISA = qw(version);
 $VERSION = 0.01;
 
 package version::Bad;
-use base version::vxs;
+use base version;
 sub new { my($self,$n)=@_;  bless \$n, $self }
 
 package main;
@@ -34,7 +34,7 @@ ok( $testobj->numify == 1.002003, "Numified correctly" );
 ok( $testobj->stringify eq "1.002003", "Stringified correctly" );
 ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 
-my $verobj = version::vxs->new("1.2.4");
+my $verobj = version->new("1.2.4");
 ok( $verobj > $testobj, "Comparison vs parent class" );
 ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");

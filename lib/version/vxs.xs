@@ -7,9 +7,9 @@
  * $Revision: 2.5 $
  * --------------------------------------------------*/
 
-typedef     SV *version;
+typedef     SV *version_vxs;
 
-MODULE = version	PACKAGE = version
+MODULE = version::vxs	PACKAGE = version::vxs
 
 PROTOTYPES: DISABLE
 VERSIONCHECK: DISABLE
@@ -17,14 +17,14 @@ VERSIONCHECK: DISABLE
 BOOT:
 	/* register the overloading (type 'A') magic */
 	PL_amagic_generation++;
-	newXS("version::()", XS_version_noop, file);
-	newXS("version::(\"\"", XS_version_stringify, file);
-	newXS("version::(0+", XS_version_numify, file);
-	newXS("version::(cmp", XS_version_vcmp, file);
-	newXS("version::(<=>", XS_version_vcmp, file);
-	newXS("version::(bool", XS_version_boolean, file);
-	newXS("version::(nomethod", XS_version_noop, file);
-	newXS("UNIVERSAL::VERSION", XS_version_VERSION, file);
+	newXS("version::vxs::()", XS_version__vxs_noop, file);
+	newXS("version::vxs::(\"\"", XS_version__vxs_stringify, file);
+	newXS("version::vxs::(0+", XS_version__vxs_numify, file);
+	newXS("version::vxs::(cmp", XS_version__vxs_vcmp, file);
+	newXS("version::vxs::(<=>", XS_version__vxs_vcmp, file);
+	newXS("version::vxs::(bool", XS_version__vxs_boolean, file);
+	newXS("version::vxs::(nomethod", XS_version__vxs_noop, file);
+	newXS("UNIVERSAL::VERSION", XS_version__vxs_VERSION, file);
 
 void
 new(...)
@@ -65,7 +65,7 @@ PPCODE:
     }
 
     rv = new_version(vs);
-    if ( strcmp(class,"version") != 0 ) /* inherited new() */
+    if ( strcmp(class,"version::vxs") != 0 ) /* inherited new() */
 	sv_bless(rv, gv_stashpv(class,TRUE));
 
     PUSHs(sv_2mortal(rv));
@@ -73,7 +73,7 @@ PPCODE:
 
 void
 stringify (lobj,...)
-    version		lobj
+    version_vxs	lobj
 PPCODE:
 {
     PUSHs(sv_2mortal(vstringify(lobj)));
@@ -81,7 +81,7 @@ PPCODE:
 
 void
 numify (lobj,...)
-    version		lobj
+    version_vxs	lobj
 PPCODE:
 {
     PUSHs(sv_2mortal(vnumify(lobj)));
@@ -89,14 +89,14 @@ PPCODE:
 
 void
 vcmp (lobj,...)
-    version		lobj
+    version_vxs	lobj
 PPCODE:
 {
     SV	*rs;
     SV * robj = ST(1);
     IV	 swap = (IV)SvIV(ST(2));
 
-    if ( ! sv_derived_from(robj, "version") )
+    if ( ! sv_derived_from(robj, "version::vxs") )
     {
 	robj = sv_2mortal(new_version(robj));
     }
@@ -115,7 +115,7 @@ PPCODE:
 
 void
 boolean(lobj,...)
-    version		lobj
+    version_vxs	lobj
 PPCODE:
 {
     SV	*rs;
@@ -125,7 +125,7 @@ PPCODE:
 
 void
 noop(lobj,...)
-    version		lobj
+    version_vxs	lobj
 CODE:
 {
     Perl_croak(aTHX_ "operation not supported with version object");
@@ -133,7 +133,7 @@ CODE:
 
 void
 is_alpha(lobj)
-    version		lobj	
+    version_vxs	lobj	
 PPCODE:
 {
     if ( hv_exists((HV*)SvRV(lobj), "alpha", 5 ) )
@@ -210,7 +210,7 @@ PPCODE:
         SV *nsv = sv_newmortal();
         sv_setsv(nsv, sv);
         sv = nsv;
-	if ( !sv_derived_from(sv, "version"))
+	if ( !sv_derived_from(sv, "version::vxs"))
 	    upg_version(sv);
         undef = Nullch;
     }
@@ -234,7 +234,7 @@ PPCODE:
 	     }
 	}
 
-        if ( !sv_derived_from(req, "version")) {
+        if ( !sv_derived_from(req, "version::vxs")) {
 	    /* req may very well be R/O, so create a new object */
 	    SV *nsv = sv_newmortal();
 	    sv_setsv(nsv, req);
@@ -248,7 +248,7 @@ PPCODE:
 		    vnumify(req),vnormal(req),vnumify(sv),vnormal(sv));
     }
 
-    if ( SvOK(sv) && sv_derived_from(sv, "version") )
+    if ( SvOK(sv) && sv_derived_from(sv, "version::vxs") )
 	PUSHs(vnumify(sv));
     else
 	PUSHs(sv);

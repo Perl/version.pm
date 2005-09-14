@@ -17,7 +17,7 @@ N_long	T_IV
 Z_int	T_IV
 Z_long	T_IV
 boolean	T_IV
-version T_PTROBJ_SPECIAL
+version_vxs T_PTROBJ_SPECIAL
 
 INPUT
 
