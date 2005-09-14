@@ -1,5 +1,5 @@
 #!perl -w
-package vxs;
+package version::vxs;
 
 use 5.005_03;
 use strict;
@@ -14,10 +14,10 @@ use vars qw(@ISA $VERSION $CLASS @EXPORT);
 
 $VERSION = "0.48"; 
 
-$CLASS = 'vxs';
+$CLASS = 'version::vxs';
 
 local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
-bootstrap vxs if $] < 5.009;
+bootstrap version::vxs if $] < 5.009;
 
 # Preloaded methods go here.
 
