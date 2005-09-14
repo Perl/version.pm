@@ -1,6 +1,7 @@
 Build.PL
 Changes
 lib/version.pm
+lib/version.pod
 lib/version/typemap
 lib/version/vxs.pm
 lib/version/vxs.xs
