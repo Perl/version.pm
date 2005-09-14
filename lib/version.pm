@@ -17,7 +17,10 @@ $VERSION = "0.47";
 $CLASS = 'version';
 
 local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
-bootstrap version if $] < 5.009;
+bootstrap version_xs if $] < 5.009;
+
+push @ISA, "version_xs";
+*qv = \&version_xs::qv;
 
 # Preloaded methods go here.
 

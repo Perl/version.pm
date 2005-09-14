@@ -2,7 +2,7 @@ Build.PL
 Changes
 lib/typemap
 lib/version.pm
-lib/version.xs
+lib/version_xs.xs
 Makefile.PL
 MANIFEST
 META.yml

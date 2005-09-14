@@ -9,7 +9,7 @@
 
 typedef     SV *version;
 
-MODULE = version	PACKAGE = version
+MODULE = version_xs	PACKAGE = version_xs
 
 PROTOTYPES: DISABLE
 VERSIONCHECK: DISABLE
@@ -17,14 +17,14 @@ VERSIONCHECK: DISABLE
 BOOT:
 	/* register the overloading (type 'A') magic */
 	PL_amagic_generation++;
-	newXS("version::()", XS_version_noop, file);
-	newXS("version::(\"\"", XS_version_stringify, file);
-	newXS("version::(0+", XS_version_numify, file);
-	newXS("version::(cmp", XS_version_vcmp, file);
-	newXS("version::(<=>", XS_version_vcmp, file);
-	newXS("version::(bool", XS_version_boolean, file);
-	newXS("version::(nomethod", XS_version_noop, file);
-	newXS("UNIVERSAL::VERSION", XS_version_VERSION, file);
+	newXS("version_xs::()", XS_version_xs_noop, file);
+	newXS("version_xs::(\"\"", XS_version_xs_stringify, file);
+	newXS("version_xs::(0+", XS_version_xs_numify, file);
+	newXS("version_xs::(cmp", XS_version_xs_vcmp, file);
+	newXS("version_xs::(<=>", XS_version_xs_vcmp, file);
+	newXS("version_xs::(bool", XS_version_xs_boolean, file);
+	newXS("version_xs::(nomethod", XS_version_xs_noop, file);
+	newXS("UNIVERSAL::VERSION", XS_version_xs_VERSION, file);
 
 void
 new(...)
