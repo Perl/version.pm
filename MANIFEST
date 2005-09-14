@@ -1,6 +1,7 @@
 Build.PL
 Changes
 lib/typemap
+lib/version.pm
 lib/vxs.pm
 lib/vxs.xs
 Makefile.PL
