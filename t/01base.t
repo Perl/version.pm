@@ -9,21 +9,21 @@ use Test::More tests => 200;
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
 BEGIN {
-    use_ok("version", 0.47); # If we made it this far, we are ok.
+    use_ok("vxs", 0.47); # If we made it this far, we are ok.
 }
 
-BaseTests("version");
+BaseTests("vxs");
 
 diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 
 package version::Empty;
 use vars qw($VERSION @ISA);
-use version;
-@ISA = qw(version);
+use vxs;
+@ISA = qw(vxs);
 $VERSION = 0.01;
 
 package version::Bad;
-use base version;
+use base vxs;
 sub new { my($self,$n)=@_;  bless \$n, $self }
 
 package main;
@@ -33,7 +33,7 @@ ok( $testobj->numify == 1.002003, "Numified correctly" );
 ok( $testobj->stringify eq "1.002003", "Stringified correctly" );
 ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 
-my $verobj = version->new("1.2.4");
+my $verobj = vxs->new("1.2.4");
 ok( $verobj > $testobj, "Comparison vs parent class" );
 ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");
@@ -109,7 +109,7 @@ sub BaseTests {
 	ok ($version, 'boolean');
 	
 	# Test class membership
-	isa_ok ( $version, "version" );
+	isa_ok ( $version, "vxs" );
 	
 	# Test comparison operators with self
 	diag "tests with self" unless $ENV{PERL_CORE};
@@ -238,7 +238,7 @@ sub BaseTests {
 
 	# test creation from existing version object
 	diag "create new from existing version" unless $ENV{PERL_CORE};
-	ok (eval {$new_version = version->new($version)},
+	ok (eval {$new_version = $CLASS->new($version)},
 		"new from existing object");
 	ok ($new_version == $version, "class->new($version) identical");
 	$new_version = $version->new();
@@ -248,9 +248,9 @@ sub BaseTests {
 
 	# test the CVS revision mode
 	diag "testing CVS Revision" unless $ENV{PERL_CORE};
-	$version = new version qw$Revision: 1.2$;
+	$version = new $CLASS qw$Revision: 1.2$;
 	ok ( $version eq "1.2.0", 'qw$Revision: 1.2$ eq 1.2.0' );
-	$version = new version qw$Revision: 1.2.3.4$;
+	$version = new $CLASS qw$Revision: 1.2.3.4$;
 	ok ( $version eq "1.2.3.4", 'qw$Revision: 1.2.3.4$ eq 1.2.3.4' );
 	
 	# test the CPAN style reduced significant digit form
