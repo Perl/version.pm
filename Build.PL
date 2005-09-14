@@ -14,7 +14,7 @@ my $class = Module::Build->subclass
 );
 
 my $m = $class->new(
-    module_name     => 'vxs',
+    module_name     => 'version',
     license         => 'perl',
     c_source        => './vutil',
     requires        => {
