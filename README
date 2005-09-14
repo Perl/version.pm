@@ -1,4 +1,4 @@
-version 0.46
+version 0.48
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -7,14 +7,24 @@ of Perl >= v5.9.0, this module will not do anything, since the code already
 exists in the Perl core.  Note that the CPAN release cannot be installed
 with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing bleadperl, you will need to check out the
-latest release of 5.9.x to get the changes included in 0.46.
+latest release of 5.9.x to get the changes included in 0.48.
 
 
 Major changes in this release:
 ==================================
+Significant archectectural change (object hash has to contain reference to
+array not the array itself); see
 
-Badly written subclasses could SEGV (reported by Andreas Koenig).  Now all
-version objects are validated before use.
+    <https://rt.cpan.org/Ticket/Display.html?id=14439>
+
+for details.  Initial changes to support pure Perl variant (not
+included yet), see
+
+    <https://rt.cpan.org/Ticket/Display.html?id=14417>
+
+for more details.  All POD moved to seperate file.  Tests
+abstracted out for reuse by different classes.
+
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.
