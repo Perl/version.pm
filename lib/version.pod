@@ -45,10 +45,10 @@ Versions>.  This also covers versions with a single decimal place and
 a single embedded underscore, see L<Numeric Alpha Versions>, even though
 these must be quoted to preserve the underscore formatting.
 
-=item * Quoted Versions
+=item * Extended Versions
 
 Any initial parameter which contains more than one decimal point
-and an optional embedded underscore, see L<Quoted Versions>.
+and an optional embedded underscore, see L<Extended Versions>.
 
 =back
 
@@ -62,7 +62,7 @@ if required:
   $v3 = version->new(  1.2.3);   # v1.2.3 for Perl >= 5.8.1
 
 In specific, version numbers initialized as L<Numeric Versions> will
-stringify in Numeric form.  Version numbers initialized as L<Quoted Versions>
+stringify in Numeric form.  Version numbers initialized as L<Extended Versions>
 will be stringified as L<Normal Form>.
 
 Please see L<Quoting> for more details on how Perl will parse various
@@ -104,7 +104,7 @@ this module is only possible with Perl 5.8.1 or better (which contain special
 code to enable it).  Their use is B<strongly> discouraged in all 
 circumstances (especially the leading 'v' style), since the meaning will
 change depending on which Perl you are running.  It is better to use
-L<"Quoted Versions"> to ensure the proper interpretation.
+L<"Extended Versions"> to ensure the proper interpretation.
 
 =head2 Numeric Versions
 
@@ -135,7 +135,7 @@ digits after the decimal place, it will be split on each multiple of 3, so
 1.0003 becomes 1.0.300, due to the need to remain compatible with Perl's
 own 5.005_03 == 5.5.30 interpretation.
 
-=head2 Quoted Versions
+=head2 Extended Versions
 
 These are the newest form of versions, and correspond to Perl's own
 version style beginning with 5.6.0.  Starting with Perl 5.10.0,
@@ -144,9 +144,9 @@ method requires that the input parameter be quoted, although Perl's after
 5.9.0 can use bare numbers with multiple decimal places as a special form
 of quoting.
 
-Unlike L<Numeric Versions>, Quoted Versions may have more than
+Unlike L<Numeric Versions>, Extended Versions may have more than
 a single decimal point, e.g. "5.6.1" (for all versions of Perl).  If a
-Quoted Version has only one decimal place (and no embedded underscore),
+Extended Version has only one decimal place (and no embedded underscore),
 it is interpreted exactly like a L<Numeric Version>.  
 
 So, for example:
@@ -155,10 +155,10 @@ So, for example:
   $v = version->new( "1.2.3");    # 1.2.3
   $v = version->new("1.0003");    # 1.0.300
 
-In addition to conventional versions, Quoted Versions can be
+In addition to conventional versions, Extended Versions can be
 used to create L<Alpha Versions>.
 
-In general, Quoted Versions permit the greatest amount of freedom
+In general, Extended Versions permit the greatest amount of freedom
 to specify a version, whereas Numeric Versions enforce a certain
 uniformity.  See also L<New Operator> for an additional method of
 initializing version objects.
@@ -215,7 +215,7 @@ In other words, the version will be automatically parsed out of the
 string, and it will be quoted to preserve the meaning CVS normally
 carries for versions.  The CVS $Revision$ increments differently from
 numeric versions (i.e. 1.10 follows 1.9), so it must be handled as if
-it were a L<Quoted Version>.
+it were a L<Extended Version>.
 
 A new version object can be created as a copy of an existing version
 object, either as a class method:
@@ -307,7 +307,7 @@ trailing zeros to preserve the correct version value.
 In order to mirror as much as possible the existing behavior of ordinary
 $VERSION scalars, the stringification operation will display differently,
 depending on whether the version was initialized as a L<Numeric Version>
-or L<Quoted Version>.
+or L<Extended Version>.
 
 What this means in practice is that if the normal CPAN and Camel rules are
 followed ($VERSION is a floating point number with no more than 3 decimal
@@ -316,7 +316,7 @@ output.  There will be no visible difference, although the internal
 representation will be different, and the L<Comparison operators> will 
 function using the internal coding.
 
-If a version object is initialized using a L<Quoted Version> form, or if
+If a version object is initialized using a L<Extended Version> form, or if
 the number of significant decimal places exceed three, then the stringified
 form will be the L<Normal Form>.  The $obj->normal operation can always be
 used to produce the L<Normal Form>, even if the version was originally a
@@ -360,7 +360,7 @@ first glance.  For example, the following inequalities hold:
   version->new("0.96.1") < version->new(0.95); # 0.096.1 < 0.950.0
 
 For this reason, it is best to use either exclusively L<Numeric Versions> or
-L<Quoted Versions> with multiple decimal places.
+L<Extended Versions> with multiple decimal places.
 
 =back
 
@@ -468,7 +468,7 @@ which is mathematically equivalent and ASCII sorts exactly the same as
 without the trailing zeros.
 
 Alpha versions with more than a single decimal place will be treated 
-exactly as if they were L<Quoted Versions>, and will display without any
+exactly as if they were L<Extended Versions>, and will display without any
 trailing (or leading) zeros, in the L<Version Normal> form.  For example,
 
   $newver = version->new("12.3.1_1");
@@ -536,7 +536,7 @@ version strings.
 
 =head1 EXPORT
 
-qv - quoted version initialization operator
+qv - Extended Version initialization operator
 
 =head1 AUTHOR
 
