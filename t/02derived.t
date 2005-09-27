@@ -10,7 +10,7 @@ require "t/coretests.pm";
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
 BEGIN {
-    use_ok("version", 0.47); # If we made it this far, we are ok.
+    use_ok("version", 0.49); # If we made it this far, we are ok.
 }
 
 BaseTests("version");

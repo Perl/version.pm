@@ -1,4 +1,22 @@
 #! /usr/local/perl -w
+use Module::Build;
+my $build = Module::Build->current;
+my $subclass = $build->module_name();
+my $version = $build->dist_version();
+
+my $outputfile = shift();
+
+open my $OUT, '>', $outputfile;
+
+while (<DATA>) {
+    s/__SUBCLASS__/$subclass/g;
+    s/__VERSION__/$version/g;
+    print {$OUT} $_;
+}
+close $OUT;
+
+__DATA__
+#! /usr/local/perl -w
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
 
@@ -10,21 +28,21 @@ require "t/coretests.pm";
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
 BEGIN {
-    use_ok("version::vxs", 0.47); # If we made it this far, we are ok.
+    use_ok("__SUBCLASS__", __VERSION__); # If we made it this far, we are ok.
 }
 
-BaseTests("version::vxs");
+BaseTests("__SUBCLASS__");
 
 diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 
 package version::Empty;
 use vars qw($VERSION @ISA);
-use version::vxs;
-@ISA = qw(version::vxs);
+use __SUBCLASS__;
+@ISA = qw(__SUBCLASS__);
 $VERSION = 0.01;
 
 package version::Bad;
-use base version::vxs;
+use base __SUBCLASS__;
 sub new { my($self,$n)=@_;  bless \$n, $self }
 
 package main;
@@ -34,7 +52,7 @@ ok( $testobj->numify == 1.002003, "Numified correctly" );
 ok( $testobj->stringify eq "1.002003", "Stringified correctly" );
 ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 
-my $verobj = version::vxs->new("1.2.4");
+my $verobj = __SUBCLASS__->new("1.2.4");
 ok( $verobj > $testobj, "Comparison vs parent class" );
 ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");
