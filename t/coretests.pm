@@ -182,6 +182,7 @@ sub BaseTests {
 	ok ( $version eq "1.2.0", 'qv("1.2") eq "1.2.0"' );
 	$version = qv(1.2);
 	ok ( $version eq "1.2.0", 'qv(1.2) eq "1.2.0"' );
+	isa_ok( qv('5.008'), $CLASS );
 
 	# test creation from existing version object
 	diag "create new from existing version" unless $ENV{PERL_CORE};

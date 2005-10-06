@@ -534,6 +534,15 @@ derived class:
 See also L<version::AlphaBeta> on CPAN for an alternate representation of
 version strings.
 
+B<NOTE:> the L<qv> operator is not a class method and will not be inherited
+in the same way as the other methods.  L<qv> will always return an object of
+type L<version> and not an object in the derived class.  If you need to
+have L<qv> return an object in your derived class, add something like this:
+
+  *::qv = sub { return bless version::qv(shift), __PACKAGE__ };
+
+as seen in the test file F<t/02derived.t>.
+
 =head1 EXPORT
 
 qv - Extended Version initialization operator

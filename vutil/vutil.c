@@ -32,7 +32,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     int alpha = 0;
     int width = 3;
     AV *av = newAV();
-    SV *hv = newSVrv(rv, "version::vxs"); /* create an SV and upgrade the RV */
+    SV *hv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
 #if 0
     /* upgrade the RV and tie it to the hash (the hard way) */
@@ -195,13 +195,13 @@ SV *
 Perl_new_version(pTHX_ SV *ver)
 {
     SV * const rv = newSV(0);
-    if ( sv_derived_from(ver,"version::vxs") ) /* can just copy directly */
+    if ( sv_derived_from(ver,"version") ) /* can just copy directly */
     {
 	I32 key;
 	AV * const av = newAV();
 	AV *sav;
 	/* This will get reblessed later if a derived class*/
-	SV * const hv = newSVrv(rv, "version::vxs"); 
+	SV * const hv = newSVrv(rv, "version"); 
 	(void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
 #ifndef NODEFAULT_SHAREKEYS
 	HvSHAREKEYS_on(hv);         /* key-sharing on by default */
