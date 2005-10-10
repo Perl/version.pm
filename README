@@ -1,4 +1,4 @@
-version 0.48
+version 0.49
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -11,6 +11,14 @@ latest release of 5.9.x to get the changes included in 0.48.
 
 
 Major changes in this release:
+==================================
+Changes in 0.48 accidently broke modules depending on qv() returning an 
+object derived from 'version'.  Tests were simplified since the
+implementation class 'version::vxs' is no longer independent of the main
+class.
+
+
+Major changes in 0.48
 ==================================
 Significant archectectural change (object hash has to contain reference to
 array not the array itself); see
