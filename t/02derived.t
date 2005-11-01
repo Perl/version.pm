@@ -15,6 +15,7 @@ diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 package version::Empty;
 use base version;
 $VERSION = 0.01;
+no warnings 'redefine';
 *::qv = sub { return bless version::qv(shift), __PACKAGE__; };
 
 package version::Bad;
