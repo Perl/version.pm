@@ -1,4 +1,4 @@
-version 0.49
+version 0.50
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -7,10 +7,25 @@ of Perl >= v5.9.0, this module will not do anything, since the code already
 exists in the Perl core.  Note that the CPAN release cannot be installed
 with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing bleadperl, you will need to check out the
-latest release of 5.9.x to get the changes included in 0.48.
+latest release of 5.9.x to get the changes included in 0.50.
 
 
 Major changes in this release:
+==================================
+Completely rewritten POD to hopefully make it clear what is the recommended
+Best Practices (to go along with Damien's book).  I also hid the forthcoming
+pure Perl module better (you cannot accidently use it, in other words,
+since it only exists on my hard-drive for now).  I also dealt with the
+following bugs:
+
+	fails tests on AIX 5.1
+	<https://rt.cpan.org/Ticket/Display.html?id=15254>
+
+	Missing vpp.pm
+	<https://rt.cpan.org/Ticket/Display.html?id=16249>
+
+
+Major changes in 0.49
 ==================================
 Changes in 0.48 accidently broke modules depending on qv() returning an 
 object derived from 'version'.  Tests were simplified since the
