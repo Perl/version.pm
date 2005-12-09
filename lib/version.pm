@@ -32,4 +32,42 @@ else # use XS module
 
 # Preloaded methods go here.
 
+sub import {
+    my ($pkg, $num) = @_;
+    my $caller = caller;
+    no strict 'refs';
+    my $bootstrap;
+    tie $bootstrap, 'version::_bootstrap', $num, $pkg;
+    *{"$caller\::VERSION"} = \$bootstrap;
+    $pkg->export_to_level(1, @_);
+}
+
+package version::_bootstrap;
+
+require Tie::Scalar;
+use vars qw(@ISA);
+
+@ISA = qw(Tie::StdScalar);
+
+sub TIESCALAR {
+    my ($class, $value, $package) = @_;
+    my $self = bless {}, $class;
+    $self->{value} = $value;
+    $self->{class} = $package;
+    return $self;
+}
+
+sub STORE {
+    $DB::single = 1;
+    my $class = $_[0]->{class};
+    untie $_[0];
+    undef $_[0];
+    $_[0] = $class->new($_[1]);
+    return ;
+}
+
+sub DESTROY {
+    return;
+}
+
 1;
