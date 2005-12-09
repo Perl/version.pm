@@ -1,4 +1,4 @@
-#! /usr/local/perl -w
+#! /usr/local/bin/perl -w
 package main;
 
 sub BaseTests {
