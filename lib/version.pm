@@ -36,9 +36,7 @@ sub import {
     my ($pkg, $num) = @_;
     my $caller = caller;
     no strict 'refs';
-    my $bootstrap;
-    tie $bootstrap, 'version::_bootstrap', $num, $pkg;
-    *{"$caller\::VERSION"} = \$bootstrap;
+    *{"$caller\::VERSION"} = version::_bootstrap->new($pkg,$num);
     $pkg->export_to_level(1, @_);
 }
 
@@ -49,21 +47,29 @@ use vars qw(@ISA);
 
 @ISA = qw(Tie::StdScalar);
 
+sub new {
+    my ($tramp_class, $real_class, @args) = @_;
+    my $self;
+    tie $self, $tramp_class, \$self, @args;
+    bless \$self, $real_class;
+}
+
 sub TIESCALAR {
-    my ($class, $value, $package) = @_;
-    my $self = bless {}, $class;
-    $self->{value} = $value;
-    $self->{class} = $package;
-    return $self;
+    $DB::single = 1;
+    my ($class, $orig, @args) = @_;
+    bless { orig => $orig, args => \@args }, $class;
+}
+
+sub _snap {
+    $DB::single = 1;
+    untie ${$_[0]{orig}};
+    my $class = ref($_[0]);
+    $class->new($_[0]{orig}, @{$_[0]{args}});
 }
 
 sub STORE {
     $DB::single = 1;
-    my $class = $_[0]->{class};
-    untie $_[0];
-    undef $_[0];
-    $_[0] = $class->new($_[1]);
-    return ;
+    &_snap->{$_[1]} = $_[2];
 }
 
 sub DESTROY {
