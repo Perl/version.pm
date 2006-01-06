@@ -1,4 +1,4 @@
-version 0.51
+version 0.52
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -9,7 +9,15 @@ with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing bleadperl, you will need to check out the
 latest release of 5.9.x to get the changes included in 0.50.
 
-Minor changes in this release
+Major changes in 0.52
+==================================
+Check for malformed initializer ("1_2") based on discussion about
+some bleadperl bugs with vector printing:
+
+	sprintf of version objects
+	<https://rt.perl.org/rt3/Ticket/Display.html?id=37897>
+
+Minor changes in 0.51
 ==================================
 Continue rewriting the POD as the situation changes with regards to support
 for version objects in various scaffolding programs (CPAN indexer does so
@@ -28,30 +36,6 @@ following bugs:
 
 	Missing vpp.pm
 	<https://rt.cpan.org/Ticket/Display.html?id=16249>
-
-
-Major changes in 0.49
-==================================
-Changes in 0.48 accidently broke modules depending on qv() returning an 
-object derived from 'version'.  Tests were simplified since the
-implementation class 'version::vxs' is no longer independent of the main
-class.
-
-
-Major changes in 0.48
-==================================
-Significant archectectural change (object hash has to contain reference to
-array not the array itself); see
-
-    <https://rt.cpan.org/Ticket/Display.html?id=14439>
-
-for details.  Initial changes to support pure Perl variant (not
-included yet), see
-
-    <https://rt.cpan.org/Ticket/Display.html?id=14417>
-
-for more details.  All POD moved to seperate file.  Tests
-abstracted out for reuse by different classes.
 
 
 Please read the POD documentation for usage/details.  See the CHANGES file

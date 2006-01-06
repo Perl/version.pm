@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 107;
+use Test::More qw/no_plan/;
 BEGIN {
     use_ok("version", 0.49); # If we made it this far, we are ok.
 }

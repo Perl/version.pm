@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 96;
+use Test::More qw/no_plan/;
 require "t/coretests.pm";
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
