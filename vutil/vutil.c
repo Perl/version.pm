@@ -34,14 +34,6 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     AV *av = newAV();
     SV *hv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
-#if 0
-    /* upgrade the RV and tie it to the hash (the hard way) */
-    HV *hv = newHV();
-    (void)sv_upgrade(rv, SVt_RV);
-    SvRV(rv) = (SV *)hv;
-    SvROK_on(rv);
-    (void)sv_bless(rv, gv_stashpv("version", TRUE)); 
-#endif
 
 #ifndef NODEFAULT_SHAREKEYS
     HvSHAREKEYS_on(hv);         /* key-sharing on by default */

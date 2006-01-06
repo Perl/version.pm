@@ -1,4 +1,4 @@
-version 0.50
+version 0.51
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -9,8 +9,13 @@ with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing bleadperl, you will need to check out the
 latest release of 5.9.x to get the changes included in 0.50.
 
+Minor changes in this release
+==================================
+Continue rewriting the POD as the situation changes with regards to support
+for version objects in various scaffolding programs (CPAN indexer does so
+support version objects).
 
-Major changes in this release:
+Major changes in 0.50
 ==================================
 Completely rewritten POD to hopefully make it clear what is the recommended
 Best Practices (to go along with Damien's book).  I also hid the forthcoming
