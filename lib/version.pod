@@ -110,7 +110,7 @@ if required:
 
   $v  = version->new(1.002);     # 1.002, but compares like 1.2.0
   $v  = version->new(1.002003);  # 1.002003
-  $v2 = version->new( "1.2.3");  # v1.2.3
+  $v2 = version->new("1.2.3");   # v1.2.3
 
 In specific, version numbers initialized as L<Numeric Versions> will
 stringify in Numeric form.  Version numbers initialized as L<Extended Versions>
@@ -161,7 +161,7 @@ a single decimal point, e.g.:
                                    # Prints
   $v = version->new( "v1.200");    # v1.200.0
   $v = version->new("v1.20.0");    # v1.20.0
-  $v = qv("v1.2.3);                # v1.2.3
+  $v = qv("v1.2.3");               # v1.2.3
   $v = qv("1.2.3");                # v1.2.3
   $v = qv("1.20");                 # v1.20.0
 
