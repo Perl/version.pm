@@ -41,12 +41,35 @@ sub BaseTests {
 	like($@, qr/underscores before decimal/,
 	    "Invalid version format (underscores before decimal)");
 	
+	eval {my $version = $CLASS->new("1_2")};
+	like($@, qr/alpha without decimal/,
+	    "Invalid version format (alpha without decimal)");
+	
+	# for this first test, just upgrade the warn() to die()
+	eval {
+	    local $SIG{__WARN__} = sub { die $_[0] };
+	    $version = $CLASS->new("1.2b3");
+	};
+	my $warnregex = "Version string '.+' contains invalid data; ".
+		"ignoring: '.+'";
+
+	like($@, qr/$warnregex/,
+	    "Version string contains invalid data; ignoring");
+
+        # from here on out capture the warning and test independently
+	my $warning;
+	local $SIG{__WARN__} = sub { $warning = $_[0] };
 	$version = $CLASS->new("99 and 44/100 pure");
+
+	like($warning, qr/$warnregex/,
+	    "Version string contains invalid data; ignoring");
 	ok ("$version" eq "99.000", '$version eq "99.000"');
 	ok ($version->numify == 99.0, '$version->numify == 99.0');
 	ok ($version->normal eq "v99.0.0", '$version->normal eq v99.0.0');
 	
 	$version = $CLASS->new("something");
+	like($warning, qr/$warnregex/,
+	    "Version string contains invalid data; ignoring");
 	ok (defined $version, 'defined $version');
 	
 	# reset the test object to something reasonable
@@ -182,6 +205,7 @@ sub BaseTests {
 	ok ( $version eq "1.2.0", 'qv("1.2") eq "1.2.0"' );
 	$version = qv(1.2);
 	ok ( $version eq "1.2.0", 'qv(1.2) eq "1.2.0"' );
+	isa_ok( qv('5.008'), $CLASS );
 
 	# test creation from existing version object
 	diag "create new from existing version" unless $ENV{PERL_CORE};

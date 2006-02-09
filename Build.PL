@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
 use Module::Build;
-
 my $perl_only;
 
 my $t = Module::Build->new(

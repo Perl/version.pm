@@ -32,16 +32,8 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     int alpha = 0;
     int width = 3;
     AV *av = newAV();
-    SV *hv = newSVrv(rv, "version::vxs"); /* create an SV and upgrade the RV */
+    SV *hv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
-#if 0
-    /* upgrade the RV and tie it to the hash (the hard way) */
-    HV *hv = newHV();
-    (void)sv_upgrade(rv, SVt_RV);
-    SvRV(rv) = (SV *)hv;
-    SvROK_on(rv);
-    (void)sv_bless(rv, gv_stashpv("version", TRUE)); 
-#endif
 
 #ifndef NODEFAULT_SHAREKEYS
     HvSHAREKEYS_on(hv);         /* key-sharing on by default */
@@ -76,6 +68,9 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 	}
 	pos++;
     }
+
+    if ( alpha && !saw_period )
+	Perl_croak(aTHX_ "Invalid version format (alpha without decimal)");
 
     if ( saw_period > 1 )
 	qv = 1; /* force quoted version processing */
@@ -195,13 +190,13 @@ SV *
 Perl_new_version(pTHX_ SV *ver)
 {
     SV * const rv = newSV(0);
-    if ( sv_derived_from(ver,"version::vxs") ) /* can just copy directly */
+    if ( sv_derived_from(ver,"version") ) /* can just copy directly */
     {
 	I32 key;
 	AV * const av = newAV();
 	AV *sav;
 	/* This will get reblessed later if a derived class*/
-	SV * const hv = newSVrv(rv, "version::vxs"); 
+	SV * const hv = newSVrv(rv, "version"); 
 	(void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
 #ifndef NODEFAULT_SHAREKEYS
 	HvSHAREKEYS_on(hv);         /* key-sharing on by default */
@@ -267,7 +262,7 @@ Returns a pointer to the upgraded SV.
 SV *
 Perl_upg_version(pTHX_ SV *ver)
 {
-    char *version;
+    const char *version, *s;
     bool qv = 0;
 
     if ( SvNOK(ver) ) /* may get too much accuracy */ 
@@ -287,7 +282,12 @@ Perl_upg_version(pTHX_ SV *ver)
     {
 	version = savepv(SvPV_nolen(ver));
     }
-    (void)scan_version(version, ver, qv);
+    s = scan_version(version, ver, qv);
+    if ( *s != '\0' )
+	if(ckWARN(WARN_MISC))
+	    Perl_warner(aTHX_ packWARN(WARN_MISC),
+	      "Version string '%s' contains invalid data; "
+	      "ignoring: '%s'", version, s);
     Safefree(version);
     return ver;
 }
@@ -388,7 +388,7 @@ Perl_vnumify(pTHX_ SV *vs)
     {
 	digit = SvIV(*av_fetch(av, i, 0));
 	if ( width < 3 ) {
-	    const int denom = (int)pow(10,(3-width));
+	    const int denom = (width == 2 ? 10 : 100);
 	    const div_t term = div((int)PERL_ABS(digit),denom);
 	    Perl_sv_catpvf(aTHX_ sv, "%0*d_%d", width, term.quot, term.rem);
 	}

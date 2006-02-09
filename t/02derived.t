@@ -4,24 +4,19 @@
 
 #########################
 
-use Test::More tests => 200;
-require "t/coretests.pm";
-
-diag "Tests with base class" unless $ENV{PERL_CORE};
-
+use Test::More qw/no_plan/;
 BEGIN {
     use_ok("version", 0.49); # If we made it this far, we are ok.
 }
-
-BaseTests("version");
+require "t/coretests.pm";
 
 diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 
 package version::Empty;
-use vars qw($VERSION @ISA);
-use version;
-@ISA = qw(version);
+use base version;
 $VERSION = 0.01;
+no warnings 'redefine';
+*::qv = sub { return bless version::qv(shift), __PACKAGE__; };
 
 package version::Bad;
 use base version;
