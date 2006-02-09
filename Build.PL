@@ -17,9 +17,6 @@ my %build_arguments = (
     requires        => {
 	perl => '> 5.005, !=5.9.1, !=5.9.2',
     },
-    PL_files        => {
-	't/01base.t.PL' => 't/01base.t'
-    },
 );
 
 if ( $perl_only or not $t->have_c_compiler() ) {
