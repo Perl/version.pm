@@ -3,6 +3,7 @@ package version::vpp;
 use strict;
 
 use Exporter ();
+use Scalar::Util qw(isvstring reftype);
 use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @REGEXS);
 $VERSION     = 0.54;
 @ISA         = qw (Exporter);
@@ -32,7 +33,13 @@ sub new
 	my ($class, $value) = @_;
 	my $self = bless ({}, ref ($class) || $class);
 
-	return ($self) unless $value;
+	if ( $#_ == 2 ) { # must be CVS-style
+	    $value = 'v'.$_[2];
+	}
+
+	if ( isvstring($value) ) {
+	    $value = sprintf("v%vd",$value);
+	}
 	
 	# This is not very efficient, but it is morally equivalent
 	# to the XS code (as that is the reference implementation).
@@ -197,6 +204,9 @@ sub new
 sub numify 
 {
     my ($self) = @_;
+    unless (_verify($self)) {
+	die "Invalid version object";
+    }
     my $width = $self->{width} || 3;
     my $alpha = $self->{alpha} || "";
     my $len = $#{$self->{version}};
@@ -234,6 +244,9 @@ sub numify
 sub normal 
 {
     my ($self) = @_;
+    unless (_verify($self)) {
+	die "Invalid version object";
+    }
     my $alpha = $self->{alpha} || "";
     my $len = $#{$self->{version}};
     my $digit = $self->{version}[0];
@@ -266,6 +279,9 @@ sub normal
 sub stringify
 {
     my ($self) = @_;
+    unless (_verify($self)) {
+	die "Invalid version object";
+    }
     if ( exists $self->{qv} ) {
 	return $self->normal;
     }
@@ -285,6 +301,12 @@ sub vcmp
 
     if ( $swap ) {
 	($left, $right) = ($right, $left);
+    }
+    unless (_verify($left)) {
+	die "Invalid version object";
+    }
+    unless (_verify($right)) {
+	die "Invalid version object";
     }
     my $l = $#{$left->{version}};
     my $r = $#{$right->{version}};
@@ -325,7 +347,7 @@ sub vcmp
 	else {
 	    while ( $i <= $l && $retval == 0 ) {
 		if ( $left->{version}[$i] != 0 ) {
-		    $retval = -1; # not a match after all
+		    $retval = +1; # not a match after all
 		}
 		$i++;
 	    }
@@ -342,9 +364,27 @@ sub is_alpha {
 
 sub qv {
     my ($value) = @_;
-    $value = 'v'.$value unless $value =~ /^v/;
-    return version->new($value);
+
+    if ( isvstring($value) ) {
+	$value = sprintf("v%vd",$value);
+    }
+    else {
+	$value = 'v'.$value unless $value =~ /^v/;
+    }
+    return version->new($value); # always use base class
+}
+
+sub _verify {
+    my ($self) = @_;
+    if (   reftype($self) eq 'HASH'
+	&& exists $self->{version}
+	&& ref($self->{version}) eq 'ARRAY'
+	) {
+	return 1;
+    }
+    else {
+	return 0;
+    }
 }
 
 1; #this line is important and will help the module return a true value
-__END__
