@@ -236,9 +236,15 @@ object, either as a class method:
 or as an object method:
 
   $v1 = version->new(12.3);
+  $v2 = $v1->new(12.3);
+
+and in each case, $v1 and $v2 will be identical.  NOTE: if you create
+a new object using an existing object like this:
+
   $v2 = $v1->new();
 
-and in each case, $v1 and $v2 will be identical.
+the new object B<will not> be a clone of the existing object.  In the
+example case, $v2 will be an empty object of the same type as $v1.
 
 =back
 

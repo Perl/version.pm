@@ -1,4 +1,4 @@
-version 0.53
+version 0.53_03
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -9,41 +9,29 @@ with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing bleadperl, you will need to check out the
 latest release of 5.9.x to get the changes included in 0.50.
 
+Major changes in 0.53_03
+==================================
+This beta release includes an optional pure Perl implementation (in case
+you don't have a C-compiler or if some reason you want your code to be
+much slower).  You can test it by calling the build script as
+
+    $ perl Build.PL --perl_only
+
+and it will install the Perl only version.
+
+NOTE: there is also a significant change in the behavior of the XS module.
+Versions prior to 0.53_03 mistakenly cloned an existing object, if new()
+was called as an object method.  In other words:
+
+    $v2 = $v1->new(); # formerly would assign the value of $v1 to $v2
+
+This behavior was wrong, and I apologize profusely.
+
 Major changes in 0.53
 ==================================
 The version parsing code always ignored trailing text that couldn't be
 parsed.  Now carp about it and show what was ignored.  Suggested by David
 Wheeler.
-
-
-Major changes in 0.52
-==================================
-Check for malformed initializer ("1_2") based on discussion about
-some bleadperl bugs with vector printing:
-
-	sprintf of version objects
-	<https://rt.perl.org/rt3/Ticket/Display.html?id=37897>
-
-Minor changes in 0.51
-==================================
-Continue rewriting the POD as the situation changes with regards to support
-for version objects in various scaffolding programs (CPAN indexer does so
-support version objects).
-
-Major changes in 0.50
-==================================
-Completely rewritten POD to hopefully make it clear what is the recommended
-Best Practices (to go along with Damien's book).  I also hid the forthcoming
-pure Perl module better (you cannot accidently use it, in other words,
-since it only exists on my hard-drive for now).  I also dealt with the
-following bugs:
-
-	fails tests on AIX 5.1
-	<https://rt.cpan.org/Ticket/Display.html?id=15254>
-
-	Missing vpp.pm
-	<https://rt.cpan.org/Ticket/Display.html?id=16249>
-
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.

@@ -21,6 +21,11 @@ my %build_arguments = (
 
 if ( $perl_only or not $t->have_c_compiler() ) {
     $build_arguments{module_name} = 'version::vpp';
+    if ( $] > 5.008001 ) {
+	$build_arguments{requires} = {
+	    'Scalar::Util' => 1.08,
+	};
+    }
     $build_arguments{pm_files} = {
 	'./lib/version.pm' => './lib/version.pm',
 	'./vperl/vpp.pm' => 'lib/version/vpp.pm',
