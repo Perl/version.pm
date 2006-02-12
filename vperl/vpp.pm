@@ -4,7 +4,7 @@ use strict;
 
 use Exporter ();
 use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @REGEXS);
-$VERSION     = 0.49;
+$VERSION     = 0.54;
 @ISA         = qw (Exporter);
 #Give a hoot don't pollute, do not export more than needed by default
 @EXPORT      = qw (qv);
@@ -12,7 +12,7 @@ $VERSION     = 0.49;
 %EXPORT_TAGS = ();
 
 push @REGEXS, qr/
-	^v	# leading 'v'
+	^v?	# optional leading 'v'
 	(\d*)	# major revision not required
 	\.	# requires at least one decimal
 	(?:(\d+)\.?){1,}
@@ -30,57 +30,165 @@ use overload (
 sub new
 {
 	my ($class, $value) = @_;
-	my $qv = 0;
-
 	my $self = bless ({}, ref ($class) || $class);
 
 	return ($self) unless $value;
-
-	# First validate the input for sanity
-	die "multiple underscores"
-	  if $value =~ /^[\d.]+_[\d.]+_[\d.]+/;
-
-	die "underscores before decimal"
-	  if $value =~ /^[\d.]+_\d+\./;
-
-	$value =~ /^\s*(v?)(\d+\.)?(\d+\.)?/;
-	if ( $1 or $3 ) # explicit or implicit vstring 
-	{
-	    $self->{qv} = 1;
-	    $qv = 1;
-	}
-
-	if ( $value =~ /\.(\d+)_/ )
-	{
-	    $self->{alpha} = 1;
-	    if ( $qv ) {
-		$value =~ tr/_/./; # underscores are treated like decimals
-	    }
-	    else {
-		$self->{width} = length($1); # only valid for numeric-style
-		$value =~ tr/_//d; # underscores are ignored
-	    }
-	}
-
-	$value =~ /^\s*v?(\d*)\.?/g;
-	my $term = int($1+0);
-	push @{$self->{version}}, $term;
 	
-	while ( $value =~ /(\d{1,3})([._]?)/g)
-	{
-	    $term = int($1+0);
-	    if ( $qv ) {
-		push @{$self->{version}}, $term;
-	    }
-	    else {
-		push @{$self->{version}}, ($term * 10**(3-length($1)));
-	    }
+	# This is not very efficient, but it is morally equivalent
+	# to the XS code (as that is the reference implementation).
+	# See vutil/vutil.c for details
+	my $qv = 0;
+	my $alpha = 0;
+	my $width = 3;
+	my $saw_period = 0;
+	my ($start, $last, $pos, $s);
+	$s = 0;
+
+	while ( substr($value,$s,1) =~ /\s/ ) { # leading whitespace is OK
+	    $s++;
 	}
+
+	if (substr($value,$s,1) eq 'v') {
+	    $s++;    # get past 'v'
+	    $qv = 1; # force quoted version processing
+	}
+
+	$start = $last = $pos = $s;
+		
+	# pre-scan the input string to check for decimals/underbars
+	while ( substr($value,$pos,1) =~ /[._\d]/ ) {
+	    if ( substr($value,$pos,1) eq '.' ) {
+		die "Invalid version format (underscores before decimal)"
+		  if $alpha;
+		$saw_period++;
+		$last = $pos;
+	    }
+	    elsif ( substr($value,$pos,1) eq '_' ) {
+		die "Invalid version format (multiple underscores)"
+		  if $alpha;
+		$alpha = 1;
+		$width = $pos - $last - 1; # natural width of sub-version
+	    }
+	    $pos++;
+	}
+
+	if ( $alpha && !$saw_period ) {
+	    die "Invalid version format (alpha without decimal)";
+	}
+
+	if ( $saw_period > 1 ) {
+	    $qv = 1; # force quoted version processing
+	}
+
+	$pos = $s;
 
 	if ( $qv ) {
-	    while ( $#{$self->{version}} < 2 ) {
-	    	push @{$self->{version}}, 0;
+	    $self->{qv} = 1;
+	}
+
+	if ( $alpha ) {
+	    $self->{alpha} = 1;
+	}
+
+	if ( !$qv && $width < 3 ) {
+	    $self->{width} = $width;
+	}
+
+	while ( substr($value,$pos,1) =~ /\d/ ) {
+	    $pos++;
+	}
+
+	if ( substr($value,$pos,1) !~ /[a-z]/ ) { ### FIX THIS ###
+	    my $rev;
+
+	    while (1) {
+		$rev = 0;
+		{
+
+		    # this is atoi() that delimits on underscores
+		    my $end = $pos;
+		    my $mult = 1;
+		    my $orev;
+
+		    # the following if() will only be true after the decimal
+		    # point of a version originally created with a bare
+		    # floating point number, i.e. not quoted in any way
+		    if ( !$qv && $s > $start && $saw_period == 1 ) {
+			$mult *= 100;
+			while ( $s < $end ) {
+			    $orev = $rev;
+			    $rev += substr($value,$s,1) * $mult;
+			    $mult /= 10;
+			    if ( abs($orev) > abs($rev) ) {
+				die "Integer overflow in version";
+			    }
+			    $s++;
+			    if ( substr($value,$s,1) eq '_' ) {
+				$s++;
+			    }
+			}
+		    }
+		    else {
+			while (--$end >= $s) {
+			    $orev = $rev;
+			    $rev += substr($value,$end,1) * $mult;
+			    $mult *= 10;
+			    if ( abs($orev) > abs($rev) ) {
+				die "Integer overflow in version";
+			    }
+			}
+		    }
+		}
+
+		# Append revision
+		push @{$self->{version}}, $rev;
+		if ( substr($value,$pos,1) eq '.' 
+		    && substr($value,$pos+1,1) =~ /\d/ ) {
+		    $s = ++$pos;
+		}
+		elsif ( substr($value,$pos,1) eq '_' 
+		    && substr($value,$pos+1,1) =~ /\d/ ) {
+		    $s = ++$pos;
+		}
+		elsif ( substr($value,$pos,1) =~ /\d/ ) {
+		    $s = $pos;
+		}
+		else {
+		    $s = $pos;
+		    last;
+		}
+		if ( $qv ) {
+		    while ( substr($value,$pos,1) =~ /\d/ ) {
+			$pos++;
+		    }
+		}
+		else {
+		    my $digits = 0;
+		    while (substr($value,$pos,1) =~ /[\d_]/ && $digits < 3) {
+			if ( substr($value,$pos,1) ne '_' ) {
+			    $digits++;
+			}
+			$pos++;
+		    }
+		}
 	    }
+	}
+	if ( $qv ) { # quoted versions always get at least three terms
+	    my $len = scalar @{$self->{version}};
+	    $len = 3 - $len;
+	    while ($len-- > 0) {
+		push @{$self->{version}}, 0;
+	    }
+	}
+
+	if ( not exists $self->{version} ) {
+	    # oops, someone forgot to pass a value (shouldn't happen)
+	    push @{$self->{version}}, 0;
+	}
+
+	if ( substr($value,$pos) ) { # any remaining text
+	    warn "Version string '$value' contains invalid data; ".
+	         "ignoring: '".substr($value,$pos)."'";
 	}
 
 	return ($self);
@@ -146,6 +254,12 @@ sub normal
 	}
     }
 
+    if ( $len <= 2 ) {
+	for ( $len = 2 - $len; $len != 0; $len-- ) {
+	    $string .= sprintf(".%0d", 0);
+	}
+    }
+
     return $string;
 }
 
@@ -167,6 +281,10 @@ sub vcmp
     my $class = ref($left);
     unless ( UNIVERSAL::isa($right, $class) ) {
 	$right = $class->new($right);
+    }
+
+    if ( $swap ) {
+	($left, $right) = ($right, $left);
     }
     my $l = $#{$left->{version}};
     my $r = $#{$right->{version}};
@@ -223,9 +341,9 @@ sub is_alpha {
 }
 
 sub qv {
-    my ($class, $value) = @_;
+    my ($value) = @_;
     $value = 'v'.$value unless $value =~ /^v/;
-    return $class->new($value);
+    return version->new($value);
 }
 
 1; #this line is important and will help the module return a true value
