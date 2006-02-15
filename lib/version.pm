@@ -11,18 +11,19 @@ use vars qw(@ISA $VERSION $CLASS @EXPORT);
 
 @EXPORT = qw(qv);
 
-$VERSION = 0.53;
+$VERSION = "0.53_03";
+$VERSION = eval $VERSION;
 
 $CLASS = 'version';
 
-eval { require version::vxs; };
+eval "use version::vxs $VERSION";
 
 if ( $@ ) # don't have the XS version installed
 {
-#    eval { require version::vpp }; # don't tempt fate
+    eval "use version::vpp $VERSION"; # don't tempt fate
     die "$@" if ( $@ );
-#    push @ISA, "version::PP";
-#    *qv = \&version::vpp::qv;
+    push @ISA, "version::vpp";
+    *qv = \&version::vpp::qv;
 }
 else # use XS module
 {

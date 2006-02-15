@@ -213,7 +213,8 @@ sub BaseTests {
 		"new from existing object");
 	ok ($new_version == $version, "class->new($version) identical");
 	$new_version = $version->new();
-	ok ($new_version == $version, "$version->new() also identical");
+	isa_ok ($new_version, $CLASS );
+	is ($new_version, "0.000", "version->new() doesn't clone");
 	$new_version = $version->new("1.2.3");
 	is ($new_version, "v1.2.3" , '$version->new("1.2.3") works too');
 

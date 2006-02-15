@@ -3,8 +3,6 @@ Changes
 lib/version.pm
 lib/version.pod
 lib/version/typemap
-lib/version/vxs.pm
-lib/version/vxs.xs
 Makefile.PL
 MANIFEST
 META.yml
@@ -12,6 +10,9 @@ README
 t/01base.t
 t/02derived.t
 t/coretests.pm
+vperl/vpp.pm
 vutil/vutil.c
 vutil/vutil.h
 vutil/ppport.h
+vutil/vxs.pm
+vutil/vxs.xs
