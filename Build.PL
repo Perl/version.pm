@@ -42,6 +42,8 @@ else {
     $build_arguments{xs_files} = {
 	'./vutil/vxs.xs' => 'lib/version/vxs.xs'
     };
+    $build_arguments{add_to_cleanup} = 
+    	['lib/version/vxs.*'];
 }
 
 my $class = Module::Build->subclass
