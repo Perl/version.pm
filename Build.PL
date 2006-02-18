@@ -20,6 +20,8 @@ my %build_arguments = (
     dynamic_config  => 1,
 );
 
+mkdir $t->config_dir();
+
 if ( $perl_only or not $t->have_c_compiler() ) {
     $build_arguments{module_name} = 'version::vpp';
     if ( $] > 5.008001 ) {
