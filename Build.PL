@@ -22,7 +22,7 @@ my %build_arguments = (
 
 mkdir $t->config_dir();
 
-if ( $perl_only or not $t->have_c_compiler() ) {
+if ( $perl_only ) { #or not $t->have_c_compiler() ) {
     $build_arguments{module_name} = 'version::vpp';
     if ( $] > 5.008001 ) {
 	$build_arguments{requires} = {
