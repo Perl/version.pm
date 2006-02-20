@@ -5,7 +5,8 @@ use strict;
 use Exporter ();
 use Scalar::Util qw(isvstring reftype);
 use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @REGEXS);
-$VERSION     = $version::VERSION;
+$VERSION     = "0.56_02";
+$VERSION     = eval $VERSION;
 @ISA         = qw (Exporter);
 #Give a hoot don't pollute, do not export more than needed by default
 @EXPORT      = qw (qv);
@@ -18,8 +19,6 @@ push @REGEXS, qr/
 	\.	# requires at least one decimal
 	(?:(\d+)\.?){1,}
 	/x;
-
-local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
 
 use overload (
     '+0'   => \&numify,
@@ -386,5 +385,38 @@ sub _verify {
 	return 0;
     }
 }
+
+local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
+no warnings 'redefine';
+
+package UNIVERSAL;
+
+sub VERSION {
+    my ($obj, $req) = @_;
+    my $class = ref($obj) || $obj;
+    no strict 'refs';
+    eval "require $class" unless %{"$class\::"}; # already existing
+    die "$class defines neither package nor VERSION--version check failed"
+        if $@ or not %{"$class\::"};
+    
+    my $version = eval "\$$class\::VERSION";
+    die "$class does not define \$$class\::VERSION--version check failed"
+        unless defined $version;
+
+    $version = version::vpp->new($version);
+
+    if ( defined $req ) {
+	$req = version::vpp->new($req);
+
+	die sprintf ("%s version %s (%s) required--".
+                 "this is only version %s (%s)", $class, 
+		 $req->numify, $req->normal,
+		 $version->numify, $version->normal)
+	    if ( $req > $version ); 
+    }
+
+    return $version->numify;
+}
+
 
 1; #this line is important and will help the module return a true value

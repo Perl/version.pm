@@ -241,7 +241,8 @@ sub BaseTests {
 	unlike($@, qr/Test::More version $version/,
 		'Replacement eval works with exact version');
 	
-	$version = $Test::More::VERSION+0.01; # this should fail even with old UNIVERSAL::VERSION
+	# this should fail even with old UNIVERSAL::VERSION
+	$version = $Test::More::VERSION+0.01;
 	eval "use Test::More $version";
 	like($@, qr/Test::More version $version/,
 		'Replacement eval works with incremented version');
@@ -256,7 +257,27 @@ sub BaseTests {
 	eval "use Test::More $version";
 	like($@, qr/Test::More version $version/,
 		'Replacement eval works with incremented digit');
+
+	{ # dummy up some variously broken modules for testing
+	    open F, ">xxx.pm" or die "Cannot open xxx.pm: $!\n";
+	    print F "1;\n";
+	    close F;
+	    eval "use lib '.'; use xxx 3;";
+	    like ($@, qr/^xxx defines neither package nor VERSION/,
+	    	'Replacement handles modules without package or VERSION'); 
+	    unlink 'xxx.pm';
+	}
 	
+	{ # dummy up some variously broken modules for testing
+	    open F, ">yyy.pm" or die "Cannot open yyy.pm: $!\n";
+	    print F "package yyy;\n#look ma no VERSION\n1;\n";
+	    close F;
+	    eval "use lib '.'; use yyy 3;";
+	    like ($@, qr/^yyy does not define \$yyy::VERSION/,
+	    	'Replacement handles modules without VERSION'); 
+	    unlink 'yyy.pm';
+	}
+
 SKIP: 	{
 	    skip 'Cannot test v-strings with Perl < 5.8.1', 4
 		    if $] < 5.008_001; 
@@ -292,5 +313,8 @@ SKIP: 	{
 	ok($version->numify eq "1.700", "leading space ignored");
 
 }
+
+package known::module;
+# Look Ma!  No $VERSION;
 
 1;
