@@ -5,7 +5,7 @@ use strict;
 use Exporter ();
 use Scalar::Util qw(isvstring reftype);
 use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @REGEXS);
-$VERSION     = "0.56_02";
+$VERSION     = "0.56_03";
 $VERSION     = eval $VERSION;
 @ISA         = qw (Exporter);
 #Give a hoot don't pollute, do not export more than needed by default

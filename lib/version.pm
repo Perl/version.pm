@@ -11,7 +11,7 @@ use vars qw(@ISA $VERSION $CLASS @EXPORT);
 
 @EXPORT = qw(qv);
 
-$VERSION = "0.56_02";
+$VERSION = "0.56_03";
 $VERSION = eval $VERSION;
 
 $CLASS = 'version';

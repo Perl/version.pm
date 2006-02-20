@@ -3,7 +3,25 @@
 use Module::Build;
 my $perl_only;
 
-my $t = Module::Build->new(
+my $class = Module::Build->subclass
+(
+    class => 'version::Builder',
+    code => q{
+    sub ACTION_dist{
+        my $self = shift;
+    	$self->do_system('svk log -x | gnuify-changelog.pl > Changes');
+	$self->SUPER::ACTION_dist();
+	};
+    sub have_c_compiler{
+	my $self = shift;
+	my $have = eval {$self->SUPER::have_c_compiler};
+	$have = 0 if $@;
+	return $have;
+	};
+    },
+);
+
+my $t = $class->new(
     module_name     => 'version',
     get_options     => {
        'perl_only' => { store => \$perl_only },
@@ -22,7 +40,7 @@ my %build_arguments = (
 
 mkdir $t->config_dir();
 
-if ( $perl_only ) { #or not $t->have_c_compiler() ) {
+if ( $perl_only or not $t->have_c_compiler() ) {
     $build_arguments{module_name} = 'version::vpp';
     if ( $] > 5.008001 ) {
 	$build_arguments{requires} = {
@@ -47,18 +65,6 @@ else {
     $build_arguments{add_to_cleanup} = 
     	['lib/version/vxs.*'];
 }
-
-my $class = Module::Build->subclass
-(
-    class => 'version::Builder',
-    code => q{
-    sub ACTION_dist{
-        my $self = shift;
-    	$self->do_system('svk log -x | gnuify-changelog.pl > Changes');
-	$self->SUPER::ACTION_dist();
-	}
-    },
-);
 
 my $m = $class->new(%build_arguments);
 
