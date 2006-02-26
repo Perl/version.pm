@@ -33,7 +33,7 @@ my %build_arguments = (
     dist_version_from => 'lib/version.pm',
     license         => 'perl',
     requires        => {
-	perl => '> 5.005, !=5.9.1, !=5.9.2',
+	perl => '> 5.005, < 5.009',
     },
     dynamic_config  => 1,
 );
