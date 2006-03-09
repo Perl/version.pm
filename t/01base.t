@@ -5,12 +5,13 @@
 #########################
 
 use Test::More qw/no_plan/;
+no warnings 'once';
 require "t/coretests.pm";
 
-diag "Tests with base class" unless $ENV{PERL_CORE};
-
 BEGIN {
-    use_ok("version", 0.49); # If we made it this far, we are ok.
+    use_ok("version", 0.57); # If we made it this far, we are ok.
 }
+
+diag "Tests with base class" if $Verbose;
 
 BaseTests("version");

@@ -74,6 +74,8 @@ and it should Just Work(TM).  Module::Build will [hopefully soon]
 include full support for version objects; there are no current plans 
 to patch ExtUtils::MakeMaker to support version objects.
 
+=back
+
 =head2 What IS a version
 
 For the purposes of this module, a version "number" is a sequence of
@@ -515,6 +517,8 @@ trailing (or leading) zeros, in the L<Version Normal> form.  For example,
 
   $newver = version->new("12.3.1_1");
   print $newver; # v12.3.1_1
+
+=back
 
 =head2 Replacement UNIVERSAL::VERSION
 

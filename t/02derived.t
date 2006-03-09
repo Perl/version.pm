@@ -5,12 +5,13 @@
 #########################
 
 use Test::More qw/no_plan/;
+
 BEGIN {
     use_ok("version", 0.49); # If we made it this far, we are ok.
 }
 require "t/coretests.pm";
 
-diag "Tests with empty derived class" unless $ENV{PERL_CORE};
+diag "Tests with empty derived class"  if $Verbose;
 
 package version::Empty;
 use base version;
@@ -34,7 +35,7 @@ ok( $verobj > $testobj, "Comparison vs parent class" );
 ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");
 
-diag "tests with bad subclass" unless $ENV{PERL_CORE};
+diag "tests with bad subclass"  if $Verbose;
 $testobj = version::Bad->new(1.002_003);
 isa_ok( $testobj, "version::Bad" );
 eval { my $string = $testobj->numify };
