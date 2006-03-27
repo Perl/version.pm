@@ -387,6 +387,28 @@ sub _verify {
     }
 }
 
+BEGIN { 
+    # Perl 5.005_x doesn't support lexical warnings, so we
+    # do the next best thing and mess with the global $SIG{__WARN__}
+    # handler to hide the "mandatory" warnings
+    if ( $] < 5.006 ) {
+	my $warnings = <<"";
+    package warnings;
+    # this evil^Wclever bit courtesy of Nick Ing-Simmons
+    \$INC{'warnings.pm'} = "inline";
+    sub unimport {
+	shift; # ignore the package name
+	my \@warnings = \@_;
+	my \$warnregex = '('.join('|',\@warnings).')';
+	\$SIG{__WARN__} = sub { warn \$_[0] unless \$_[0] =~ /\$warnregex/ };
+    }
+    1;
+
+       eval $warnings;
+       die $@ if $@;
+    }
+}
+
 package UNIVERSAL;
 no warnings qw(redefine);
 

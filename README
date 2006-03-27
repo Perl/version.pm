@@ -13,23 +13,8 @@ Major changes in 0.58
 ==================================
 Fix mainline code to work on Perl 5.6.x again (a few 5.8.x'isms had crept 
 in to the C code and tests).  Compatibility with Perl 5.005_x is currently
-broken, both for pure Perl and XS modules.  This should be rectified in 
-0.59, sorry.
-
-Major changes in 0.57
-==================================
-Fully implemented UNIVERSAL::VERSION in the pure Perl module.  Revert
-change to implementation modules so that the $VERSION testing in the main
-module loads the correct underlying module during testing.  Subclass
-Module::Build so lack of compiler is not fatal.
-
-This release includes an optional pure Perl implementation (in case
-you don't have a C-compiler or if some reason you want your code to be
-much slower).  You can test it by calling the build script as
-
-    $ perl Build.PL --perl_only
-
-and it will install the Perl only version.
+broken for the XS module; the pure Perl module works fine, though.  The XS
+code should be fixed in 0.59, sorry.
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.
@@ -43,9 +28,23 @@ To install this module type the following:
    $ ./Build test
    # ./Build install
 
+This release includes an optional pure Perl implementation (in case
+you don't have a C-compiler or if some reason you want your code to be
+much slower).  You can test it by calling the build script as
+
+    $ perl Build.PL --perl_only
+
+and it will install the Perl only version.
+
 DEPENDENCIES
 
-The same C compiler used to build Perl (or not).
+The same C compiler used to build Perl (or not).  Module::Build 0.2611
+or better.
+
+Module::Build installs fine under 5.005_03 or better, though the optional
+dependency Archive::Tar doesn't.  If you install Module::Build without any
+of the optional dependencies, you can safely install version.pm.
+
 
 COPYRIGHT AND LICENCE
 
