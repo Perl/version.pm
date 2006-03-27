@@ -7,20 +7,22 @@
 use Test::More qw/no_plan/;
 
 BEGIN {
-    use_ok("version", 0.49); # If we made it this far, we are ok.
+    use_ok("version", 0.58); # If we made it this far, we are ok.
 }
+
+no warnings qw(redefine once);
 require "t/coretests.pm";
 
 diag "Tests with empty derived class"  if $Verbose;
 
 package version::Empty;
-use base version;
+use base 'version';
 $VERSION = 0.01;
-no warnings 'redefine';
+no warnings qw(once redefine);
 *::qv = sub { return bless version::qv(shift), __PACKAGE__; };
 
 package version::Bad;
-use base version;
+use base 'version';
 sub new { my($self,$n)=@_;  bless \$n, $self }
 
 package main;
@@ -30,7 +32,7 @@ ok( $testobj->numify == 1.002003, "Numified correctly" );
 ok( $testobj->stringify eq "1.002003", "Stringified correctly" );
 ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 
-my $verobj = version->new("1.2.4");
+my $verobj = version::->new("1.2.4");
 ok( $verobj > $testobj, "Comparison vs parent class" );
 ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");

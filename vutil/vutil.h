@@ -7,6 +7,14 @@
 #define PERL_ABS(x) ((x) < 0 ? -(x) : (x))
 #endif
 
+#ifndef WARN_MISC
+#define WARN_MISC (1)
+#endif
+
+#ifndef packWARN
+#define packWARN(a) (a)
+#endif
+
 #ifndef SVf
 #define SVf "_"
 #endif

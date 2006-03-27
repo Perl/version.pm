@@ -5,12 +5,13 @@
 #########################
 
 use Test::More qw/no_plan/;
-no warnings 'once';
-require "t/coretests.pm";
 
 BEGIN {
-    use_ok("version", 0.57); # If we made it this far, we are ok.
+    use_ok("version", 0.58); # If we made it this far, we are ok.
 }
+
+no warnings qw(once redefine);
+require "t/coretests.pm";
 
 diag "Tests with base class" if $Verbose;
 

@@ -3,9 +3,9 @@ package version::vpp;
 use strict;
 
 use Exporter ();
-use Scalar::Util qw(isvstring reftype);
+use Scalar::Util;
 use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @REGEXS);
-$VERSION     = 0.57;
+$VERSION     = 0.58;
 @ISA         = qw (Exporter);
 #Give a hoot don't pollute, do not export more than needed by default
 @EXPORT      = qw (qv);
@@ -35,7 +35,8 @@ sub new
 	    $value = 'v'.$_[2];
 	}
 
-	if ( isvstring($value) ) {
+	my $eval = eval 'Scalar::Util::isvstring($value)';
+	if ( !$@ and $eval ) {
 	    $value = sprintf("v%vd",$value);
 	}
 	
@@ -363,7 +364,8 @@ sub is_alpha {
 sub qv {
     my ($value) = @_;
 
-    if ( isvstring($value) ) {
+    my $eval = eval 'Scalar::Util::isvstring($value)';
+    if ( !$@ and $eval ) {
 	$value = sprintf("v%vd",$value);
     }
     else {
@@ -374,7 +376,7 @@ sub qv {
 
 sub _verify {
     my ($self) = @_;
-    if (   reftype($self) eq 'HASH'
+    if (   Scalar::Util::reftype($self) eq 'HASH'
 	&& exists $self->{version}
 	&& ref($self->{version}) eq 'ARRAY'
 	) {
@@ -385,10 +387,8 @@ sub _verify {
     }
 }
 
-local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
-no warnings 'redefine';
-
 package UNIVERSAL;
+no warnings qw(redefine);
 
 sub VERSION {
     my ($obj, $req) = @_;
@@ -416,6 +416,5 @@ sub VERSION {
 
     return $version->numify;
 }
-
 
 1; #this line is important and will help the module return a true value

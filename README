@@ -1,4 +1,4 @@
-version 0.57
+version 0.58
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -7,7 +7,14 @@ of Perl >= v5.9.0, this module will not do anything, since the code already
 exists in the Perl core.  Note that the CPAN release cannot be installed
 with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing bleadperl, you will need to check out the
-latest release of 5.9.x to get the changes included in 0.50.
+latest release of 5.9.x to get the changes included in 0.58.
+
+Major changes in 0.58
+==================================
+Fix mainline code to work on Perl 5.6.x again (a few 5.8.x'isms had crept 
+in to the C code and tests).  Compatibility with Perl 5.005_x is currently
+broken, both for pure Perl and XS modules.  This should be rectified in 
+0.59, sorry.
 
 Major changes in 0.57
 ==================================

@@ -267,8 +267,16 @@ sub BaseTests {
 	open F, ">xxx.pm" or die "Cannot open xxx.pm: $!\n";
 	print F "1;\n";
 	close F;
+	my $error_regex;
+	if ( $] < 5.008 ) {
+	    $error_regex = 'xxx does not define \$xxx::VERSION';
+	}
+	else {
+	    $error_regex = 'xxx defines neither package nor VERSION';
+	}
+
 	eval "use lib '.'; use xxx 3;";
-	like ($@, qr/^xxx defines neither package nor VERSION/,
+	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without package or VERSION'); 
 	unlink 'xxx.pm';
     }

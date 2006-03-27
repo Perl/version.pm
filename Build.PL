@@ -1,5 +1,11 @@
 #!/usr/bin/perl
 
+BEGIN {
+    if ( $] < 5.006 ) {
+	die "version-0.58 is not currently compatible with Perl 5.005_x";
+    }
+}
+
 use Module::Build;
 my $perl_only;
 
@@ -38,7 +44,7 @@ my %build_arguments = (
     dynamic_config  => 1,
 );
 
-mkdir $t->config_dir();
+mkdir($t->config_dir(),0777);
 
 if ( $perl_only or not $t->have_c_compiler() ) {
     $build_arguments{module_name} = 'version::vpp';
