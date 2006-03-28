@@ -12,7 +12,7 @@ use vars qw(@ISA $VERSION $CLASS @EXPORT);
 
 @EXPORT = qw(qv);
 
-$VERSION = 0.58;
+$VERSION = 0.59;
 
 $CLASS = 'version::vxs';
 

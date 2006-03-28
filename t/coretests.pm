@@ -1,7 +1,6 @@
 #! /usr/local/perl -w
 package main;
 require Test::Harness;
-my $Verbose;
 *Verbose = \$Test::Harness::Verbose;
 
 sub BaseTests {

@@ -5,7 +5,7 @@ use strict;
 use Exporter ();
 use Scalar::Util;
 use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @REGEXS);
-$VERSION     = 0.58;
+$VERSION     = 0.59;
 @ISA         = qw (Exporter);
 #Give a hoot don't pollute, do not export more than needed by default
 @EXPORT      = qw (qv);
@@ -387,56 +387,35 @@ sub _verify {
     }
 }
 
-BEGIN { 
-    # Perl 5.005_x doesn't support lexical warnings, so we
-    # do the next best thing and mess with the global $SIG{__WARN__}
-    # handler to hide the "mandatory" warnings
-    if ( $] < 5.006 ) {
-	my $warnings = <<"";
-    package warnings;
-    # this evil^Wclever bit courtesy of Nick Ing-Simmons
-    \$INC{'warnings.pm'} = "inline";
-    sub unimport {
-	shift; # ignore the package name
-	my \@warnings = \@_;
-	my \$warnregex = '('.join('|',\@warnings).')';
-	\$SIG{__WARN__} = sub { warn \$_[0] unless \$_[0] =~ /\$warnregex/ };
-    }
-    1;
+# Thanks to Yitzchak Scott-Thoennes for this mode of operation
+{
+    local $^W;
+    *UNIVERSAL::VERSION = sub {
+	my ($obj, $req) = @_;
+	my $class = ref($obj) || $obj;
+	no strict 'refs';
+	eval "require $class" unless %{"$class\::"}; # already existing
+	die "$class defines neither package nor VERSION--version check failed"
+	    if $@ or not %{"$class\::"};
+	
+	my $version = eval "\$$class\::VERSION";
+	die "$class does not define \$$class\::VERSION--version check failed"
+	    unless defined $version;
 
-       eval $warnings;
-       die $@ if $@;
-    }
-}
+	$version = version::vpp->new($version);
 
-package UNIVERSAL;
-no warnings qw(redefine);
+	if ( defined $req ) {
+	    $req = version::vpp->new($req);
 
-sub VERSION {
-    my ($obj, $req) = @_;
-    my $class = ref($obj) || $obj;
-    no strict 'refs';
-    eval "require $class" unless %{"$class\::"}; # already existing
-    die "$class defines neither package nor VERSION--version check failed"
-        if $@ or not %{"$class\::"};
-    
-    my $version = eval "\$$class\::VERSION";
-    die "$class does not define \$$class\::VERSION--version check failed"
-        unless defined $version;
+	    die sprintf ("%s version %s (%s) required--".
+		     "this is only version %s (%s)", $class, 
+		     $req->numify, $req->normal,
+		     $version->numify, $version->normal)
+		if ( $req > $version ); 
+	}
 
-    $version = version::vpp->new($version);
-
-    if ( defined $req ) {
-	$req = version::vpp->new($req);
-
-	die sprintf ("%s version %s (%s) required--".
-                 "this is only version %s (%s)", $class, 
-		 $req->numify, $req->normal,
-		 $version->numify, $version->normal)
-	    if ( $req > $version ); 
-    }
-
-    return $version->numify;
+	return $version->numify;
+    };
 }
 
 1; #this line is important and will help the module return a true value

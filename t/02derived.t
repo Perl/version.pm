@@ -10,16 +10,17 @@ BEGIN {
     use_ok("version", 0.58); # If we made it this far, we are ok.
 }
 
-no warnings qw(redefine once);
+my $Verbose;
 require "t/coretests.pm";
 
 diag "Tests with empty derived class"  if $Verbose;
 
 package version::Empty;
 use base 'version';
-$VERSION = 0.01;
-no warnings qw(once redefine);
-*::qv = sub { return bless version::qv(shift), __PACKAGE__; };
+{ # localize this so it doesn't leak to the rest of the file
+    local $^W;
+    *::qv = sub { return bless version::qv(shift), __PACKAGE__; };
+}
 
 package version::Bad;
 use base 'version';

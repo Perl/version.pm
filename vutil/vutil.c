@@ -284,8 +284,12 @@ Perl_upg_version(pTHX_ SV *ver)
     }
     s = scan_version(version, ver, qv);
     if ( *s != '\0' )
+#if defined(ckWARN)
 	if(ckWARN(WARN_MISC))
 	    Perl_warner(aTHX_ packWARN(WARN_MISC),
+#else
+	warn(
+#endif
 	      "Version string '%s' contains invalid data; "
 	      "ignoring: '%s'", version, s);
     Safefree(version);

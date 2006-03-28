@@ -10,7 +10,7 @@ BEGIN {
     use_ok("version", 0.58); # If we made it this far, we are ok.
 }
 
-no warnings qw(once redefine);
+my $Verbose;
 require "t/coretests.pm";
 
 diag "Tests with base class" if $Verbose;
