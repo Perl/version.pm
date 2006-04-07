@@ -290,6 +290,16 @@ sub BaseTests {
 	unlink 'yyy.pm';
     }
 
+    { # dummy up some variously broken modules for testing
+	open F, ">zzz.pm" or die "Cannot open zzz.pm: $!\n";
+	print F "package zzz;\n\@VERSION = ();\n1;\n";
+	close F;
+	eval "use lib '.'; use zzz 3;";
+	like ($@, qr/^zzz does not define \$zzz::VERSION/,
+	    'Replacement handles modules without VERSION'); 
+	unlink 'zzz.pm';
+    }
+
 SKIP: 	{
 	skip 'Cannot test v-strings with Perl < 5.8.1', 4
 		if $] < 5.008_001; 

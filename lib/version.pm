@@ -1,7 +1,7 @@
 #!perl -w
 package version;
 
-use 5.005_03;
+use 5.005_04;
 use strict;
 
 require Exporter;
