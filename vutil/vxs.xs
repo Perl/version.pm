@@ -149,9 +149,11 @@ PPCODE:
 	char *version;
 	if ( SvNOK(ver) ) /* may get too much accuracy */
 	{
+	    STRLEN len;
 	    char tbuf[64];
-	    sprintf(tbuf,"%.9"NVgf, SvNVX(ver));
-	    version = savepv(tbuf);
+	    len = sprintf(tbuf,"%.9"NVff, SvNVX(ver));
+	    while (tbuf[len-1] == '0' && len > 0) len--;
+	    version = savepvn(tbuf,len);
 	}
 	else
 	{

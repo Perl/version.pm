@@ -165,7 +165,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 	    av_push(av, newSViv(0));
     }
 
-    if ( av_len(av) == -1 ) /* oops, someone forgot to pass a value */
+    if ( av_len(av) < 1 ) /* oops, someone forgot to pass a value */
 	av_push(av, newSViv(0));
 
     /* And finally, store the AV in the hash */
@@ -267,9 +267,11 @@ Perl_upg_version(pTHX_ SV *ver)
 
     if ( SvNOK(ver) ) /* may get too much accuracy */ 
     {
+	STRLEN len;
 	char tbuf[64];
-	sprintf(tbuf,"%.9"NVgf, SvNVX(ver));
-	version = savepv(tbuf);
+	len = sprintf(tbuf,"%.9"NVff, SvNVX(ver));
+	while (tbuf[len-1] == '0' && len > 0) len--;
+	version = savepvn(tbuf,len);
     }
 #ifdef SvVOK
     else if ( SvVOK(ver) ) { /* already a v-string */
@@ -283,7 +285,7 @@ Perl_upg_version(pTHX_ SV *ver)
 	version = savepv(SvPV_nolen(ver));
     }
     s = scan_version(version, ver, qv);
-    if ( *s != '\0' )
+    if ( *s != '\0' && *s != '.' )
 #if defined(ckWARN)
 	if(ckWARN(WARN_MISC))
 	    Perl_warner(aTHX_ packWARN(WARN_MISC),

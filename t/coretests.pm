@@ -206,9 +206,9 @@ sub BaseTests {
     # test the qv() sub
     diag "testing qv" if $Verbose;
     $version = qv("1.2");
-    ok ( $version eq "1.2.0", 'qv("1.2") eq "1.2.0"' );
+    cmp_ok ( $version, "eq", "v1.2.0", 'qv("1.2") eq "1.2.0"' );
     $version = qv(1.2);
-    ok ( $version eq "1.2.0", 'qv(1.2) eq "1.2.0"' );
+    cmp_ok ( $version, "eq", "v1.2.0", 'qv(1.2) eq "1.2.0"' );
     isa_ok( qv('5.008'), $CLASS );
 
     # test creation from existing version object
@@ -334,6 +334,29 @@ SKIP: 	{
     $version = $CLASS->new(" 1.7");
     ok($version->numify eq "1.700", "leading space ignored");
 
+    open F, ">www.pm" or die "Cannot open www.pm: $!\n";
+    print F <<"EOF";
+package www;
+use version; \$VERSION = qv('0.0.4');
+1;
+EOF
+    close F;
+    { # dummy up legal module for testing RT#19017
+	eval "use lib '.'; use www 0.000008;";
+	like ($@, qr/^www version 0.000008 \(v0.0.8\) required/,
+	    "Make sure very small versions don't freak"); 
+    }
+    {
+	eval "use lib '.'; use www 1;";
+	like ($@, qr/^www version 1.000 \(v1.0.0\) required/,
+	    "Comparing vs. version with no decimal"); 
+    }
+    {
+	eval "use lib '.'; use www 1.;";
+	like ($@, qr/^www version 1.000 \(v1.0.0\) required/,
+	    "Comparing "); 
+    }
+    unlink 'www.pm';
 }
 
 package known::module;

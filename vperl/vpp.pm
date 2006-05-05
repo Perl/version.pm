@@ -2,15 +2,10 @@
 package version::vpp;
 use strict;
 
-use Exporter ();
 use Scalar::Util;
-use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @REGEXS);
-$VERSION     = 0.59;
-@ISA         = qw (Exporter);
-#Give a hoot don't pollute, do not export more than needed by default
-@EXPORT      = qw (qv);
-@EXPORT_OK   = qw ();
-%EXPORT_TAGS = ();
+use vars qw ($VERSION @ISA @REGEXS);
+$VERSION     = "0.59_01";
+$VERSION     = eval $VERSION;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -364,6 +359,11 @@ sub is_alpha {
 sub qv {
     my ($value) = @_;
 
+    if ( $value =~ /\d+e-?\d+/ ) { # exponential notation
+	$value = sprintf("%.9f",$value);
+	$value =~ s/(0+)//;
+    }
+
     my $eval = eval 'Scalar::Util::isvstring($value)';
     if ( !$@ and $eval ) {
 	$value = sprintf("v%vd",$value);
@@ -393,6 +393,11 @@ sub _verify {
     *UNIVERSAL::VERSION = sub {
 	my ($obj, $req) = @_;
 	my $class = ref($obj) || $obj;
+	if ( $req =~ /\d+e-?\d+/ ) { # exponential notation
+	    $DB::single = 1;
+	    $req = sprintf("%.9f",$req);
+	    $req =~ s/(0+)$//;
+	}
 	no strict 'refs';
 	eval "require $class" unless %{"$class\::"}; # already existing
 	die "$class defines neither package nor VERSION--version check failed"

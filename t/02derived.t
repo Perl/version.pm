@@ -17,9 +17,9 @@ diag "Tests with empty derived class"  if $Verbose;
 
 package version::Empty;
 use base 'version';
-{ # localize this so it doesn't leak to the rest of the file
+{
     local $^W;
-    *::qv = sub { return bless version::qv(shift), __PACKAGE__; };
+    *main::qv = sub {return bless version::qv(shift), __PACKAGE__};
 }
 
 package version::Bad;
@@ -50,6 +50,6 @@ like($@, qr/Invalid version object/,
 eval { my $string = $testobj->stringify };
 like($@, qr/Invalid version object/,
     "Bad subclass stringify");
-eval { my $test = $testobj > 1.0 };
+eval { my $test = ($testobj > 1.0) };
 like($@, qr/Invalid version object/,
     "Bad subclass vcmp");

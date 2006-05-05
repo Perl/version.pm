@@ -4,15 +4,13 @@ package version::vxs;
 use 5.005_03;
 use strict;
 
-require Exporter;
 require DynaLoader;
-use vars qw(@ISA $VERSION $CLASS @EXPORT);
+use vars qw(@ISA $VERSION $CLASS );
 
-@ISA = qw(Exporter DynaLoader);
+@ISA = qw(DynaLoader);
 
-@EXPORT = qw(qv);
-
-$VERSION = 0.59;
+$VERSION = "0.59_01";
+$VERSION = eval $VERSION;
 
 $CLASS = 'version::vxs';
 

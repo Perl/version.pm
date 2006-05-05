@@ -4,30 +4,31 @@ package version;
 use 5.005_04;
 use strict;
 
-require Exporter;
-use vars qw(@ISA $VERSION $CLASS @EXPORT);
+use vars qw(@ISA $VERSION $CLASS *qv);
 
-@ISA = qw(Exporter);
-
-@EXPORT = qw(qv);
-
-$VERSION = 0.59;
+$VERSION = "0.59_01";
+$VERSION = eval($VERSION);
 
 $CLASS = 'version';
 
-eval "use version::vxs $VERSION";
-
-if ( $@ ) # don't have the XS version installed
-{
-    eval "use version::vpp $VERSION"; # don't tempt fate
-    die "$@" if ( $@ );
-    push @ISA, "version::vpp";
-    *qv = \&version::vpp::qv;
-}
-else # use XS module
-{
-    push @ISA, "version::vxs";
-    *qv = \&version::vxs::qv;
+sub import {
+    my ($class, @args) = @_;
+    my $callpkg = caller();
+    no strict 'refs';
+    
+    eval "use version::vxs $VERSION";
+    if ( $@ ) { # don't have the XS version installed
+	eval "use version::vpp $VERSION"; # don't tempt fate
+	die "$@" if ( $@ );
+	push @ISA, "version::vpp";
+	*qv = \&version::vpp::qv;
+    }
+    else { # use XS module
+	push @ISA, "version::vxs";
+	*qv = \&version::vxs::qv;
+    }
+    *{$callpkg."::qv"} = 
+	    sub {return bless version::qv(shift), $class };
 }
 
 # Preloaded methods go here.
