@@ -334,6 +334,7 @@ SKIP: 	{
     $version = $CLASS->new(" 1.7");
     ok($version->numify eq "1.700", "leading space ignored");
 
+    # dummy up a legal module for testing RT#19017
     open F, ">www.pm" or die "Cannot open www.pm: $!\n";
     print F <<"EOF";
 package www;
@@ -341,8 +342,16 @@ use version; \$VERSION = qv('0.0.4');
 1;
 EOF
     close F;
-    { # dummy up legal module for testing RT#19017
+    {
 	eval "use lib '.'; use www 0.000008;";
+	like ($@, qr/^www version 0.000008 \(v0.0.8\) required/,
+	    "Make sure very small versions don't freak"); 
+    }
+SKIP: {
+	skip 'Cannot "use" extended versions with Perl < 5.6.2', 1
+		if $] < 5.006_002; 
+        
+	eval "use lib '.'; use www 0.0.8;";
 	like ($@, qr/^www version 0.000008 \(v0.0.8\) required/,
 	    "Make sure very small versions don't freak"); 
     }

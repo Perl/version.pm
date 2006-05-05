@@ -40,6 +40,11 @@ my %build_arguments = (
 
 mkdir($t->config_dir(),0777);
 
+if ( $] < 5.005_04 ) {
+    # Cannot support 5.005_03 with the XS code
+    $perl_only = 1;
+}
+
 if ( $perl_only or not $t->have_c_compiler() ) {
     $build_arguments{module_name} = 'version::vpp';
     if ( $] > 5.008001 ) {

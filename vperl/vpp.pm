@@ -4,7 +4,7 @@ use strict;
 
 use Scalar::Util;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION     = "0.59_01";
+$VERSION     = "0.59_02";
 $VERSION     = eval $VERSION;
 
 push @REGEXS, qr/
