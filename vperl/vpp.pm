@@ -4,7 +4,7 @@ use strict;
 
 use Scalar::Util;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION     = "0.59_02";
+$VERSION     = "0.59_03";
 $VERSION     = eval $VERSION;
 
 push @REGEXS, qr/
@@ -34,6 +34,18 @@ sub new
 	if ( !$@ and $eval ) {
 	    $value = sprintf("v%vd",$value);
 	}
+
+	# may be a non-magic v-string
+	if ( $] >= 5.006_002 && $] < 5.008_001
+		&& length($value) >= 3 && $value !~ /[._]/ ) {
+	    $DB::single = 1;
+	    my $tvalue = sprintf("%vd",$value);
+	    if ( $tvalue =~ /^\d+\.\d+\.\d+$/ ) {
+		# must be a non-magic v-string
+		$value = $tvalue;
+	    }
+	}
+	    
 	
 	# This is not very efficient, but it is morally equivalent
 	# to the XS code (as that is the reference implementation).
@@ -394,7 +406,6 @@ sub _verify {
 	my ($obj, $req) = @_;
 	my $class = ref($obj) || $obj;
 	if ( $req =~ /\d+e-?\d+/ ) { # exponential notation
-	    $DB::single = 1;
 	    $req = sprintf("%.9f",$req);
 	    $req =~ s/(0+)$//;
 	}
@@ -404,22 +415,33 @@ sub _verify {
 	    if $@ or not %{"$class\::"};
 	
 	my $version = eval "\$$class\::VERSION";
-	die "$class does not define \$$class\::VERSION--version check failed"
-	    unless defined $version;
-
-	$version = version::vpp->new($version);
 
 	if ( defined $req ) {
+	    unless ( defined $version ) {
+		my $msg =  "$class does not define ".
+			   "\$$class\::VERSION--version check failed";
+		if ( $ENV{VERSION_DEBUG} ) {
+		    require Carp;
+		    Carp::confess($msg);
+		}
+		else {
+		    die($msg);
+		}
+	    }
+
+	    $version = version::vpp->new($version);
+
 	    $req = version::vpp->new($req);
 
-	    die sprintf ("%s version %s (%s) required--".
+	    if ( $req > $version ) {
+		die sprintf ("%s version %s (%s) required--".
 		     "this is only version %s (%s)", $class, 
 		     $req->numify, $req->normal,
-		     $version->numify, $version->normal)
-		if ( $req > $version ); 
+		     $version->numify, $version->normal);
+	    }
 	}
 
-	return $version->numify;
+	return defined $version ? $version->numify : undef;
     };
 }
 

@@ -277,6 +277,9 @@ sub BaseTests {
 	eval "use lib '.'; use xxx 3;";
 	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without package or VERSION'); 
+	eval "use lib '.'; use xxx; print xxx->VERSION";
+	unlike ($@, qr/$error_regex/,
+	    'Replacement handles modules without package or VERSION'); 
 	unlink 'xxx.pm';
     }
     
@@ -286,6 +289,9 @@ sub BaseTests {
 	close F;
 	eval "use lib '.'; use yyy 3;";
 	like ($@, qr/^yyy does not define \$yyy::VERSION/,
+	    'Replacement handles modules without VERSION'); 
+	eval "use lib '.'; use yyy; print yyy->VERSION";
+	unlike ($@, qr/^yyy does not define \$yyy::VERSION/,
 	    'Replacement handles modules without VERSION'); 
 	unlink 'yyy.pm';
     }
@@ -297,11 +303,14 @@ sub BaseTests {
 	eval "use lib '.'; use zzz 3;";
 	like ($@, qr/^zzz does not define \$zzz::VERSION/,
 	    'Replacement handles modules without VERSION'); 
+	eval "use lib '.'; use zzz; print zzz->VERSION";
+	unlike ($@, qr/^zzz does not define \$zzz::VERSION/,
+	    'Replacement handles modules without VERSION'); 
 	unlink 'zzz.pm';
     }
 
 SKIP: 	{
-	skip 'Cannot test v-strings with Perl < 5.8.1', 4
+	skip 'Cannot test bare v-strings with Perl < 5.8.1', 4
 		if $] < 5.008_001; 
 	diag "Tests with v-strings" if $Verbose;
 	$version = $CLASS->new(1.2.3);
@@ -367,8 +376,5 @@ SKIP: {
     }
     unlink 'www.pm';
 }
-
-package known::module;
-# Look Ma!  No $VERSION;
 
 1;
