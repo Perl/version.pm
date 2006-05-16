@@ -1,4 +1,4 @@
-version 0.59_03
+version 0.59_04
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -9,19 +9,18 @@ with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing bleadperl, you will need to check out the
 latest release of 5.9.x to get the changes included in 0.58.
 
-Beta Release 0.59_03 - 2006-05-14
-==================================
-Very small version number (like 0.000001, e.g. v0.0.1) would run afoul of
+Major changes in 0.59_04 - 2006-05-16
+=====================================
+Very small version numbers (like 0.000001, e.g. v0.0.1) would run afoul of
 Perl's normal switch to exponential notation.  Both the XS and Perl modules
-have been rewritten to try a lot harder to deal with this problem.  If this
-tests out, then 0.60 will be cut within a few days. 
+have been rewritten to try a lot harder to deal with this problem.
 
 It was also reported that calling the replacement UNIVERSAL::VERSION as a 
 fallback method, e.g. module->VERSION, did not work the same between the
 pure Perl and XS variants.  The pure Perl module was also modified to try
 and spot embedded non-magic v-strings between Perl 5.6.2 and 5.8.1.
 
-This release removes the dependency on Exporter, as well as includes
+This release also removes the dependency on Exporter, as well as includes
 improved documentation on how to use a module that uses version.pm itself.
 
 Major changes in 0.59

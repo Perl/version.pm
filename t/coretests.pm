@@ -5,7 +5,7 @@ require Test::Harness;
 
 sub BaseTests {
 
-    my $CLASS = shift;
+    my ($CLASS, $no_qv) = @_;
     
     # Insert your test code below, the Test module is use()ed here so read
     # its man page ( perldoc Test ) for help writing this test script.
@@ -203,6 +203,9 @@ sub BaseTests {
     ok ( !eval { $version*3 }, "noop *" );
     ok ( !eval { abs($version) }, "noop abs" );
 
+SKIP: {
+    skip "version require'd instead of use'd, cannot test qv", 3
+    	if defined $no_qv;
     # test the qv() sub
     diag "testing qv" if $Verbose;
     $version = qv("1.2");
@@ -210,6 +213,7 @@ sub BaseTests {
     $version = qv(1.2);
     cmp_ok ( $version, "eq", "v1.2.0", 'qv(1.2) eq "1.2.0"' );
     isa_ok( qv('5.008'), $CLASS );
+}
 
     # test creation from existing version object
     diag "create new from existing version" if $Verbose;
@@ -319,6 +323,8 @@ SKIP: 	{
 	$new_version = $CLASS->new(1);
 	ok($version == $new_version, '$version == $new_version');
 	ok($version eq $new_version, '$version eq $new_version');
+	skip "version require'd instead of use'd, cannot test qv", 1
+	    if defined $no_qv;
 	$version = qv(1.2.3);
 	ok("$version" eq "v1.2.3", 'v-string initialized qv()');
     }
@@ -343,38 +349,38 @@ SKIP: 	{
     $version = $CLASS->new(" 1.7");
     ok($version->numify eq "1.700", "leading space ignored");
 
-    # dummy up a legal module for testing RT#19017
-    open F, ">www.pm" or die "Cannot open www.pm: $!\n";
-    print F <<"EOF";
+SKIP: {
+	$DB::single = 1;
+	skip "version require'd instead of use'd, cannot test qv", 4
+	    if defined $no_qv;
+
+	# dummy up a legal module for testing RT#19017
+	open F, ">www.pm" or die "Cannot open www.pm: $!\n";
+	print F <<"EOF";
 package www;
 use version; \$VERSION = qv('0.0.4');
 1;
 EOF
-    close F;
-    {
+	close F;
+
 	eval "use lib '.'; use www 0.000008;";
 	like ($@, qr/^www version 0.000008 \(v0.0.8\) required/,
 	    "Make sure very small versions don't freak"); 
-    }
-SKIP: {
-	skip 'Cannot "use" extended versions with Perl < 5.6.2', 1
-		if $] < 5.006_002; 
-        
-	eval "use lib '.'; use www 0.0.8;";
-	like ($@, qr/^www version 0.000008 \(v0.0.8\) required/,
-	    "Make sure very small versions don't freak"); 
-    }
-    {
 	eval "use lib '.'; use www 1;";
 	like ($@, qr/^www version 1.000 \(v1.0.0\) required/,
 	    "Comparing vs. version with no decimal"); 
-    }
-    {
 	eval "use lib '.'; use www 1.;";
 	like ($@, qr/^www version 1.000 \(v1.0.0\) required/,
 	    "Comparing "); 
+
+	skip 'Cannot "use" extended versions with Perl < 5.6.2', 1
+	    if $] < 5.006_002;
+	eval "use lib '.'; use www 0.0.8;";
+	like ($@, qr/^www version 0.000008 \(v0.0.8\) required/,
+	    "Make sure very small versions don't freak"); 
+
+	unlink 'www.pm';
     }
-    unlink 'www.pm';
 }
 
 1;
