@@ -249,6 +249,10 @@ SKIP: {
     unlike($@, qr/Test::More version $version/,
 	    'Replacement eval works with exact version');
     
+    # test as class method
+    $new_version = Test::More->VERSION;
+    cmp_ok($new_version,'cmp',$version, "Called as class method");
+
     # this should fail even with old UNIVERSAL::VERSION
     $version = $Test::More::VERSION+0.01;
     eval "use Test::More $version";
@@ -281,9 +285,10 @@ SKIP: {
 	eval "use lib '.'; use xxx 3;";
 	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without package or VERSION'); 
-	eval "use lib '.'; use xxx; print xxx->VERSION";
+	eval "use lib '.'; use xxx; $version = xxx->VERSION";
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without package or VERSION'); 
+	isnt (defined($version), "Called as class method");
 	unlink 'xxx.pm';
     }
     
@@ -351,8 +356,6 @@ SKIP: 	{
 
 SKIP: {
 	$DB::single = 1;
-	skip "version require'd instead of use'd, cannot test qv", 4
-	    if defined $no_qv;
 
 	# dummy up a legal module for testing RT#19017
 	open F, ">www.pm" or die "Cannot open www.pm: $!\n";

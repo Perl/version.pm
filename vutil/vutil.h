@@ -19,6 +19,35 @@
 #define SVf "_"
 #endif
 
+#ifndef SvVSTRING_mg
+#define SvVSTRING_mg(sv) (SvMAGICAL(sv) \
+    ? mg_find(sv,PERL_MAGIC_vstring) : NULL)
+#endif
+
+#ifndef dVAR
+#define dVAR 
+#endif
+
+#ifndef my_snprintf
+#define my_snprintf snprintf
+#endif
+
+#ifndef STR_WITH_LEN
+#define STR_WITH_LEN(s)  (s ""), (sizeof(s)-1)
+#endif
+
+#ifndef hv_fetchs
+#define hv_fetchs(hv,key,lval) Perl_hv_fetch(aTHX_ hv, STR_WITH_LEN(key), lval)
+#endif
+
+#ifndef sv_catpvs
+#  if PERL_VERSION < 8
+#    define sv_catpvs(sv, str) Perl_sv_catpvn(aTHX_ sv, STR_WITH_LEN(str))
+#  else
+#    define sv_catpvs(sv, str) Perl_sv_catpvn_flags(aTHX_ sv, STR_WITH_LEN(str), SV_GMAGIC )
+#  endif
+#endif
+
 const char * Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv);
 SV * Perl_new_version(pTHX_ SV *ver);
 SV * Perl_upg_version(pTHX_ SV *sv);

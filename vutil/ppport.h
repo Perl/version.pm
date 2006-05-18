@@ -4,10 +4,10 @@
 /*
 ----------------------------------------------------------------------
 
-    vutil/ppport.h -- Perl/Pollution/Portability Version 3.08
+    ppport.h -- Perl/Pollution/Portability Version 3.08
 
     Automatically created by Devel::PPPort running under
-    perl 5.008007 on Fri May  5 06:47:04 2006.
+    perl 5.008007 on Wed May 17 21:18:44 2006.
 
 ----------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ __DATA__
    (or greater), but who knows.
  */
 #if PERL_REVISION != 5
-#  error vutil/ppport.h only works with Perl version 5
+#  error ppport.h only works with Perl version 5
 #endif /* PERL_REVISION != 5 */
 
 #ifdef I_LIMITS
@@ -1130,7 +1130,7 @@ DPPP_(my_sv_2pv_nolen)(pTHX_ register SV *sv)
 #ifdef SvPVbyte
 
 /* Hint: SvPVbyte
- * Does not work in perl-5.6.1, vutil/ppport.h implements a version
+ * Does not work in perl-5.6.1, ppport.h implements a version
  * borrowed from perl-5.7.3.
  */
 
@@ -2454,4 +2454,4 @@ DPPP_(my_grok_oct)(pTHX_ char *start, STRLEN *len_p, I32 *flags, NV *result)
 
 #endif /* _P_P_PORTABILITY_H_ */
 
-/* End of File vutil/ppport.h */
+/* End of File ppport.h */

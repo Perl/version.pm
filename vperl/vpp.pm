@@ -415,6 +415,9 @@ sub _verify {
 	    if $@ or not %{"$class\::"};
 	
 	my $version = eval "\$$class\::VERSION";
+	if ( defined $version ) {
+	    $version = version::vpp->new($version);
+	}
 
 	if ( defined $req ) {
 	    unless ( defined $version ) {
@@ -428,8 +431,6 @@ sub _verify {
 		    die($msg);
 		}
 	    }
-
-	    $version = version::vpp->new($version);
 
 	    $req = version::vpp->new($req);
 
