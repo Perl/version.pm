@@ -4,10 +4,10 @@
 /*
 ----------------------------------------------------------------------
 
-    ppport.h -- Perl/Pollution/Portability Version 3.08
+    ppport.h -- Perl/Pollution/Portability Version 3.08_01
 
     Automatically created by Devel::PPPort running under
-    perl 5.008007 on Wed May 17 21:18:44 2006.
+    perl 5.008007 on Sat May 20 12:17:02 2006.
 
 ----------------------------------------------------------------------
 
@@ -559,12 +559,33 @@ __DATA__
 #    define PERL_UNUSED_DECL
 #  endif
 #endif
+
+#ifndef PERL_UNUSED_ARG
+#  if defined(lint) && defined(S_SPLINT_S) /* www.splint.org */
+#    include <note.h>
+#    define PERL_UNUSED_ARG(x) NOTE(ARGUNUSED(x))
+#  else
+#    define PERL_UNUSED_ARG(x) ((void)x)
+#  endif
+#endif
+
+#ifndef PERL_UNUSED_VAR
+#  define PERL_UNUSED_VAR(x) ((void)x)
+#endif
+
+#ifndef PERL_UNUSED_CONTEXT
+#  ifdef USE_ITHREADS
+#    define PERL_UNUSED_CONTEXT PERL_UNUSED_ARG(my_perl)
+#  else
+#    define PERL_UNUSED_CONTEXT
+#  endif
+#endif
 #ifndef NOOP
-#  define NOOP                           (void)0
+#  define NOOP                           /*EMPTY*/(void)0
 #endif
 
 #ifndef dNOOP
-#  define dNOOP                          extern int Perl___notused PERL_UNUSED_DECL
+#  define dNOOP                          extern int /*@unused@*/ Perl___notused PERL_UNUSED_DECL
 #endif
 
 #ifndef NVTYPE
@@ -722,6 +743,15 @@ typedef NVTYPE NV;
           PL_stack_sp = PL_stack_base + ax + ((off) - 1); \
           return;                                         \
       } STMT_END
+#endif
+#ifndef PERL_ABS
+#  define PERL_ABS(x)                    ((x) < 0 ? -(x) : (x))
+#endif
+#ifndef dVAR
+#  define dVAR                           dNOOP
+#endif
+#ifndef SVf
+#  define SVf                            "_"
 #endif
 
 #ifndef PERL_SIGNALS_UNSAFE_FLAG
@@ -1437,6 +1467,267 @@ DPPP_(my_sv_setpvf_mg_nocontext)(SV *sv, const char *pat, ...)
      SvSETMAGIC(sv);                                                       \
    } STMT_END
 #endif
+#ifndef WARN_ALL
+#  define WARN_ALL                       0
+#endif
+
+#ifndef WARN_CLOSURE
+#  define WARN_CLOSURE                   1
+#endif
+
+#ifndef WARN_DEPRECATED
+#  define WARN_DEPRECATED                2
+#endif
+
+#ifndef WARN_EXITING
+#  define WARN_EXITING                   3
+#endif
+
+#ifndef WARN_GLOB
+#  define WARN_GLOB                      4
+#endif
+
+#ifndef WARN_IO
+#  define WARN_IO                        5
+#endif
+
+#ifndef WARN_CLOSED
+#  define WARN_CLOSED                    6
+#endif
+
+#ifndef WARN_EXEC
+#  define WARN_EXEC                      7
+#endif
+
+#ifndef WARN_LAYER
+#  define WARN_LAYER                     8
+#endif
+
+#ifndef WARN_NEWLINE
+#  define WARN_NEWLINE                   9
+#endif
+
+#ifndef WARN_PIPE
+#  define WARN_PIPE                      10
+#endif
+
+#ifndef WARN_UNOPENED
+#  define WARN_UNOPENED                  11
+#endif
+
+#ifndef WARN_MISC
+#  define WARN_MISC                      12
+#endif
+
+#ifndef WARN_NUMERIC
+#  define WARN_NUMERIC                   13
+#endif
+
+#ifndef WARN_ONCE
+#  define WARN_ONCE                      14
+#endif
+
+#ifndef WARN_OVERFLOW
+#  define WARN_OVERFLOW                  15
+#endif
+
+#ifndef WARN_PACK
+#  define WARN_PACK                      16
+#endif
+
+#ifndef WARN_PORTABLE
+#  define WARN_PORTABLE                  17
+#endif
+
+#ifndef WARN_RECURSION
+#  define WARN_RECURSION                 18
+#endif
+
+#ifndef WARN_REDEFINE
+#  define WARN_REDEFINE                  19
+#endif
+
+#ifndef WARN_REGEXP
+#  define WARN_REGEXP                    20
+#endif
+
+#ifndef WARN_SEVERE
+#  define WARN_SEVERE                    21
+#endif
+
+#ifndef WARN_DEBUGGING
+#  define WARN_DEBUGGING                 22
+#endif
+
+#ifndef WARN_INPLACE
+#  define WARN_INPLACE                   23
+#endif
+
+#ifndef WARN_INTERNAL
+#  define WARN_INTERNAL                  24
+#endif
+
+#ifndef WARN_MALLOC
+#  define WARN_MALLOC                    25
+#endif
+
+#ifndef WARN_SIGNAL
+#  define WARN_SIGNAL                    26
+#endif
+
+#ifndef WARN_SUBSTR
+#  define WARN_SUBSTR                    27
+#endif
+
+#ifndef WARN_SYNTAX
+#  define WARN_SYNTAX                    28
+#endif
+
+#ifndef WARN_AMBIGUOUS
+#  define WARN_AMBIGUOUS                 29
+#endif
+
+#ifndef WARN_BAREWORD
+#  define WARN_BAREWORD                  30
+#endif
+
+#ifndef WARN_DIGIT
+#  define WARN_DIGIT                     31
+#endif
+
+#ifndef WARN_PARENTHESIS
+#  define WARN_PARENTHESIS               32
+#endif
+
+#ifndef WARN_PRECEDENCE
+#  define WARN_PRECEDENCE                33
+#endif
+
+#ifndef WARN_PRINTF
+#  define WARN_PRINTF                    34
+#endif
+
+#ifndef WARN_PROTOTYPE
+#  define WARN_PROTOTYPE                 35
+#endif
+
+#ifndef WARN_QW
+#  define WARN_QW                        36
+#endif
+
+#ifndef WARN_RESERVED
+#  define WARN_RESERVED                  37
+#endif
+
+#ifndef WARN_SEMICOLON
+#  define WARN_SEMICOLON                 38
+#endif
+
+#ifndef WARN_TAINT
+#  define WARN_TAINT                     39
+#endif
+
+#ifndef WARN_THREADS
+#  define WARN_THREADS                   40
+#endif
+
+#ifndef WARN_UNINITIALIZED
+#  define WARN_UNINITIALIZED             41
+#endif
+
+#ifndef WARN_UNPACK
+#  define WARN_UNPACK                    42
+#endif
+
+#ifndef WARN_UNTIE
+#  define WARN_UNTIE                     43
+#endif
+
+#ifndef WARN_UTF8
+#  define WARN_UTF8                      44
+#endif
+
+#ifndef WARN_VOID
+#  define WARN_VOID                      45
+#endif
+
+#ifndef WARN_ASSERTIONS
+#  define WARN_ASSERTIONS                46
+#endif
+#ifndef packWARN
+#  define packWARN(a)                    (a)
+#endif
+
+#ifndef ckWARN
+#  ifdef G_WARN_ON
+#    define  ckWARN(a)                  (PL_dowarn & G_WARN_ON)
+#  else
+#    define  ckWARN(a)                  PL_dowarn
+#  endif
+#endif
+
+/* warner depends on vnewSVpvf */
+#if ((PERL_VERSION > 4) || ((PERL_VERSION == 4) && (PERL_SUBVERSION >= 0))) && !defined(warner)
+#if defined(NEED_warner)
+static void DPPP_(my_warner)(U32 err, const char *pat, ...);
+static
+#else
+extern void DPPP_(my_warner)(U32 err, const char *pat, ...);
+#endif
+
+#define Perl_warner DPPP_(my_warner)
+
+#if defined(NEED_warner) || defined(NEED_warner_GLOBAL)
+
+void
+DPPP_(my_warner)(U32 err, const char *pat, ...)
+{
+  SV *sv;
+  va_list args;
+
+  PERL_UNUSED_ARG(err);
+
+  va_start(args, pat);
+  sv = vnewSVpvf(pat, &args);
+  va_end(args);
+  sv_2mortal(sv);
+  warn("%s", SvPV_nolen(sv));
+}
+
+#define warner  Perl_warner
+
+/* Perl_warner_nocontext depends on warner */
+#define Perl_warner_nocontext  Perl_warner
+
+#endif
+#endif
+
+/* concatenating with "" ensures that only literal strings are accepted as argument
+ * note that STR_WITH_LEN() can't be used as argument to macros or functions that
+ * under some configurations might be macros
+ */
+#ifndef STR_WITH_LEN
+#  define STR_WITH_LEN(s)                (s ""), (sizeof(s)-1)
+#endif
+#ifndef newSVpvs
+#  define newSVpvs(str)                  newSVpvn(str "", sizeof(str) - 1)
+#endif
+
+#ifndef sv_catpvs
+#  define sv_catpvs(sv, str)             sv_catpvn(sv, str "", sizeof(str) - 1)
+#endif
+
+#ifndef sv_setpvs
+#  define sv_setpvs(sv, str)             sv_setpvn(sv, str "", sizeof(str) - 1)
+#endif
+
+#ifndef hv_fetchs
+#  define hv_fetchs(hv,key,lval)         hv_fetch(hv, key "", sizeof(key) - 1, lval)
+#endif
+
+#ifndef hv_stores
+#  define hv_stores(hv,key,val,hash)     hv_store(hv, key "", sizeof(key) - 1, val, hash)
+#endif
 #ifndef SvGETMAGIC
 #  define SvGETMAGIC(x)                  STMT_START { if (SvGMAGICAL(x)) mg_get(x); } STMT_END
 #endif
@@ -1717,6 +2008,9 @@ DPPP_(my_sv_setpvf_mg_nocontext)(SV *sv, const char *pat, ...)
      sv_usepvn(TeMpSv,ptr,len);         \
      SvSETMAGIC(TeMpSv);                \
    } STMT_END
+#endif
+#ifndef SvVSTRING_mg
+#  define SvVSTRING_mg(sv)               (SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_vstring) : NULL)
 #endif
 
 #ifdef USE_ITHREADS
@@ -2433,6 +2727,40 @@ DPPP_(my_grok_oct)(pTHX_ char *start, STRLEN *len_p, I32 *flags, NV *result)
         *result = value_nv;
     return UV_MAX;
 }
+#endif
+#endif
+
+#if !defined(my_snprintf)
+#if defined(NEED_my_snprintf)
+static int DPPP_(my_my_snprintf)(char * buffer, const Size_t len, const char * format, ...);
+static
+#else
+extern int DPPP_(my_my_snprintf)(char * buffer, const Size_t len, const char * format, ...);
+#endif
+
+#define my_snprintf DPPP_(my_my_snprintf)
+#define Perl_my_snprintf DPPP_(my_my_snprintf)
+
+#if defined(NEED_my_snprintf) || defined(NEED_my_snprintf_GLOBAL)
+
+int
+DPPP_(my_my_snprintf)(char *buffer, const Size_t len, const char *format, ...)
+{
+    dTHX;
+    int retval;
+    va_list ap;
+    va_start(ap, format);
+#ifdef HAS_VSNPRINTF
+    retval = vsnprintf(buffer, len, format, ap);
+#else
+    retval = vsprintf(buffer, format, ap);
+#endif
+    va_end(ap);
+    if (retval >= (int)len)
+	Perl_croak(aTHX_ "panic: my_snprintf buffer overflow");
+    return retval;
+}
+
 #endif
 #endif
 

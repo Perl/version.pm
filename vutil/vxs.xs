@@ -2,6 +2,7 @@
 #include "perl.h"
 #include "XSUB.h"
 #define NEED_sv_2pv_nolen_GLOBAL
+#include "ppport.h"
 #include "vutil.h"
 
 /* --------------------------------------------------

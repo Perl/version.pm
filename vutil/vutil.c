@@ -1,3 +1,11 @@
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#define NEED_my_snprintf
+#define NEED_newRV_noinc
+#define NEED_vnewSVpvf
+#define NEED_warner
+#include "ppport.h"
 #include "vutil.h"
 
 /*
@@ -289,12 +297,8 @@ Perl_upg_version(pTHX_ SV *ver)
     }
     s = scan_version(version, ver, qv);
     if ( *s != '\0' ) 
-#if defined(ckWARN)
 	if(ckWARN(WARN_MISC))
 	    Perl_warner(aTHX_ packWARN(WARN_MISC), 
-#else
-	warn(
-#endif
 	    "Version string '%s' contains invalid data; "
 	    "ignoring: '%s'", version, s);
     Safefree(version);
