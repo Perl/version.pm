@@ -30,7 +30,9 @@ sub import {
     no strict 'refs';
     
     *{$callpkg."::qv"} = 
-	    sub {return bless version::qv(shift), $class };
+	    sub {return bless version::qv(shift), $class }
+	unless $callpkg->can('qv');
+
 }
 
 1;

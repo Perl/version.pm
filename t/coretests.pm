@@ -355,8 +355,6 @@ SKIP: 	{
     ok($version->numify eq "1.700", "leading space ignored");
 
 SKIP: {
-	$DB::single = 1;
-
 	# dummy up a legal module for testing RT#19017
 	open F, ">www.pm" or die "Cannot open www.pm: $!\n";
 	print F <<"EOF";
@@ -384,6 +382,7 @@ EOF
 
 	unlink 'www.pm';
     }
+
 }
 
 1;

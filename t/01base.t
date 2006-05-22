@@ -16,3 +16,9 @@ require "t/coretests.pm";
 diag "Tests with base class" if $Verbose;
 
 BaseTests("version");
+
+# dummy up a redundant call to satify David Wheeler
+local $SIG{__WARN__} = sub { die $_[0] };
+eval 'use version;';
+unlike ($@, qr/^Subroutine main::qv redefined/,
+    "Only export qv once per package (to prevent redefined warnings)."); 
