@@ -4,10 +4,10 @@
 /*
 ----------------------------------------------------------------------
 
-    ppport.h -- Perl/Pollution/Portability Version 3.08_01
+    ppport.h -- Perl/Pollution/Portability Version 3.08_02
 
     Automatically created by Devel::PPPort running under
-    perl 5.008007 on Sat May 20 12:17:02 2006.
+    perl 5.008007 on Tue May 23 07:26:38 2006.
 
 ----------------------------------------------------------------------
 
@@ -497,8 +497,20 @@ __DATA__
 #endif
 
 #endif
+#ifndef PoisonWith
+#  define PoisonWith(d,n,t,b)            (void)memset((char*)(d), (U8)(b), (n) * sizeof(t))
+#endif
+
+#ifndef PoisonNew
+#  define PoisonNew(d,n,t)               PoisonWith(d,n,t,0xAB)
+#endif
+
+#ifndef PoisonFree
+#  define PoisonFree(d,n,t)              PoisonWith(d,n,t,0xEF)
+#endif
+
 #ifndef Poison
-#  define Poison(d,n,t)                  (void)memset((char*)(d), 0xAB, (n) * sizeof(t))
+#  define Poison(d,n,t)                  PoisonFree(d,n,t)
 #endif
 #ifndef Newx
 #  define Newx(v,n,t)                    New(0,v,n,t)
@@ -637,15 +649,21 @@ typedef NVTYPE NV;
 #  define EXTERN_C extern
 #endif
 
-#ifndef PERL_GCC_BRACE_GROUPS_FORBIDDEN
-#  if defined(__STRICT_ANSI__) && defined(PERL_GCC_PEDANTIC)
+#if defined(PERL_GCC_PEDANTIC)
+#  ifndef PERL_GCC_BRACE_GROUPS_FORBIDDEN
 #    define PERL_GCC_BRACE_GROUPS_FORBIDDEN
+#  endif
+#endif
+
+#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN) && !defined(__cplusplus)
+#  ifndef PERL_USE_GCC_BRACE_GROUPS
+#    define PERL_USE_GCC_BRACE_GROUPS
 #  endif
 #endif
 
 #undef STMT_START
 #undef STMT_END
-#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN) && !defined(__cplusplus)
+#ifdef PERL_USE_GCC_BRACE_GROUPS
 #  define STMT_START	(void)(	/* gcc supports ``({ STATEMENTS; })'' */
 #  define STMT_END	)
 #else
@@ -1118,6 +1136,78 @@ DPPP_(my_newCONSTSUB)(HV *stash, char *name, SV *sv)
 #    define NVff          "f"
 #    define NVgf          "g"
 #  endif
+#endif
+
+#ifndef SvREFCNT_inc
+#  ifdef PERL_USE_GCC_BRACE_GROUPS
+#    define SvREFCNT_inc(sv)		\
+      ({				\
+          SV * const _sv = (SV*)(sv);	\
+          if (_sv)			\
+               (SvREFCNT(_sv))++;	\
+          _sv;				\
+      })
+#  else
+#    define SvREFCNT_inc(sv)	\
+          ((PL_Sv=(SV*)(sv)) ? (++(SvREFCNT(PL_Sv)),PL_Sv) : NULL)
+#  endif
+#endif
+
+#ifndef SvREFCNT_inc_simple
+#  ifdef PERL_USE_GCC_BRACE_GROUPS
+#    define SvREFCNT_inc_simple(sv)	\
+      ({					\
+          if (sv)				\
+               (SvREFCNT(sv))++;		\
+          (SV *)(sv);				\
+      })
+#  else
+#    define SvREFCNT_inc_simple(sv) \
+          ((sv) ? (SvREFCNT(sv)++,(SV*)(sv)) : NULL)
+#  endif
+#endif
+
+#ifndef SvREFCNT_inc_NN
+#  ifdef PERL_USE_GCC_BRACE_GROUPS
+#    define SvREFCNT_inc_NN(sv)		\
+      ({					\
+          SV * const _sv = (SV*)(sv);	\
+          SvREFCNT(_sv)++;		\
+          _sv;				\
+      })
+#  else
+#    define SvREFCNT_inc_NN(sv) \
+          (PL_Sv=(SV*)(sv),++(SvREFCNT(PL_Sv)),PL_Sv)
+#  endif
+#endif
+
+#ifndef SvREFCNT_inc_void
+#  ifdef PERL_USE_GCC_BRACE_GROUPS
+#    define SvREFCNT_inc_void(sv)		\
+      ({					\
+          SV * const _sv = (SV*)(sv);	\
+          if (_sv)			\
+              (void)(SvREFCNT(_sv)++);	\
+      })
+#  else
+#    define SvREFCNT_inc_void(sv) \
+          (void)((PL_Sv=(SV*)(sv)) ? ++(SvREFCNT(PL_Sv)) : 0)
+#  endif
+#endif
+#ifndef SvREFCNT_inc_simple_void
+#  define SvREFCNT_inc_simple_void(sv)   STMT_START { if (sv) SvREFCNT(sv)++; } STMT_END
+#endif
+
+#ifndef SvREFCNT_inc_simple_NN
+#  define SvREFCNT_inc_simple_NN(sv)     (++SvREFCNT(sv), (SV*)(sv))
+#endif
+
+#ifndef SvREFCNT_inc_void_NN
+#  define SvREFCNT_inc_void_NN(sv)       (void)(++SvREFCNT((SV*)(sv)))
+#endif
+
+#ifndef SvREFCNT_inc_simple_void_NN
+#  define SvREFCNT_inc_simple_void_NN(sv) (void)(++SvREFCNT((SV*)(sv)))
 #endif
 
 #ifndef SvPV_nolen
@@ -1722,11 +1812,11 @@ DPPP_(my_warner)(U32 err, const char *pat, ...)
 #endif
 
 #ifndef hv_fetchs
-#  define hv_fetchs(hv,key,lval)         hv_fetch(hv, key "", sizeof(key) - 1, lval)
+#  define hv_fetchs(hv, key, lval)       hv_fetch(hv, key "", sizeof(key) - 1, lval)
 #endif
 
 #ifndef hv_stores
-#  define hv_stores(hv,key,val,hash)     hv_store(hv, key "", sizeof(key) - 1, val, hash)
+#  define hv_stores(hv, key, val)        hv_store(hv, key "", sizeof(key) - 1, val, 0)
 #endif
 #ifndef SvGETMAGIC
 #  define SvGETMAGIC(x)                  STMT_START { if (SvGMAGICAL(x)) mg_get(x); } STMT_END
