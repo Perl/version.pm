@@ -4,7 +4,7 @@ use strict;
 
 use Scalar::Util;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION     = 0.61;
+$VERSION     = 0.62;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -25,6 +25,13 @@ sub new
 	my ($class, $value) = @_;
 	my $self = bless ({}, ref ($class) || $class);
 
+	if ( not defined $value or $value =~ /^undef$/ ) {
+	    # RT #19517 - special case for undef comparison
+	    # oops, someone forgot to pass a value (shouldn't happen)
+	    push @{$self->{version}}, 0;
+	    return ($self);
+	}
+
 	if ( $#_ == 2 ) { # must be CVS-style
 	    $value = 'v'.$_[2];
 	}
@@ -32,19 +39,18 @@ sub new
 	my $eval = eval 'Scalar::Util::isvstring($value)';
 	if ( !$@ and $eval ) {
 	    $value = sprintf("v%vd",$value);
+	    undef $@; # fix for RT#19517
 	}
 
 	# may be a non-magic v-string
 	if ( $] >= 5.006_002 && $] < 5.008_001
 		&& length($value) >= 3 && $value !~ /[._]/ ) {
-	    $DB::single = 1;
 	    my $tvalue = sprintf("%vd",$value);
 	    if ( $tvalue =~ /^\d+\.\d+\.\d+$/ ) {
 		# must be a non-magic v-string
 		$value = $tvalue;
 	    }
 	}
-	    
 	
 	# This is not very efficient, but it is morally equivalent
 	# to the XS code (as that is the reference implementation).
@@ -191,11 +197,6 @@ sub new
 	    while ($len-- > 0) {
 		push @{$self->{version}}, 0;
 	    }
-	}
-
-	if ( not exists $self->{version} ) {
-	    # oops, someone forgot to pass a value (shouldn't happen)
-	    push @{$self->{version}}, 0;
 	}
 
 	if ( substr($value,$pos) ) { # any remaining text

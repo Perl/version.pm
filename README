@@ -1,4 +1,4 @@
-version 0.60
+version 0.62
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -6,27 +6,19 @@ the 5.10.0 release).  In fact, if you attempt to use this module with a version
 of Perl >= v5.9.0, this module will not do anything, since the code already
 exists in the Perl core.  Note that the CPAN release cannot be installed
 with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
-in the core).  If you are testing bleadperl, you will need to check out the
-latest release of 5.9.x to get the changes included in 0.58.
+in the core).  If you are testing 5.9.x, you must check out bleadperl in
+order to get the current changes (the CPAN release has no effect in
+bleadperl).
 
-Major changes in 0.60 - 2006-05-20
+Major changes in 0.62 - 2006-05-27
 =====================================
-Very small version numbers (like 0.000001, e.g. v0.0.1) would run afoul of
-Perl's normal switch to exponential notation.  Both the XS and Perl modules
-have been rewritten to try a lot harder to deal with this problem.
+Fix RT#19517 - need to special case the string 'undef' as being equivalent
+to an undef version (0.000), so that EU::MM doesn't freak out.
 
-It was also reported that calling the replacement UNIVERSAL::VERSION as a 
-fallback method, e.g. module->VERSION, did not work the same between the
-pure Perl and XS variants.  The pure Perl module was also modified to try
-and spot embedded non-magic v-strings between Perl 5.6.2 and 5.8.1.
-
-This release also removes the dependency on Exporter, as well as includes
-improved documentation on how to use a module that uses version.pm itself.
-
-Major changes in 0.59
-==================================
-Fix mainline code to work on Perl 5.6.x and 5.005_0x again (a few 
-5.8.x'isms had crept in to the C code and tests).
+Major changes in 0.61 - 2006-05-23
+=====================================
+Include better ppperl.h as well as avoid re-exporting qv() if version.pm
+use'd more than once.
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.

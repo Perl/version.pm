@@ -354,6 +354,15 @@ SKIP: 	{
     $version = $CLASS->new(" 1.7");
     ok($version->numify eq "1.700", "leading space ignored");
 
+    # RT 19517 - deal with undef and 'undef' initialization
+    ok($version ne 'undef', "Undef version comparison #1");
+    ok($version ne undef, "Undef version comparison #2");
+    $version = $CLASS->new('undef');
+    unlike($warning, qr/^Version string 'undef' contains invalid data/,
+	"Version string 'undef'");
+    ok($version eq 'undef', "Undef version comparison #3");
+    ok($version eq undef, "Undef version comparison #4");
+
 SKIP: {
 	# dummy up a legal module for testing RT#19017
 	open F, ">www.pm" or die "Cannot open www.pm: $!\n";
