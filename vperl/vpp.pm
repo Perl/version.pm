@@ -4,7 +4,7 @@ use strict;
 
 use Scalar::Util;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION     = 0.62;
+$VERSION     = 0.63;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'

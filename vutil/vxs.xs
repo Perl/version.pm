@@ -50,15 +50,11 @@ PPCODE:
 	vs = sv_newmortal();
 	sv_setpvf(vs,"v%s",SvPV(ST(2),n_a));
     }
-    if ( items == 1 )
+    if ( items == 1 || vs == &PL_sv_undef ) /* no param or explicit undef */
     {
-	/* no parameter provided */
-	if ( sv_isobject(ST(0)) )
-	{
-	    /* create empty object */
-	    vs = sv_newmortal();
-	    sv_setpv(vs,"");
-	}
+	/* create empty object */
+	vs = sv_newmortal();
+	sv_setpv(vs,"");
     }
 
     rv = new_version(vs);

@@ -360,8 +360,16 @@ SKIP: 	{
     $version = $CLASS->new('undef');
     unlike($warning, qr/^Version string 'undef' contains invalid data/,
 	"Version string 'undef'");
+
+    $version = $CLASS->new(undef);
+    like($warning, qr/^Use of uninitialized value/,
+	"Version string 'undef'");
     ok($version eq 'undef', "Undef version comparison #3");
     ok($version eq undef, "Undef version comparison #4");
+    eval "\$version = \$CLASS->new()"; # no parameter at all
+    unlike($@, qr/^Bizarre copy of CODE/, "No initializer at all");
+    ok($version eq 'undef', "Undef version comparison #5");
+    ok($version eq undef, "Undef version comparison #6");
 
 SKIP: {
 	# dummy up a legal module for testing RT#19017
