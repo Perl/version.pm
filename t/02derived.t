@@ -19,7 +19,7 @@ package version::Empty;
 use base 'version';
 {
     local $^W;
-    *main::qv = sub {return bless version::qv(shift), __PACKAGE__};
+    *{caller()."\::qv"} = sub {return bless version::qv(shift), __PACKAGE__};
 }
 
 package version::Bad;

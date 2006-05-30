@@ -4,7 +4,8 @@ use strict;
 
 use Scalar::Util;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION     = 0.63;
+$VERSION = "0.63_01";
+$VERSION = eval $VERSION;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -27,7 +28,7 @@ sub new
 
 	if ( not defined $value or $value =~ /^undef$/ ) {
 	    # RT #19517 - special case for undef comparison
-	    # oops, someone forgot to pass a value (shouldn't happen)
+	    # or someone forgot to pass a value
 	    push @{$self->{version}}, 0;
 	    return ($self);
 	}
