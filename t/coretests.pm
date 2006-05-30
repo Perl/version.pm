@@ -400,6 +400,20 @@ EOF
 	unlink 'www.pm';
     }
 
+    open F, ">vvv.pm" or die "Cannot open vvv.pm: $!\n";
+    print F <<"EOF";
+package vvv;
+use base qw(version);
+1;
+EOF
+    close F;
+    # need to eliminate any other qv()'s
+    undef *main::qv;
+    ok(!defined(&{"main\::qv"}), "make sure we cleared qv() properly");
+    eval "use lib '.'; use vvv;";
+    ok(defined(&{"main\::qv"}), "make sure we exported qv() properly");
+    isa_ok( qv(1.2), "vvv");
+    unlink 'vvv.pm';
 }
 
 1;

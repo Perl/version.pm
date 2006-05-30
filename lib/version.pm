@@ -25,8 +25,8 @@ else { # use XS module
 
 # Preloaded methods go here.
 sub import {
-    my ($class, $caller) = @_;
-    my $callpkg = $caller || caller();
+    my ($class) = @_;
+    my $callpkg = caller();
     no strict 'refs';
     
     *{$callpkg."::qv"} = 

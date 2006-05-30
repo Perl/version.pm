@@ -18,8 +18,10 @@ diag "Tests with empty derived class"  if $Verbose;
 package version::Empty;
 use base 'version';
 {
+    # have to do this because import() will not get called
     local $^W;
-    *{caller()."\::qv"} = sub {return bless version::qv(shift), __PACKAGE__};
+    *{caller()."\::qv"} =
+	sub {return bless version::qv(shift), __PACKAGE__};
 }
 
 package version::Bad;
