@@ -1,4 +1,4 @@
-version 0.63
+version 0.64
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -10,16 +10,17 @@ in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
 
+Major changes in 0.64 - 2006-06-08
+=====================================
+Change test for already-exported qv() to work better under inheritance.
+Test and document that import() can be inherited by subclasses of version
+and still export qv() to the caller appropriately.
+
 Major changes in 0.63 - 2006-05-27
 =====================================
 Fix RT#19517 - need to special case the string 'undef' as being equivalent
 to an undef version (0.000), so that EU::MM doesn't freak out.  Prevent
 warnings when initializing with undef or no initializer at all.
-
-Major changes in 0.61 - 2006-05-23
-=====================================
-Include better ppperl.h as well as avoid re-exporting qv() if version.pm
-use'd more than once.
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.
