@@ -15,5 +15,6 @@ vperl/vpp.pm
 vutil/vutil.c
 vutil/vutil.h
 vutil/ppport.h
-vutil/vxs.pm
 vutil/vxs.xs
+vutil/lib/version/vxs.pm
+vutil/Makefile.PLz

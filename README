@@ -1,4 +1,4 @@
-version 0.64
+version 0.65
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -10,17 +10,11 @@ in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
 
-Major changes in 0.64 - 2006-06-08
+Major changes in 0.65 - 2006-07-17
 =====================================
-Change test for already-exported qv() to work better under inheritance.
-Test and document that import() can be inherited by subclasses of version
-and still export qv() to the caller appropriately.
-
-Major changes in 0.63 - 2006-05-27
-=====================================
-Fix RT#19517 - need to special case the string 'undef' as being equivalent
-to an undef version (0.000), so that EU::MM doesn't freak out.  Prevent
-warnings when initializing with undef or no initializer at all.
+Reorganize structure and provide a fully EU::MM compatible Makefile.PL for, 
+among other cases, bootstrap installing of Module::Build (which now depends 
+on version.pm).  No new tests, no change to core code.  Resolves RT#20493.
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.
@@ -41,6 +35,22 @@ much slower).  You can test it by calling the build script as
     $ perl Build.PL --perl_only
 
 and it will install the Perl only version.
+
+OR
+
+To install with ExtUtils::MakeMaker:
+
+   $ perl Makefile.PL
+   $ make
+   $ make test
+   # make install
+
+and 
+
+   $ perl Makefile.PL --perl_only
+
+and it will install the Perl only version.
+  
 
 DEPENDENCIES
 

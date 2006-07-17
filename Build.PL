@@ -54,7 +54,7 @@ if ( $perl_only or not $t->have_c_compiler() ) {
     }
     $build_arguments{pm_files} = {
 	'./lib/version.pm' => './lib/version.pm',
-	'./vperl/vpp.pm' => 'lib/version/vpp.pm',
+	'./vperl/vpp.pm' => './lib/version/vpp.pm',
     };
 }
 else {
@@ -62,10 +62,10 @@ else {
     $build_arguments{module_name} = 'version::vxs';
     $build_arguments{pm_files} = {
 	'./lib/version.pm' => './lib/version.pm',
-	'./vutil/vxs.pm' => 'lib/version/vxs.pm'
+	'./vutil/lib/version/vxs.pm' => './lib/version/vxs.pm'
     };
     $build_arguments{xs_files} = {
-	'./vutil/vxs.xs' => 'lib/version/vxs.xs'
+	'./vutil/vxs.xs' => './lib/version/vxs.xs'
     };
     $build_arguments{add_to_cleanup} = 
     	['lib/version/vxs.*'];
