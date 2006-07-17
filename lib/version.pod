@@ -248,7 +248,10 @@ equivalent and sorts alpha-numerically as would be expected.
 
 Overloading has been used with version objects to provide a natural
 interface for their use.  All mathematical operations are forbidden,
-since they don't make any sense for base version objects.
+since they don't make any sense for base version objects.  Consequently,
+there is no overloaded numification available.  If you want to use a
+version object in a numeric context for some reason, see the L<numify>
+object method.
 
 =over 4
 

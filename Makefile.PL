@@ -27,6 +27,9 @@ unless (defined $no_xs)
 {
     check_for_compiler()
         or no_cc();
+
+    map { unlink $_ if -f $_ } ('test.c','test.o');
+
 }
 
 write_makefile();
