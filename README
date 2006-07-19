@@ -1,4 +1,4 @@
-version 0.651
+version 0.652
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -10,12 +10,13 @@ in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
 
-Major changes in 0.651 - 2006-07-17
+Major changes in 0.652 - 2006-07-19
 =====================================
 Reorganize structure and provide a fully EU::MM compatible Makefile.PL for, 
 among other cases, bootstrap installing of Module::Build (which now depends 
 on version.pm).  No new tests, no change to core code.  Resolves RT#20493.
-Now works if ExtUtils::CBuilder isn't installed.
+Now works if ExtUtils::CBuilder isn't installed.  Slight tweak of
+Makefile.PL to deal with Perl < v5.6.0.
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.

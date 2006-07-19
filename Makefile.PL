@@ -49,6 +49,7 @@ sub write_makefile
                    ), 
 		   PM              => 
 		       {'lib/version.pm' => '$(INST_LIBDIR)/version.pm'},
+		   PL_FILES        => {},
 
 		   clean           => { FILES => 'vutil/Makefile.PL' },
                  );
