@@ -4,7 +4,7 @@ use strict;
 
 use Scalar::Util;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.652;
+$VERSION = 0.66;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -35,18 +35,11 @@ sub new
 	    $value = 'v'.$_[2];
 	}
 
-	my $eval = eval 'Scalar::Util::isvstring($value)';
-	if ( !$@ and $eval ) {
-	    $value = sprintf("v%vd",$value);
-	    undef $@; # fix for RT#19517
-	}
-
-	# may be a non-magic v-string
-	if ( $] >= 5.006_002 && $] < 5.008_001
-		&& length($value) >= 3 && $value !~ /[._]/ ) {
+	# may be a v-string
+	if ( $] >= 5.006_002 && length($value) >= 3 && $value !~ /[._]/ ) {
 	    my $tvalue = sprintf("%vd",$value);
 	    if ( $tvalue =~ /^\d+\.\d+\.\d+$/ ) {
-		# must be a non-magic v-string
+		# must be a v-string
 		$value = $tvalue;
 	    }
 	}

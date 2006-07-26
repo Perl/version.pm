@@ -28,7 +28,7 @@ unless (defined $no_xs)
     check_for_compiler()
         or no_cc();
 
-    map { unlink $_ if -f $_ } ('test.c','test.o');
+    map { unlink $_ if -f $_ } ('test.c',"test$Config{obj_ext}");
 
 }
 
@@ -61,7 +61,6 @@ sub init
 
     if ($no_xs) {
 	$hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';
-	$hash->{'PREREQ_PM'}->{'Scalar::Util'} = 1.08;
     }
     else {
 	require File::Copy;
