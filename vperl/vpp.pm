@@ -4,7 +4,7 @@ use strict;
 
 use Scalar::Util;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.66;
+$VERSION = 0.661;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -397,10 +397,7 @@ sub _verify {
     *UNIVERSAL::VERSION = sub {
 	my ($obj, $req) = @_;
 	my $class = ref($obj) || $obj;
-	if ( $req =~ /\d+e-?\d+/ ) { # exponential notation
-	    $req = sprintf("%.9f",$req);
-	    $req =~ s/(0+)$//;
-	}
+
 	no strict 'refs';
 	eval "require $class" unless %{"$class\::"}; # already existing
 	die "$class defines neither package nor VERSION--version check failed"
@@ -412,6 +409,10 @@ sub _verify {
 	}
 
 	if ( defined $req ) {
+	    if ( $req =~ /\d+e-?\d+/ ) { # exponential notation
+		$req = sprintf("%.9f",$req);
+		$req =~ s/(0+)$//;
+	    }
 	    unless ( defined $version ) {
 		my $msg =  "$class does not define ".
 			   "\$$class\::VERSION--version check failed";

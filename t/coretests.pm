@@ -397,6 +397,10 @@ EOF
 	like ($@, qr/^www version 0.000008 \(v0.0.8\) required/,
 	    "Make sure very small versions don't freak"); 
 
+	eval "use lib '.'; use www 0.0.4;";
+	isnt ($@, 'This should succeed');
+	cmp_ok ( "www"->VERSION, 'eq', '0.000004', 'No undef warnings' );
+
 	unlink 'www.pm';
     }
 
