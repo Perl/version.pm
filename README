@@ -1,4 +1,4 @@
-version 0.661
+version 0.662
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -9,6 +9,17 @@ with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
+
+Minor changes in 0.662 - 2006-07-30
+=====================================
+Special "Microsoft Visual C is Stupid" release.  Force the MSVC compiler to
+act rationally and not call the linker when not explicitely asked during
+the "manual search for a C compiler" phase of the compatibility
+Makefile.PL.  Also, make sure that Makefile.PL creates manified-POD's (like
+Build.PL already does automatically).  For an added bonus, augment the
+Makefile.PL to generate the Changes file automatically (again, to match
+what Build.PL already does), since Module::Release prefers to use
+Makefile.PL instead of Build.PL (something I may change).
 
 Major changes in 0.661 - 2006-07-25
 =====================================

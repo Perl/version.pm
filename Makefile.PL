@@ -47,11 +47,21 @@ sub write_makefile
                        AUTHOR      => 'John Peacock <jpeacock@cpan.org>') :
                      ()
                    ), 
-		   PM              => 
-		       {'lib/version.pm' => '$(INST_LIBDIR)/version.pm'},
-		   PL_FILES        => {},
 
-		   clean           => { FILES => 'vutil/Makefile.PL' },
+                   MAN3PODS       =>
+                       {'lib/version.pod' => 'blib/man3/version.3' },
+
+                   PM              => 
+                       {'lib/version.pm' => '$(INST_LIBDIR)/version.pm'},
+                   PL_FILES        => {},
+
+                   clean           => { FILES => 'vutil/Makefile.PL' },
+                   dist            => {
+                      PREOP  => (
+                          'svk log -x | gnuify-changelog.pl > Changes'
+                      )
+                   },
+
                  );
 }
 
@@ -60,11 +70,11 @@ sub init
     my $hash = $_[1];
 
     if ($no_xs) {
-	$hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';
+        $hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';
     }
     else {
-	require File::Copy;
-	File::Copy::copy('vutil/Makefile.PLz','vutil/Makefile.PL');
+        require File::Copy;
+        File::Copy::copy('vutil/Makefile.PLz','vutil/Makefile.PL');
         @{ $hash }{ 'DIR' } = ['vutil'];
     }
 
@@ -125,7 +135,12 @@ EOF
 
     close F or return 0;
 
-    system( "$Config{cc} -o test$Config{obj_ext} test.c" ) and return 0;
+    my $cc = $Config{cc};
+    if ( $cc =~ /cl(\.exe)?$/ ) { # stupid stupid MSVC compiler
+        $cc .= ' -c'; # prevent it from calling the linker
+    }
+
+    system( "$cc -o test$Config{obj_ext} test.c" ) and return 0;
 
     return 1;
 }
