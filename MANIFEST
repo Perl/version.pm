@@ -5,6 +5,7 @@ lib/version.pod
 lib/version/typemap
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.yml
 README
 t/01base.t
@@ -12,9 +13,8 @@ t/02derived.t
 t/03require.t
 t/coretests.pm
 vperl/vpp.pm
+vutil/lib/version/vxs.pm
+vutil/ppport.h
 vutil/vutil.c
 vutil/vutil.h
-vutil/ppport.h
 vutil/vxs.xs
-vutil/lib/version/vxs.pm
-vutil/Makefile.PLz

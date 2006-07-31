@@ -73,8 +73,11 @@ sub init
         $hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';
     }
     else {
-        require File::Copy;
-        File::Copy::copy('vutil/Makefile.PLz','vutil/Makefile.PL');
+	open MAKEFILE, '>vutil/Makefile.PL';
+	while (<DATA>) {
+	    print MAKEFILE $_;
+	}
+	close MAKEFILE;
         @{ $hash }{ 'DIR' } = ['vutil'];
     }
 
@@ -144,3 +147,16 @@ EOF
 
     return 1;
 }
+
+__DATA__
+#!/usr/bin/perl -w
+use strict;
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    NAME                => 'version::vxs',
+    AUTHOR              => 'John Peacock <jpeacock@cpan.org>',
+    VERSION_FROM        => 'lib/version/vxs.pm',
+    OBJECT              => q/$(O_FILES)/,
+    TYPEMAPS            => ['../lib/version/typemap'],
+);

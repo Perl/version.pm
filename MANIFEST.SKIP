@@ -1,0 +1,8 @@
+\.lwpcookies
+\.releaserc
+.+\.diff
+.+\.bak
+.+~
+Makefile$
+version-.+\.tar\.gz
+vutil/Makefile\.PL
