@@ -288,7 +288,7 @@ SKIP: {
 	eval "use lib '.'; use xxx; $version = xxx->VERSION";
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without package or VERSION'); 
-	isnt (defined($version), "Called as class method");
+	ok (defined($version), "Called as class method");
 	unlink 'xxx.pm';
     }
     
@@ -371,6 +371,10 @@ SKIP: 	{
     ok($version eq 'undef', "Undef version comparison #5");
     ok($version eq undef, "Undef version comparison #6");
 
+    $version = $CLASS->new(0.000001);
+    unlike($warning, qr/^Version string '1e-06' contains invalid data/,
+    	"Very small version objects");
+
 SKIP: {
 	# dummy up a legal module for testing RT#19017
 	open F, ">www.pm" or die "Cannot open www.pm: $!\n";
@@ -389,7 +393,7 @@ EOF
 	    "Comparing vs. version with no decimal"); 
 	eval "use lib '.'; use www 1.;";
 	like ($@, qr/^www version 1.000 \(v1.0.0\) required/,
-	    "Comparing "); 
+	    "Comparing vs. version with decimal only"); 
 
 	skip 'Cannot "use" extended versions with Perl < 5.6.2', 1
 	    if $] < 5.006_002;
@@ -398,7 +402,8 @@ EOF
 	    "Make sure very small versions don't freak"); 
 
 	eval "use lib '.'; use www 0.0.4;";
-	isnt ($@, 'This should succeed');
+	unlike($@, qr/^www version 0.000004 \(v0.0.4\) required/,
+	    'Succeed - required == VERSION');
 	cmp_ok ( "www"->VERSION, 'eq', '0.000004', 'No undef warnings' );
 
 	unlink 'www.pm';
