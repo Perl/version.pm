@@ -3,6 +3,7 @@
 .+\.diff
 .+\.bak
 .+~
+.+\.orig
 Makefile$
 version-.+\.tar\.gz
 vutil/Makefile\.PL
