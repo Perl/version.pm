@@ -56,13 +56,20 @@ sub write_makefile
                    PL_FILES        => {},
 
                    clean           => { FILES => 'vutil/Makefile.PL' },
-                   dist            => {
-                      PREOP  => (
-                          'svk log -x | gnuify-changelog.pl > Changes'
-                      )
+                   depend => {
+                       dist => 'changelog',
                    },
 
                  );
+}
+
+sub MY::postamble {
+    return <<'MAKE_MORE';
+
+changelog:
+	svk update && svk log -x | gnuify-changelog.pl > Changes
+
+MAKE_MORE
 }
 
 sub init
@@ -73,11 +80,11 @@ sub init
         $hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';
     }
     else {
-	open MAKEFILE, '>vutil/Makefile.PL';
-	while (<DATA>) {
-	    print MAKEFILE $_;
-	}
-	close MAKEFILE;
+        open MAKEFILE, '>vutil/Makefile.PL';
+        while (<DATA>) {
+            print MAKEFILE $_;
+        }
+        close MAKEFILE;
         @{ $hash }{ 'DIR' } = ['vutil'];
     }
 
