@@ -56,20 +56,15 @@ sub write_makefile
                    PL_FILES        => {},
 
                    clean           => { FILES => 'vutil/Makefile.PL' },
-                   depend => {
-                       dist => 'changelog',
+                   dist            => {
+                       COMPRESS => 'gzip -9f', 
+                       SUFFIX => 'gz',
+                       PREOP  => (
+                          'svk log -x | gnuify-changelog.pl > Changes'
+                       ),
                    },
 
                  );
-}
-
-sub MY::postamble {
-    return <<'MAKE_MORE';
-
-changelog:
-	svk update && svk log -x | gnuify-changelog.pl > Changes
-
-MAKE_MORE
 }
 
 sub init
