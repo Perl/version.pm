@@ -1,4 +1,4 @@
-version 0.67
+version 0.6701
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -10,23 +10,19 @@ in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
 
+Minor changes in 0.6701 - 2006-08-16
+=====================================
+
+Another Build.PL tweak for Module::Build 0.2805, which nukes the version::
+namespace during the test for an installed release of version.pm.  This
+makes it impossible to install version.pm from CPAN with M::B.
+
 Major changes in 0.67 - 2006-08-08
 =====================================
 
 Redo pure Perl code to correctly handle all instances of very small version
 objects (where Perl "helpfully" hands us exponential notation).
 
-
-Minor changes in 0.662 - 2006-07-30
-=====================================
-Special "Microsoft Visual C is Stupid" release.  Force the MSVC compiler to
-act rationally and not call the linker when not explicitely asked during
-the "manual search for a C compiler" phase of the compatibility
-Makefile.PL.  Also, make sure that Makefile.PL creates manified-POD's (like
-Build.PL already does automatically).  For an added bonus, augment the
-Makefile.PL to generate the Changes file automatically (again, to match
-what Build.PL already does), since Module::Release prefers to use
-Makefile.PL instead of Build.PL (something I may change).
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.

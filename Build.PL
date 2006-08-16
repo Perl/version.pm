@@ -5,7 +5,7 @@ my $perl_only;
 
 my $class = Module::Build->subclass
 (
-    class => 'version::Builder',
+#    class => 'version::Builder',
     code => q{
     sub ACTION_dist{
         my $self = shift;
