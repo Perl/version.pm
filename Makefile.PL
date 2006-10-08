@@ -49,10 +49,11 @@ sub write_makefile
                    ), 
 
                    MAN3PODS       =>
-                       {'lib/version.pod' => 'blib/man3/version.3' },
+                      {'lib/version.pod' => 'blib/man3/version.3' },
 
                    PM              => 
-                       {'lib/version.pm' => '$(INST_LIBDIR)/version.pm'},
+                       {'lib/version.pm'  => '$(INST_LIBDIR)/version.pm',
+                        'lib/version.pod' => '$(INST_LIBDIR)/version.pod'},
                    PL_FILES        => {},
 
                    clean           => { FILES => 'vutil/Makefile.PL' },

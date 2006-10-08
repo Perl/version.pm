@@ -3,8 +3,9 @@ package version::vpp;
 use strict;
 
 use Scalar::Util;
+use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.6701;
+$VERSION = "0.67_03"; $VERSION = eval $VERSION;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -23,6 +24,11 @@ sub new
 {
 	my ($class, $value) = @_;
 	my $self = bless ({}, ref ($class) || $class);
+	require POSIX;
+	my $currlocale = POSIX::setlocale(&POSIX::LC_ALL);
+	my $radix_comma = ( POSIX::localeconv()->{decimal_point} eq ',' );
+
+	POSIX::setlocale(&POSIX::LC_ALL, 'C') if $radix_comma;
 
 	if ( not defined $value or $value =~ /^undef$/ ) {
 	    # RT #19517 - special case for undef comparison
@@ -50,6 +56,11 @@ sub new
 	    $value =~ s/(0+)$//;
 	}
 	
+	# if the original locale used commas for decimal points, need 
+	# to force the PV to be regenerated, since just changing the
+	# locale isn't sufficient for Perl < 5.8.0
+	$value += 0 if $radix_comma and $] < 5.008;
+
 	# This is not very efficient, but it is morally equivalent
 	# to the XS code (as that is the reference implementation).
 	# See vutil/vutil.c for details
@@ -201,6 +212,8 @@ sub new
 	    warn "Version string '$value' contains invalid data; ".
 	         "ignoring: '".substr($value,$pos)."'";
 	}
+
+	POSIX::setlocale(&POSIX::LC_ALL, $currlocale) if $radix_comma;
 
 	return ($self);
 }
