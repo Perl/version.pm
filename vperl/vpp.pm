@@ -56,10 +56,10 @@ sub new
 	    $value =~ s/(0+)$//;
 	}
 	
-	# if the original locale used commas for decimal points, need 
-	# to force the PV to be regenerated, since just changing the
-	# locale isn't sufficient for Perl < 5.8.0
-	$value += 0 if $radix_comma and $] < 5.008;
+	# if the original locale used commas for decimal points, we
+	# need to force the PV to be regenerated, since just changing
+	# the locale isn't sufficient (use harmless math operation)
+	$value += 0 if $radix_comma;
 
 	# This is not very efficient, but it is morally equivalent
 	# to the XS code (as that is the reference implementation).
