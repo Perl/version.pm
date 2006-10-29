@@ -1,4 +1,4 @@
-version 0.67_03
+version 0.68
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -10,7 +10,7 @@ in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
 
-Major changes in 0.67_03 - 2006-10-07
+Major changes in 0.68 - 2006-10-29
 =====================================
 
 Properly handle locales which utilize commas as decimal points for floating

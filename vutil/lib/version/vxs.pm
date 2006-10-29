@@ -9,7 +9,7 @@ use vars qw(@ISA $VERSION $CLASS );
 
 @ISA = qw(DynaLoader);
 
-$VERSION = "0.67_03"; $VERSION = eval $VERSION;
+$VERSION = 0.68;
 
 $CLASS = 'version::vxs';
 
