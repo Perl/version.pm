@@ -243,32 +243,39 @@ SKIP: {
     # test reformed UNIVERSAL::VERSION
     diag "Replacement UNIVERSAL::VERSION tests" if $Verbose;
     
-    # we know this file is here since we require it ourselves
-    $version = $Test::More::VERSION;
-    eval "use Test::More $version";
-    unlike($@, qr/Test::More version $version/,
-	    'Replacement eval works with exact version');
-    
-    # test as class method
-    $new_version = Test::More->VERSION;
-    cmp_ok($new_version,'cmp',$version, "Called as class method");
+    {
+	open F, ">aaa.pm" or die "Cannot open aaa.pm: $!\n";
+	print F "package aaa;\n\$aaa::VERSION=0.58;\n1;\n";
+	close F;
 
-    # this should fail even with old UNIVERSAL::VERSION
-    $version = $Test::More::VERSION+0.01;
-    eval "use Test::More $version";
-    like($@, qr/Test::More version $version/,
-	    'Replacement eval works with incremented version');
-    
-    $version =~ s/\.0$//; #convert to string and remove trailing '.0'
-    chop($version);	# shorten by 1 digit, should still succeed
-    eval "use Test::More $version";
-    unlike($@, qr/Test::More version $version/,
-	    'Replacement eval works with single digit');
-    
-    $version += 0.1; # this would fail with old UNIVERSAL::VERSION
-    eval "use Test::More $version";
-    like($@, qr/Test::More version $version/,
-	    'Replacement eval works with incremented digit');
+	$version = 0.58; $version = sprintf("%.3f",$version);
+	eval "use lib '.'; use aaa $version";
+	unlike($@, qr/aaa version $version/,
+		'Replacement eval works with exact version');
+	
+	# test as class method
+	$new_version = "aaa"->VERSION;
+	cmp_ok($new_version,'eq',$version, "Called as class method");
+
+	# this should fail even with old UNIVERSAL::VERSION
+	$version += 0.01; $version = sprintf("%.3f",$version);
+	eval "use lib '.'; use aaa $version";
+	like($@, qr/aaa version $version/,
+		'Replacement eval works with incremented version');
+	
+	$version =~ s/0+$//; #convert to string and remove trailing 0's
+	chop($version);	# shorten by 1 digit, should still succeed
+	eval "use lib '.'; use aaa $version";
+	unlike($@, qr/aaa version $version/,
+		'Replacement eval works with single digit');
+	
+	# this would fail with old UNIVERSAL::VERSION
+	$version += 0.1; $version = sprintf("%.3f",$version);
+	eval "use lib '.'; use aaa $version";
+	like($@, qr/aaa version $version/,
+		'Replacement eval works with incremented digit');
+	unlink 'aaa.pm';
+    }
 
     { # dummy up some variously broken modules for testing
 	open F, ">xxx.pm" or die "Cannot open xxx.pm: $!\n";
