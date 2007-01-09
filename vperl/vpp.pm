@@ -2,7 +2,6 @@
 package version::vpp;
 use strict;
 
-use Scalar::Util;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
 $VERSION = 0.6801;
@@ -41,14 +40,7 @@ sub new
 	    $value = 'v'.$_[2];
 	}
 
-	# may be a v-string
-	if ( $] >= 5.006_002 && length($value) >= 3 && $value !~ /[._]/ ) {
-	    my $tvalue = sprintf("%vd",$value);
-	    if ( $tvalue =~ /^\d+\.\d+\.\d+$/ ) {
-		# must be a v-string
-		$value = $tvalue;
-	    }
-	}
+	$value = _un_vstring($value);
 
 	# exponential notation
 	if ( $value =~ /\d+e-?\d+/ ) {
@@ -382,20 +374,15 @@ sub is_alpha {
 sub qv {
     my ($value) = @_;
 
-    my $eval = eval 'Scalar::Util::isvstring($value)';
-    if ( !$@ and $eval ) {
-	$value = sprintf("v%vd",$value);
-    }
-    else {
-	$value = 'v'.$value unless $value =~ /^v/;
-    }
+    $value = _un_vstring($value);
+    $value = 'v'.$value unless $value =~ /^v/;
     return version->new($value); # always use base class
 }
 
 sub _verify {
     my ($self) = @_;
-    if (   Scalar::Util::reftype($self) eq 'HASH'
-	&& exists $self->{version}
+    if ( ref($self)
+	&& eval { exists $self->{version} }
 	&& ref($self->{version}) eq 'ARRAY'
 	) {
 	return 1;
@@ -403,6 +390,19 @@ sub _verify {
     else {
 	return 0;
     }
+}
+
+sub _un_vstring {
+    my $value = shift;
+    # may be a v-string
+    if ( $] >= 5.006_000 && length($value) >= 3 && $value !~ /[._]/ ) {
+	my $tvalue = sprintf("%vd",$value);
+	if ( $tvalue =~ /^\d+\.\d+\.\d+$/ ) {
+	    # must be a v-string
+	    $value = $tvalue;
+	}
+    }
+    return $value;
 }
 
 # Thanks to Yitzchak Scott-Thoennes for this mode of operation

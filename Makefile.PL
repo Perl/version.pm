@@ -142,11 +142,8 @@ EOF
     close F or return 0;
 
     my $cc = $Config{cc};
-    if ( $cc =~ /cl(\.exe)?$/ ) { # stupid stupid MSVC compiler
-        $cc .= ' -c'; # prevent it from calling the linker
-    }
 
-    system( "$cc -o test$Config{obj_ext} test.c" ) and return 0;
+    system( "$cc -c -o test$Config{obj_ext} test.c" ) and return 0;
 
     return 1;
 }

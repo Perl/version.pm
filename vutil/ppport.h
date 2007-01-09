@@ -4,10 +4,18 @@
 /*
 ----------------------------------------------------------------------
 
-    ppport.h -- Perl/Pollution/Portability Version 3.08_02
+    ppport.h -- Perl/Pollution/Portability Version 3.10
 
-    Automatically created by Devel::PPPort running under
-    perl 5.008007 on Tue May 23 07:26:38 2006.
+    Automatically created by Devel::PPPort running under perl 5.008008.
+
+    Version 3.x, Copyright (c) 2004-2006, Marcus Holland-Moritz.
+
+    Version 2.x, Copyright (C) 2001, Paul Marquess.
+
+    Version 1.x, Copyright (C) 1999, Kenneth Albanowski.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
 
 ----------------------------------------------------------------------
 
@@ -15,6 +23,11 @@ SKIP
 if (@ARGV && $ARGV[0] eq '--unstrip') {
   eval { require Devel::PPPort };
   $@ and die "Cannot require Devel::PPPort, please install.\n";
+  if ($Devel::PPPort::VERSION < 3.1) {
+    die "ppport.h was originally generated with Devel::PPPort 3.1.\n"
+      . "Your Devel::PPPort is only version $Devel::PPPort::VERSION.\n"
+      . "Please install a newer version, or --unstrip will not work.\n";
+  }
   Devel::PPPort::WriteFile($0);
   exit 0;
 }
@@ -2868,6 +2881,66 @@ DPPP_(my_my_snprintf)(char *buffer, const Size_t len, const char *format, ...)
 #    define XCPT_CATCH        if (rEtV != 0)
 #    define XCPT_RETHROW      Siglongjmp(top_env, rEtV)
 #  endif
+#endif
+
+#if !defined(my_strlcat)
+#if defined(NEED_my_strlcat)
+static Size_t DPPP_(my_my_strlcat)(char * dst, const char * src, Size_t size);
+static
+#else
+extern Size_t DPPP_(my_my_strlcat)(char * dst, const char * src, Size_t size);
+#endif
+
+#define my_strlcat DPPP_(my_my_strlcat)
+#define Perl_my_strlcat DPPP_(my_my_strlcat)
+
+#if defined(NEED_my_strlcat) || defined(NEED_my_strlcat_GLOBAL)
+
+Size_t
+DPPP_(my_my_strlcat)(char *dst, const char *src, Size_t size)
+{
+    Size_t used, length, copy;
+
+    used = strlen(dst);
+    length = strlen(src);
+    if (size > 0 && used < size - 1) {
+        copy = (length >= size - used) ? size - used - 1 : length;
+        memcpy(dst + used, src, copy);
+        dst[used + copy] = '\0';
+    }
+    return used + length;
+}
+#endif
+#endif
+
+#if !defined(my_strlcpy)
+#if defined(NEED_my_strlcpy)
+static Size_t DPPP_(my_my_strlcpy)(char * dst, const char * src, Size_t size);
+static
+#else
+extern Size_t DPPP_(my_my_strlcpy)(char * dst, const char * src, Size_t size);
+#endif
+
+#define my_strlcpy DPPP_(my_my_strlcpy)
+#define Perl_my_strlcpy DPPP_(my_my_strlcpy)
+
+#if defined(NEED_my_strlcpy) || defined(NEED_my_strlcpy_GLOBAL)
+
+Size_t
+DPPP_(my_my_strlcpy)(char *dst, const char *src, Size_t size)
+{
+    Size_t length, copy;
+
+    length = strlen(src);
+    if (size > 0) {
+        copy = (length >= size) ? size - 1 : length;
+        memcpy(dst, src, copy);
+        dst[copy] = '\0';
+    }
+    return length;
+}
+
+#endif
 #endif
 
 #endif /* _P_P_PORTABILITY_H_ */
