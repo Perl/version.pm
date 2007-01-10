@@ -17,6 +17,8 @@ for (@ARGV)
     /^--xs/ and $no_xs = 0;
 }
 
+map { unlink $_ if -f $_ } <vutil/Makefile*>;
+
 if ($no_xs)
 {
     write_makefile();
