@@ -19,19 +19,10 @@ for (@ARGV)
 
 map { unlink $_ if -f $_ } <vutil/Makefile*>;
 
-if ($no_xs)
-{
-    write_makefile();
-    exit;
-}
-
 unless (defined $no_xs)
 {
     check_for_compiler()
         or no_cc();
-
-    map { unlink $_ if -f $_ } ('test.c',"test$Config{obj_ext}");
-
 }
 
 write_makefile();
@@ -103,8 +94,6 @@ sub no_cc
 
 EOF
 
-    write_makefile();
-    exit;
 }
 
 sub check_for_compiler
@@ -145,9 +134,10 @@ EOF
 
     my $cc = $Config{cc};
 
-    system( "$cc -c -o test$Config{obj_ext} test.c" ) and return 0;
+    my $retval = system( "$cc -c -o test$Config{obj_ext} test.c" );
+    map { unlink $_ if -f $_ } ('test.c',"test$Config{obj_ext}");
 
-    return 1;
+    return not($retval); # system returns -1
 }
 
 __DATA__
