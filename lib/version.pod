@@ -521,13 +521,22 @@ leading 'v' character (also bare).  For example:
   $vs1 = 1.2.3; # encoded as \1\2\3
   $vs2 = v1.2;  # encoded as \1\2 
 
-However, the use of v-strings to initialize version objects with this 
-module is only possible with Perl 5.8.1 or better (which contain special
-code to enable it).  Their use is B<strongly> discouraged in all 
-circumstances (especially the leading 'v' style), since the meaning will
-change depending on which Perl you are running.  It is better to directly 
-use L<"Extended Versions"> to ensure the proper interpretation.
+However, the use of bare v-strings to initialize version objects is
+B<strongly> discouraged in all circumstances (especially the leading 
+'v' style), since the meaning will change depending on which Perl you 
+are running.  It is better to directly use L<"Extended Versions"> to 
+ensure the proper interpretation.
 
+If you insist on using bare v-strings with Perl > 5.6.0, be aware of the 
+following limitations:
+
+1) For Perl releases 5.6.0 through 5.8.0, the v-string code merely guesses, 
+based on some characteristics of v-strings.  You B<must> use a three part
+version, e.g. 1.2.3 or v1.2.3 in order for this heuristic to be successful.
+
+2) For Perl releases 5.8.1 and later, v-strings have changed in the Perl
+core to be magical, which means that the version.pm code can automatically
+determine whether the v-string encoding was used.
 
 =head2 Types of Versions Objects
 
