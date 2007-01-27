@@ -9,8 +9,8 @@ use ExtUtils::MakeMaker;
 use Config qw(%Config);
 use File::Spec;
 
-my $no_xs;
-my $force_xs;
+use vars qw ($no_xs $force_xs);
+
 for (@ARGV)
 {
     /^--perl_only/ and $no_xs = 1;

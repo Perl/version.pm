@@ -6,7 +6,8 @@ use strict;
 
 use vars qw(@ISA $VERSION $CLASS *qv);
 
-$VERSION = 0.69;
+$VERSION = "0.69_01";
+$VERSION = eval $VERSION;
 
 $CLASS = 'version';
 
@@ -24,7 +25,7 @@ else { # use XS module
 
 # Preloaded methods go here.
 sub import {
-    my ($class) = @_;
+    my ($class) = shift;
     my $callpkg = caller();
     no strict 'refs';
     
@@ -32,6 +33,14 @@ sub import {
 	    sub {return bless version::qv(shift), $class }
 	unless defined(&{"$callpkg\::qv"});
 
+#    if (@_) { # must have initialization on the use line
+#	if ( defined $_[2] ) { # CVS style
+#	    $_[0] = version::qv($_[2]);
+#	}
+#	else {
+#	    $_[0] = version->new($_[1]);
+#	}
+#    }
 }
 
 1;

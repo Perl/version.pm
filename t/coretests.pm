@@ -326,8 +326,8 @@ SKIP: {
     }
 
 SKIP: 	{
-	skip 'Cannot test bare v-strings with Perl < 5.8.1', 4
-		if $] < 5.008_001; 
+	skip 'Cannot test bare v-strings with Perl < 5.6.0', 4
+		if $] < 5.006_000; 
 	diag "Tests with v-strings" if $Verbose;
 	$version = $CLASS->new(1.2.3);
 	ok("$version" eq "v1.2.3", '"$version" eq 1.2.3');

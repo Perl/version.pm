@@ -1,10 +1,10 @@
-
 package version::vpp;
 use strict;
 
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.69;
+$VERSION = "0.69_01";
+$VERSION = eval $VERSION;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -14,9 +14,12 @@ push @REGEXS, qr/
 	/x;
 
 use overload (
-    '""'   => \&stringify,
-    'cmp'  => \&vcmp,
-    '<=>'  => \&vcmp,
+    '""'       => \&stringify,
+    '0+'       => \&numify,
+    'cmp'      => \&vcmp,
+    '<=>'      => \&vcmp,
+    'bool'     => \&vbool,
+    'nomethod' => \&vnoop,
 );
 
 sub new
@@ -366,6 +369,16 @@ sub vcmp
     return $retval;  
 }
 
+sub vbool {
+    my ($self) = @_;
+    return vcmp($self,new("0"),1);
+}
+
+sub vnoop { 
+    require Carp; 
+    Carp::croak("operation not supported with version object");
+}
+
 sub is_alpha {
     my ($self) = @_;
     return (exists $self->{alpha});
@@ -419,6 +432,7 @@ sub _un_vstring {
 	
 	my $version = eval "\$$class\::VERSION";
 	if ( defined $version ) {
+	    local $^W if $] <= 5.008;
 	    $version = version::vpp->new($version);
 	}
 
