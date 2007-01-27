@@ -371,7 +371,7 @@ sub vcmp
 
 sub vbool {
     my ($self) = @_;
-    return vcmp($self,new("0"),1);
+    return vcmp($self,$self->new("0"),1);
 }
 
 sub vnoop { 
