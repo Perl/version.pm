@@ -1,4 +1,4 @@
-version 0.68
+version 0.69_02
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -10,17 +10,24 @@ in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
 
+Major changes in 0.70 - NOT YET
+=====================================
+
+Rewrite Makefile.PL again to make it run successfully with 5.005 and 5.6.x.
+Rewrite UNIVERSAL::VERSION error code to more closely echo what Perl itself
+outputs.  
+
+Major changes in 0.69 - 2007-01-10
+=====================================
+
+Rewrite Makefile.PL to be more compliant about weird compilers.
+Eliminate Scalar::Util from pure Perl module.
+
 Major changes in 0.68 - 2006-10-29
 =====================================
 
 Properly handle locales which utilize commas as decimal points for floating
 point numbers.  Slight tweaks to Makefile.PL to correctly install the POD.
-
-Major changes in 0.67 - 2006-08-08
-=====================================
-
-Redo pure Perl code to correctly handle all instances of very small version
-objects (where Perl "helpfully" hands us exponential notation).
 
 
 Please read the POD documentation for usage/details.  See the CHANGES file
