@@ -424,11 +424,26 @@ sub _un_vstring {
     *UNIVERSAL::VERSION = sub {
 	my ($obj, $req) = @_;
 	my $class = ref($obj) || $obj;
+	my $error; 
+
+	if ( $] < 5.006 ) {
+	    $error = "$class version $req required--this is only version ";
+	}
+	else {
+	    $error = "$class does not define \$$class\::VERSION".
+	    "--version check failed";
+	}
 
 	no strict 'refs';
+	require Carp;
 	eval "require $class" unless %{"$class\::"}; # already existing
-	die "$class defines neither package nor VERSION--version check failed"
-	    if $@ or not %{"$class\::"};
+	return undef if $@ =~ /Can't locate/ and not defined $req;
+	
+	if ( not %{"$class\::"} and $] >= 5.008) { # file but no package
+	    Carp::croak(
+		"$class defines neither package nor VERSION"
+		."--version check failed");
+	}
 	
 	my $version = eval "\$$class\::VERSION";
 	if ( defined $version ) {
@@ -438,24 +453,28 @@ sub _un_vstring {
 
 	if ( defined $req ) {
 	    unless ( defined $version ) {
-		my $msg =  "$class does not define ".
-			   "\$$class\::VERSION--version check failed";
+		my $msg =  $] < 5.006 
+		? "$class version $req required--this is only version "
+		: "$class does not define \$$class\::VERSION"
+		  ."--version check failed";
+
 		if ( $ENV{VERSION_DEBUG} ) {
-		    require Carp;
 		    Carp::confess($msg);
 		}
 		else {
-		    die($msg);
+		    Carp::croak($msg);
 		}
 	    }
 
 	    $req = version::vpp->new($req);
 
 	    if ( $req > $version ) {
-		die sprintf ("%s version %s (%s) required--".
-		     "this is only version %s (%s)", $class, 
-		     $req->numify, $req->normal,
-		     $version->numify, $version->normal);
+		Carp::croak( 
+		    sprintf ("%s version %s (%s) required--".
+		    "this is only version %s (%s)", $class, 
+		    $req->numify, $req->normal,
+		    $version->numify, $version->normal)
+		);
 	    }
 	}
 
