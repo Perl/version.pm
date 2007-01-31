@@ -242,6 +242,10 @@ SKIP: {
 
     # test reformed UNIVERSAL::VERSION
     diag "Replacement UNIVERSAL::VERSION tests" if $Verbose;
+
+    my $error_regex = $] < 5.006
+	? 'version \d required'
+	: 'does not define \$...::VERSION';
     
     {
 	open F, ">aaa.pm" or die "Cannot open aaa.pm: $!\n";
@@ -256,6 +260,16 @@ SKIP: {
 	# test as class method
 	$new_version = "aaa"->VERSION;
 	cmp_ok($new_version,'eq',$version, "Called as class method");
+
+	eval "print Completely::Unknown::Module->VERSION";
+	if ( $] < 5.008 ) {
+	    unlike($@, qr/$error_regex/,
+		"Don't freak if the module doesn't even exist");
+	}
+	else {
+	    unlike($@, qr/defines neither package nor VERSION/,
+		"Don't freak if the module doesn't even exist");
+	}
 
 	# this should fail even with old UNIVERSAL::VERSION
 	$version += 0.01; $version = sprintf("%.3f",$version);
@@ -281,21 +295,20 @@ SKIP: {
 	open F, ">xxx.pm" or die "Cannot open xxx.pm: $!\n";
 	print F "1;\n";
 	close F;
-	my $error_regex;
-	if ( $] < 5.008 ) {
-	    $error_regex = 'xxx does not define \$xxx::VERSION';
-	}
-	else {
-	    $error_regex = 'xxx defines neither package nor VERSION';
-	}
 
 	eval "use lib '.'; use xxx 3;";
-	like ($@, qr/$error_regex/,
-	    'Replacement handles modules without package or VERSION'); 
-	eval "use lib '.'; use xxx; $version = xxx->VERSION";
+	if ( $] < 5.008 ) {
+	    like($@, qr/$error_regex/,
+		'Replacement handles modules without package or VERSION'); 
+	}
+	else {
+	    like($@, qr/defines neither package nor VERSION/,
+		'Replacement handles modules without package or VERSION'); 
+	}
+	eval "use lib '.'; use xxx; \$version = xxx->VERSION";
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without package or VERSION'); 
-	ok (defined($version), "Called as class method");
+	ok (!defined($version), "Called as class method");
 	unlink 'xxx.pm';
     }
     
@@ -304,10 +317,10 @@ SKIP: {
 	print F "package yyy;\n#look ma no VERSION\n1;\n";
 	close F;
 	eval "use lib '.'; use yyy 3;";
-	like ($@, qr/^yyy does not define \$yyy::VERSION/,
+	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	eval "use lib '.'; use yyy; print yyy->VERSION";
-	unlike ($@, qr/^yyy does not define \$yyy::VERSION/,
+	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	unlink 'yyy.pm';
     }
@@ -317,10 +330,10 @@ SKIP: {
 	print F "package zzz;\n\@VERSION = ();\n1;\n";
 	close F;
 	eval "use lib '.'; use zzz 3;";
-	like ($@, qr/^zzz does not define \$zzz::VERSION/,
+	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	eval "use lib '.'; use zzz; print zzz->VERSION";
-	unlike ($@, qr/^zzz does not define \$zzz::VERSION/,
+	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	unlink 'zzz.pm';
     }

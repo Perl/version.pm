@@ -424,15 +424,6 @@ sub _un_vstring {
     *UNIVERSAL::VERSION = sub {
 	my ($obj, $req) = @_;
 	my $class = ref($obj) || $obj;
-	my $error; 
-
-	if ( $] < 5.006 ) {
-	    $error = "$class version $req required--this is only version ";
-	}
-	else {
-	    $error = "$class does not define \$$class\::VERSION".
-	    "--version check failed";
-	}
 
 	no strict 'refs';
 	require Carp;
