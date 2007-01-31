@@ -225,13 +225,23 @@ PPCODE:
 	STRLEN len;
 
 	if (undef) {
-	     if (pkg)
-		  Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
+	     if (pkg) {
+#if PERL_VERSION == 5
+		 Perl_croak(aTHX_ "%s version %s required--this is only version ",
+		 	    HvNAME(pkg), SvPVx(req, len));
+#else
+		 Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
 			     HvNAME(pkg), HvNAME(pkg));
+#endif
+	     }
 	     else {
-		  char *str = SvPVx(ST(0), len);
-
-		  Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed", str);
+#if PERL_VERSION == 8
+		 char *str = SvPVx(ST(0), len);
+		 Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed", str);
+#else
+		 Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
+			     HvNAME(pkg), HvNAME(pkg));
+#endif
 	     }
 	}
 
