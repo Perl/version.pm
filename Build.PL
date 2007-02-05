@@ -66,6 +66,14 @@ else {
     	['lib/version/vxs.*'];
 }
 
+if ( $] >= 5.009 ) { # already included in bleadperl
+    $build_arguments{c_source} = '';
+    $build_arguments{pm_files} = {};
+    $build_arguments{xs_files} = {};
+    $build_arguments{add_to_cleanup} = [];
+    $build_arguments{manpages} = {};
+}
+
 my $m = $class->new(%build_arguments);
 
 $m->create_build_script;

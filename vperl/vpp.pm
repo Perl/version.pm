@@ -3,7 +3,7 @@ use strict;
 
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = "0.69_02";
+$VERSION = "0.69_03";
 $VERSION = eval $VERSION;
 
 push @REGEXS, qr/
