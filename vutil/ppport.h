@@ -2946,3 +2946,6 @@ DPPP_(my_my_strlcpy)(char *dst, const char *src, Size_t size)
 #endif /* _P_P_PORTABILITY_H_ */
 
 /* End of File ppport.h */
+#ifndef SVfARG
+#  define SVfARG(p) ((void*)(p))
+#endif

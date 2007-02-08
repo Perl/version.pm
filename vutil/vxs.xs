@@ -35,32 +35,32 @@ PPCODE:
 {
     SV *vs = ST(1);
     SV *rv;
-    char *class;
+    const char * const classname = 
+    	sv_isobject(ST(0)) /* get the class if called as an object method */
+	    ? HvNAME(SvSTASH(SvRV(ST(0))))
+	    : (char *)SvPV_nolen(ST(0));
 
-    /* get the class if called as an object method */
-    if ( sv_isobject(ST(0)) ) {
-	class = HvNAME(SvSTASH(SvRV(ST(0))));
-    }
-    else {
-	class = (char *)SvPV_nolen(ST(0));
-    }
+    if (items > 3)
+	Perl_croak(aTHX_ "Usage: version::new(class, version)");
 
-    if (items == 3 )
-    {
+    if ( items == 1 || vs == &PL_sv_undef ) { /* no param or explicit undef */
+	/* create empty object */
+	vs = sv_newmortal();
+	sv_setpvn(vs,"",0);
+    }
+    else if (items == 3 ) {
 	STRLEN n_a;
 	vs = sv_newmortal();
 	sv_setpvf(vs,"v%s",SvPV(ST(2),n_a));
     }
-    if ( items == 1 || vs == &PL_sv_undef ) /* no param or explicit undef */
-    {
-	/* create empty object */
-	vs = sv_newmortal();
-	sv_setpv(vs,"");
-    }
 
     rv = new_version(vs);
-    if ( strcmp(class,"version::vxs") != 0 ) /* inherited new() */
-	sv_bless(rv, gv_stashpv(class,TRUE));
+    if ( strcmp(classname,"version::vxs") != 0 ) /* inherited new() */
+#if PERL_VERSION == 5
+	sv_bless(rv, gv_stashpv((char *)classname, GV_ADD));
+#else
+	sv_bless(rv, gv_stashpv(classname, GV_ADD));
+#endif
 
     PUSHs(sv_2mortal(rv));
 }
@@ -82,18 +82,28 @@ PPCODE:
 }
 
 void
+normal(ver)
+    SV *ver
+PPCODE:
+{
+    PUSHs(sv_2mortal(vnormal(ver)));
+}
+
+void
 vcmp (lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    SV	*rs;
-    SV * robj = ST(1);
-    IV	 swap = (IV)SvIV(ST(2));
+    SV *rs;
+    SV *rvs;
+    SV *robj = ST(1);
+    const IV  swap = (IV)SvIV(ST(2));
 
     if ( ! sv_derived_from(robj, "version::vxs") )
     {
 	robj = sv_2mortal(new_version(robj));
     }
+    rvs = SvRV(robj);
 
     if ( swap )
     {
@@ -112,8 +122,7 @@ boolean(lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    SV	*rs;
-    rs = newSViv( vcmp(lobj,new_version(newSVpvn("0",1))) );
+    SV	* const rs = newSViv( vcmp(lobj,new_version(newSVpvs("0"))) );
     PUSHs(sv_2mortal(rs));
 }
 
@@ -130,7 +139,7 @@ is_alpha(lobj)
     version_vxs	lobj	
 PPCODE:
 {
-    if ( hv_exists((HV*)SvRV(lobj), "alpha", 5 ) )
+    if ( hv_exists((HV*)lobj, "alpha", 5 ) )
 	XSRETURN_YES;
     else
 	XSRETURN_NO;
@@ -144,7 +153,7 @@ PPCODE:
 #ifdef SvVOK
     if ( !SvVOK(ver) ) { /* not already a v-string */
 #endif
-	SV *vs = sv_newmortal();
+	SV * const vs = sv_newmortal();
 	char *version;
 	if ( SvNOK(ver) ) /* may get too much accuracy */
 	{
@@ -178,14 +187,6 @@ PPCODE:
 }
 
 void
-normal(ver)
-    SV *ver
-PPCODE:
-{
-    PUSHs(sv_2mortal(vnormal(ver)));
-}
-
-void
 VERSION(sv,...)
     SV *sv
 PPCODE:
@@ -193,7 +194,7 @@ PPCODE:
     HV *pkg;
     GV **gvp;
     GV *gv;
-    char *undef;
+    const char *undef;
 
     if (SvROK(sv)) {
         sv = (SV*)SvRV(sv);
@@ -205,15 +206,15 @@ PPCODE:
         pkg = gv_stashsv(sv, FALSE);
     }
 
-    gvp = pkg ? (GV**)hv_fetch(pkg,"VERSION",7,FALSE) : Null(GV**);
+    gvp = pkg ? (GV**)hv_fetchs(pkg,"VERSION",FALSE) : Null(GV**);
 
     if (gvp && isGV(gv = *gvp) && (sv = GvSV(gv)) && SvOK(sv)) {
-        SV *nsv = sv_newmortal();
+        SV * const nsv = sv_newmortal();
         sv_setsv(nsv, sv);
         sv = nsv;
 	if ( !sv_derived_from(sv, "version::vxs"))
 	    upg_version(sv);
-        undef = Nullch;
+        undef = NULL;
     }
     else {
         sv = (SV*)&PL_sv_undef;
@@ -226,28 +227,29 @@ PPCODE:
 
 	if (undef) {
 	     if (pkg) {
+		 const char * const name = HvNAME(pkg);
 #if PERL_VERSION == 5
 		 Perl_croak(aTHX_ "%s version %s required--this is only version ",
-		 	    HvNAME(pkg), SvPVx(req, len));
+		 	    name, SvPVx(req, len));
 #else
 		 Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
-			     HvNAME(pkg), HvNAME(pkg));
+			    name, name);
 #endif
 	     }
 	     else {
+		 const char * const name = SvPVx(ST(0), len);
 #if PERL_VERSION == 8
-		 char *str = SvPVx(ST(0), len);
-		 Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed", str);
+		 Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed", name );
 #else
 		 Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
-			     HvNAME(pkg), HvNAME(pkg));
+			    name, name);
 #endif
 	     }
 	}
 
         if ( !sv_derived_from(req, "version::vxs")) {
 	    /* req may very well be R/O, so create a new object */
-	    SV *nsv = sv_newmortal();
+	    SV * const nsv = sv_newmortal();
 	    sv_setsv(nsv, req);
 	    req = nsv;
 	    upg_version(req);
@@ -255,14 +257,18 @@ PPCODE:
 
 	if ( vcmp( req, sv ) > 0 )
 	    Perl_croak(aTHX_ "%s version %"SVf" (%"SVf") required--"
-		    "this is only version %"SVf" (%"SVf")", HvNAME(pkg),
-		    vnumify(req),vnormal(req),vnumify(sv),vnormal(sv));
+		       "this is only version %"SVf" (%"SVf")", HvNAME(pkg),
+		       SVfARG(vnumify(req)),
+		       SVfARG(vnormal(req)),
+		       SVfARG(vnumify(sv)),
+		       SVfARG(vnormal(sv)));
     }
 
-    if ( SvOK(sv) && sv_derived_from(sv, "version::vxs") )
-	PUSHs(vnumify(sv));
-    else
-	PUSHs(sv);
+    if ( SvOK(sv) && sv_derived_from(sv, "version::vxs") ) {
+	ST(0) = vnumify(sv);
+    } else {
+	ST(0) = sv;
+    }
 
     XSRETURN(1);
 }
