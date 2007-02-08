@@ -1,4 +1,4 @@
-version 0.69_04
+version 0.69_05
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and hopefully in
@@ -16,6 +16,7 @@ Major changes in 0.70 - NOT YET
 Rewrite Makefile.PL again to make it run successfully with 5.005 and 5.6.x.
 Rewrite UNIVERSAL::VERSION error code to more closely echo what Perl itself
 outputs.  Don't install anything (just run tests) with bleadperl or better.
+Port upstream changes from bleadperl back into CPAN release.
 
 Major changes in 0.69 - 2007-01-10
 =====================================
