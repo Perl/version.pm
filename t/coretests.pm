@@ -470,6 +470,10 @@ SKIP: {
 	is ($v, "1.230", "Locale doesn't apply to version objects");
 	ok ($v == $ver, "Comparison to locale floating point");
     }
+
+    eval 'my $v = $CLASS->new("1._1");';
+    unlike($@, qr/^Invalid version format \(alpha with zero width\)/,
+    	"Invalid version format 1._1");
 }
 
 1;
