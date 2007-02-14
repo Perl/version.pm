@@ -40,10 +40,6 @@ sub write_makefile
                        AUTHOR      => 'John Peacock <jpeacock@cpan.org>') :
                      ()
                    ), 
-
-                   MAN3PODS       =>
-                      {'lib/version.pod' => 'blib/man3/version.3' },
-
                    PM              => 
                        {'lib/version.pm'  => '$(INST_LIBDIR)/version.pm',
                         'lib/version.pod' => '$(INST_LIBDIR)/version.pod'},
