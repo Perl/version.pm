@@ -6,13 +6,13 @@ use strict;
 
 use vars qw(@ISA $VERSION $CLASS *qv);
 
-$VERSION = "0.70";
+$VERSION = "0.70_01";
 
 $CLASS = 'version';
 
 eval "use version::vxs $VERSION";
 if ( $@ ) { # don't have the XS version installed
-    eval "use version::vpp $VERSION"; # don't tempt fate
+    eval "use version::vpp \"$VERSION\""; # don't tempt fate
     die "$@" if ( $@ );
     push @ISA, "version::vpp";
     *version::qv = \&version::vpp::qv;
