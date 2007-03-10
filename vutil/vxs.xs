@@ -247,21 +247,28 @@ PPCODE:
 	     }
 	}
 
-        if ( !sv_derived_from(req, "version::vxs")) {
+        if ( !sv_derived_from(req, "version")) {
 	    /* req may very well be R/O, so create a new object */
 	    SV * const nsv = sv_newmortal();
 	    sv_setsv(nsv, req);
-	    req = nsv;
-	    upg_version(req);
+	    req = new_version(nsv);
 	}
+	
 
-	if ( vcmp( req, sv ) > 0 )
-	    Perl_croak(aTHX_ "%s version %"SVf" (%"SVf") required--"
-		       "this is only version %"SVf" (%"SVf")", HvNAME(pkg),
-		       SVfARG(vnumify(req)),
+	if ( vcmp( req, sv ) > 0 ) {
+	    if ( hv_exists((HV*)SvRV(req), "qv", 2 ) ) {
+		Perl_croak(aTHX_ "%s version %"SVf" required--"
+		   "this is only version %"SVf" ", HvNAME(pkg),
 		       SVfARG(vnormal(req)),
-		       SVfARG(vnumify(sv)),
 		       SVfARG(vnormal(sv)));
+	    }
+	    else {
+		Perl_croak(aTHX_ "%s version %"SVf" required--"
+		   "this is only version %"SVf" ", HvNAME(pkg),
+		       SVfARG(vnumify(req)),
+		       SVfARG(vnumify(sv)));
+	    }
+	}
     }
 
     if ( SvOK(sv) && sv_derived_from(sv, "version::vxs") ) {

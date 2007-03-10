@@ -3,7 +3,7 @@ use strict;
 
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = "0.70_01";
+$VERSION = 0.71;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -444,6 +444,7 @@ sub _un_vstring {
 {
     local $^W;
     *UNIVERSAL::VERSION = sub {
+	$DB::single = 1;
 	my ($obj, $req) = @_;
 	my $class = ref($obj) || $obj;
 

@@ -449,6 +449,30 @@ EOF
     unlink 'vvv.pm';
 
 SKIP: {
+	if ( $] < 5.006_002 ) {
+	    skip 'Cannot "use" extended versions with Perl < 5.6.2', 3; 
+	}
+	open F, ">uuu.pm" or die "Cannot open uuu.pm: $!\n";
+	print F <<"EOF";
+package uuu;
+\$VERSION = 1.0;
+1;
+EOF
+	close F;
+	eval "use lib '.'; use uuu 1.001;";
+	like ($@, qr/^uuu version 1.001 required/,
+	    "User typed numeric so we error with numeric"); 
+	eval "use lib '.'; use uuu 1.1.0;";
+	like ($@, qr/^uuu version v1.1.0 required/,
+	    "User typed extended so we error with extended"); 
+	$DB::single = 1;
+	eval "use lib '.'; use uuu v1.1.0;";
+	like ($@, qr/^uuu version v1.1.0 required/,
+	    "User typed extended so we error with extended"); 
+	unlink 'uuu.pm';
+    }
+
+SKIP: {
 	# test locale handling
 	my $warning;
 	local $SIG{__WARN__} = sub { $warning = $_[0] };
@@ -475,26 +499,6 @@ SKIP: {
     unlike($@, qr/^Invalid version format \(alpha with zero width\)/,
     	"Invalid version format 1._1");
 
-    {
-	open F, ">uuu.pm" or die "Cannot open vvv.pm: $!\n";
-	print F <<"EOF";
-package uuu;
-\$VERSION = 1.0;
-1;
-EOF
-	close F;
-	eval "use lib '.'; use uuu 1.001;";
-	like ($@, qr/^uuu version 1.001 required/,
-	    "User typed numeric so we error with numeric"); 
-	eval "use lib '.'; use uuu 1.1.0;";
-	like ($@, qr/^uuu version v1.1.0 required/,
-	    "User typed extended so we error with extended"); 
-	$DB::single = 1;
-	eval "use lib '.'; use uuu v1.1.0;";
-	like ($@, qr/^uuu version v1.1.0 required/,
-	    "User typed extended so we error with extended"); 
-	unlink 'uuu.pm';
-    }
 }
 
 1;
