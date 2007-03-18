@@ -10,7 +10,7 @@ in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
 
-Major changes in 0.71 - 2007-03-12
+Major changes in 0.71 - 2007-03-18
 =====================================
 
 Polymorphic error messages (where possible).  If the user typed 
@@ -21,6 +21,9 @@ Polymorphic error messages (where possible).  If the user typed
 Only available with Perl v5.6.0 or later (no v-strings at all pre v5.6.0). 
 On earlier Perl releases, always displays the numeric style error (the 
 first example above).
+
+All releases from Perl v5.6.0-v5.8.0 now fully support v-strings (which
+was already supported in 5.8.1 or better).
 
 Major changes in 0.70 - 2007-02-02
 =====================================
