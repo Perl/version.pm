@@ -1,14 +1,26 @@
-version 0.70
+version 0.71
 ==================================
 
-Provides the same version objects as included in Perl v5.9.x (and hopefully in
-the 5.10.0 release).  In fact, if you attempt to use this module with a version
+Provides the same version objects as included in Perl v5.9.x (and in the
+v5.10.0 release).  In fact, if you attempt to use this module with a version
 of Perl >= v5.9.0, this module will not do anything, since the code already
 exists in the Perl core.  Note that the CPAN release cannot be installed
 with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
+
+Major changes in 0.71 - 2007-03-12
+=====================================
+
+Polymorphic error messages (where possible).  If the user typed 
+
+    use module 1.000;  # error with 'module version 1.000 required'
+    use module v1.0.0; # error with 'module version v1.0.0 required'
+ 
+Only available with Perl v5.6.0 or later (no v-strings at all pre v5.6.0). 
+On earlier Perl releases, always displays the numeric style error (the 
+first example above).
 
 Major changes in 0.70 - 2007-02-02
 =====================================
@@ -17,18 +29,6 @@ Rewrite Makefile.PL again to make it run successfully with 5.005 and 5.6.x.
 Rewrite UNIVERSAL::VERSION error code to more closely echo what Perl itself
 outputs.  Don't install anything (just run tests) with bleadperl or better.
 Port upstream changes from bleadperl back into CPAN release.
-
-Major changes in 0.69 - 2007-01-10
-=====================================
-
-Rewrite Makefile.PL to be more compliant about weird compilers.
-Eliminate Scalar::Util from pure Perl module.
-
-Major changes in 0.68 - 2006-10-29
-=====================================
-
-Properly handle locales which utilize commas as decimal points for floating
-point numbers.  Slight tweaks to Makefile.PL to correctly install the POD.
 
 
 Please read the POD documentation for usage/details.  See the CHANGES file
@@ -81,5 +81,5 @@ COPYRIGHT AND LICENCE
 
 This module can be distributed under the same terms as Perl.
 
-Copyright (C) 2004,2005,2006 John Peacock
+Copyright (C) 2004,2005,2006,2007 John Peacock
 
