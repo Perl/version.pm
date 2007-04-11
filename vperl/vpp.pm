@@ -221,6 +221,9 @@ sub new
 	         "ignoring: '".substr($value,$pos)."'";
 	}
 
+	# cache the original value for use when stringification
+	$self->{original} = substr($value,0,$pos);
+
 	return ($self);
 }
 
@@ -301,6 +304,12 @@ sub normal
     return $string;
 }
 
+sub original {
+    my $self = shift;
+    $self->{original} = shift if @_;
+    return (defined $self->{original} ? $self->{original} : "0");
+}
+
 sub stringify
 {
     my ($self) = @_;
@@ -312,7 +321,7 @@ sub stringify
 	return $self->normal;
     }
     else {
-	return $self->numify;
+	return $self->original;
     }
 }
 

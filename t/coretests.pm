@@ -13,14 +13,14 @@ sub BaseTests {
     # Test bare number processing
     diag "tests with bare numbers" if $Verbose;
     $version = $CLASS->new(5.005_03);
-    is ( "$version" , "5.005030" , '5.005_03 eq 5.5.30' );
+    is ( "$version" , "5.00503" , '5.005_03 eq 5.00503' );
     $version = $CLASS->new(1.23);
-    is ( "$version" , "1.230" , '1.23 eq "1.230"' );
+    is ( "$version" , "1.23" , '1.23 eq "1.230"' );
     
     # Test quoted number processing
     diag "tests with quoted numbers" if $Verbose;
     $version = $CLASS->new("5.005_03");
-    is ( "$version" , "5.005_030" , '"5.005_03" eq "5.005_030"' );
+    is ( "$version" , "5.005_03" , '"5.005_03" eq "5.005_03"' );
     $version = $CLASS->new("v1.23");
     is ( "$version" , "v1.23.0" , '"v1.23" eq "v1.23.0"' );
     
@@ -66,7 +66,7 @@ sub BaseTests {
 
     like($warning, qr/$warnregex/,
 	"Version string contains invalid data; ignoring");
-    ok ("$version" eq "99.000", '$version eq "99.000"');
+    is ("$version", "99", '$version eq "99"');
     ok ($version->numify == 99.0, '$version->numify == 99.0');
     ok ($version->normal eq "v99.0.0", '$version->normal eq v99.0.0');
     
@@ -223,7 +223,7 @@ SKIP: {
     ok ($new_version == $version, "class->new($version) identical");
     $new_version = $version->new();
     isa_ok ($new_version, $CLASS );
-    is ($new_version, "0.000", "version->new() doesn't clone");
+    is ($new_version, "0", "version->new() doesn't clone");
     $new_version = $version->new("1.2.3");
     is ($new_version, "v1.2.3" , '$version->new("1.2.3") works too');
 
@@ -237,7 +237,7 @@ SKIP: {
     # test the CPAN style reduced significant digit form
     diag "testing CPAN-style versions" if $Verbose;
     $version = $CLASS->new("1.23_01");
-    is ( "$version" , "1.23_0100", "CPAN-style alpha version" );
+    is ( "$version" , "1.23_01", "CPAN-style alpha version" );
     ok ( $version > 1.23, "1.23_01 > 1.23");
     ok ( $version < 1.24, "1.23_01 < 1.24");
 
@@ -487,7 +487,7 @@ SKIP: {
 	my $v = $CLASS->new($ver);
 	unlike($warning,qr/Version string '1,23' contains invalid data/,
 	    "Process locale-dependent floating point");
-	is ($v, "1.230", "Locale doesn't apply to version objects");
+	is ($v, "1.23", "Locale doesn't apply to version objects");
 	ok ($v == $ver, "Comparison to locale floating point");
     }
 
