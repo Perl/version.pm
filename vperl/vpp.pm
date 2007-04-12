@@ -33,6 +33,7 @@ sub new
 	    # RT #19517 - special case for undef comparison
 	    # or someone forgot to pass a value
 	    push @{$self->{version}}, 0;
+	    $self->{original} = "0";
 	    return ($self);
 	}
 
@@ -307,7 +308,7 @@ sub normal
 sub original {
     my $self = shift;
     $self->{original} = shift if @_;
-    return (defined $self->{original} ? $self->{original} : "0");
+    return $self->{original};
 }
 
 sub stringify
@@ -414,7 +415,9 @@ sub qv {
 
     $value = _un_vstring($value);
     $value = 'v'.$value unless $value =~ /^v/;
-    return version->new($value); # always use base class
+    my $version = version->new($value); # always use base class
+    $version->original($_[0]);
+    return $version;
 }
 
 sub is_qv {
