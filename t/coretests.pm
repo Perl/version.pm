@@ -15,7 +15,7 @@ sub BaseTests {
     $version = $CLASS->new(5.005_03);
     is ( "$version" , "5.00503" , '5.005_03 eq 5.00503' );
     $version = $CLASS->new(1.23);
-    is ( "$version" , "1.23" , '1.23 eq "1.230"' );
+    is ( "$version" , "1.23" , '1.23 eq "1.23"' );
     
     # Test quoted number processing
     diag "tests with quoted numbers" if $Verbose;
@@ -86,33 +86,12 @@ sub BaseTests {
     
     # Test comparison operators with self
     diag "tests with self" if $Verbose;
-    ok ( $version eq $version, '$version eq $version' );
-    is ( $version cmp $version, 0, '$version cmp $version == 0' );
+    is ( $version <=> $version, 0, '$version <=> $version == 0' );
     ok ( $version == $version, '$version == $version' );
-    
-    # test first with non-object
-    $version = $CLASS->new("5.006.001");
-    $new_version = "5.8.0";
-    diag "tests with non-objects" if $Verbose;
-    ok ( $version ne $new_version, '$version ne $new_version' );
-    ok ( $version lt $new_version, '$version lt $new_version' );
-    ok ( $new_version gt $version, '$new_version gt $version' );
-    ok ( ref(\$new_version) eq 'SCALAR', 'no auto-upgrade');
-    $new_version = "$version";
-    ok ( $version eq $new_version, '$version eq $new_version' );
-    ok ( $new_version eq $version, '$new_version eq $version' );
-    
-    # now test with existing object
-    $new_version = $CLASS->new("5.8.0");
-    diag "tests with objects" if $Verbose;
-    ok ( $version ne $new_version, '$version ne $new_version' );
-    ok ( $version lt $new_version, '$version lt $new_version' );
-    ok ( $new_version gt $version, '$new_version gt $version' );
-    $new_version = $CLASS->new("$version");
-    ok ( $version eq $new_version, '$version eq $new_version' );
     
     # Test Numeric Comparison operators
     # test first with non-object
+    $version = $CLASS->new("5.006.001");
     $new_version = "5.8.0";
     diag "numeric tests with non-objects" if $Verbose;
     ok ( $version == $version, '$version == $version' );
@@ -137,20 +116,20 @@ sub BaseTests {
     # test with long decimals
     diag "Tests with extended decimal versions" if $Verbose;
     $version = $CLASS->new(1.002003);
-    ok ( $version eq "1.2.3", '$version eq "1.2.3"');
+    ok ( $version == "1.2.3", '$version == "1.2.3"');
     ok ( $version->numify == 1.002003, '$version->numify == 1.002003');
     $version = $CLASS->new("2002.09.30.1");
-    ok ( $version eq "2002.9.30.1",'$version eq 2002.9.30.1');
+    ok ( $version == "2002.9.30.1",'$version == 2002.9.30.1');
     ok ( $version->numify == 2002.009030001,
 	'$version->numify == 2002.009030001');
     
     # now test with alpha version form with string
     $version = $CLASS->new("1.2.3");
     $new_version = "1.2.3_4";
-    diag "tests with alpha-style non-objects" if $Verbose;
-    ok ( $version lt $new_version, '$version lt $new_version' );
-    ok ( $new_version gt $version, '$new_version gt $version' );
-    ok ( $version ne $new_version, '$version ne $new_version' );
+    diag "numeric tests with alpha-style non-objects" if $Verbose;
+    ok ( $version < $new_version, '$version < $new_version' );
+    ok ( $new_version > $version, '$new_version > $version' );
+    ok ( $version != $new_version, '$version != $new_version' );
     
     $version = $CLASS->new("1.2.4");
     diag "numeric tests with alpha-style non-objects"
@@ -203,6 +182,11 @@ sub BaseTests {
     ok ( !eval { $version/1 }, "noop /" );
     ok ( !eval { $version*3 }, "noop *" );
     ok ( !eval { abs($version) }, "noop abs" );
+    ok ( !eval { $version cmp "1.2.3" }, "No string comparisons!" ); 
+    ok ( !eval { $version  eq "1.2.3" }, "No string comparisons!" ); 
+    ok ( !eval { $version  ne "1.2.3" }, "No string comparisons!" ); 
+    ok ( !eval { $version  lt "1.2.3" }, "No string comparisons!" ); 
+    ok ( !eval { $version  gt "1.2.3" }, "No string comparisons!" ); 
 
 SKIP: {
     skip "version require'd instead of use'd, cannot test qv", 3
@@ -210,9 +194,9 @@ SKIP: {
     # test the qv() sub
     diag "testing qv" if $Verbose;
     $version = qv("1.2");
-    cmp_ok ( $version, "eq", "v1.2.0", 'qv("1.2") eq "1.2.0"' );
+    is ( "$version", "v1.2.0", 'qv("1.2") == "1.2.0"' );
     $version = qv(1.2);
-    cmp_ok ( $version, "eq", "v1.2.0", 'qv(1.2) eq "1.2.0"' );
+    is ( "$version", "v1.2.0", 'qv(1.2) == "1.2.0"' );
     isa_ok( qv('5.008'), $CLASS );
 }
 
@@ -230,9 +214,9 @@ SKIP: {
     # test the CVS revision mode
     diag "testing CVS Revision" if $Verbose;
     $version = new $CLASS qw$Revision: 1.2$;
-    ok ( $version eq "1.2.0", 'qw$Revision: 1.2$ eq 1.2.0' );
+    ok ( $version == "1.2.0", 'qw$Revision: 1.2$ == 1.2.0' );
     $version = new $CLASS qw$Revision: 1.2.3.4$;
-    ok ( $version eq "1.2.3.4", 'qw$Revision: 1.2.3.4$ eq 1.2.3.4' );
+    ok ( $version == "1.2.3.4", 'qw$Revision: 1.2.3.4$ == 1.2.3.4' );
     
     # test the CPAN style reduced significant digit form
     diag "testing CPAN-style versions" if $Verbose;
@@ -260,7 +244,7 @@ SKIP: {
 	
 	# test as class method
 	$new_version = "aaa"->VERSION;
-	cmp_ok($new_version,'eq',$version, "Called as class method");
+	cmp_ok($new_version,'==',$version, "Called as class method");
 
 	eval "print Completely::Unknown::Module->VERSION";
 	if ( $] < 5.008 ) {
@@ -344,15 +328,14 @@ SKIP: 	{
 		if $] < 5.006_000; 
 	diag "Tests with v-strings" if $Verbose;
 	$version = $CLASS->new(1.2.3);
-	ok("$version" eq "v1.2.3", '"$version" eq 1.2.3');
+	ok("$version" == "v1.2.3", '"$version" == 1.2.3');
 	$version = $CLASS->new(1.0.0);
 	$new_version = $CLASS->new(1);
 	ok($version == $new_version, '$version == $new_version');
-	ok($version eq $new_version, '$version eq $new_version');
 	skip "version require'd instead of use'd, cannot test qv", 1
 	    if defined $no_qv;
 	$version = qv(1.2.3);
-	ok("$version" eq "v1.2.3", 'v-string initialized qv()');
+	ok("$version" == "v1.2.3", 'v-string initialized qv()');
     }
 
     diag "Tests with real-world (malformed) data" if $Verbose;
@@ -376,8 +359,8 @@ SKIP: 	{
     ok($version->numify eq "1.700", "leading space ignored");
 
     # RT 19517 - deal with undef and 'undef' initialization
-    ok($version ne 'undef', "Undef version comparison #1");
-    ok($version ne undef, "Undef version comparison #2");
+    ok("$version" ne 'undef', "Undef version comparison #1");
+    ok("$version" ne undef, "Undef version comparison #2");
     $version = $CLASS->new('undef');
     unlike($warning, qr/^Version string 'undef' contains invalid data/,
 	"Version string 'undef'");
@@ -385,12 +368,12 @@ SKIP: 	{
     $version = $CLASS->new(undef);
     like($warning, qr/^Use of uninitialized value/,
 	"Version string 'undef'");
-    ok($version eq 'undef', "Undef version comparison #3");
-    ok($version eq undef, "Undef version comparison #4");
+    ok($version == 'undef', "Undef version comparison #3");
+    ok($version ==  undef,  "Undef version comparison #4");
     eval "\$version = \$CLASS->new()"; # no parameter at all
     unlike($@, qr/^Bizarre copy of CODE/, "No initializer at all");
-    ok($version eq 'undef', "Undef version comparison #5");
-    ok($version eq undef, "Undef version comparison #6");
+    ok($version == 'undef', "Undef version comparison #5");
+    ok($version ==  undef,  "Undef version comparison #6");
 
     $version = $CLASS->new(0.000001);
     unlike($warning, qr/^Version string '1e-06' contains invalid data/,

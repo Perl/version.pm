@@ -15,7 +15,7 @@ push @REGEXS, qr/
 use overload (
     '""'       => \&stringify,
     '0+'       => \&numify,
-    'cmp'      => \&vcmp,
+    'cmp'      => \&vnoop,
     '<=>'      => \&vcmp,
     'bool'     => \&vbool,
     'nomethod' => \&vnoop,
@@ -453,7 +453,6 @@ sub _un_vstring {
 {
     local $^W;
     *UNIVERSAL::VERSION = sub {
-	$DB::single = 1;
 	my ($obj, $req) = @_;
 	my $class = ref($obj) || $obj;
 

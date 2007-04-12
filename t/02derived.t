@@ -37,7 +37,6 @@ ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 
 my $verobj = version::->new("1.2.4");
 ok( $verobj > $testobj, "Comparison vs parent class" );
-ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");
 
 diag "tests with bad subclass"  if $Verbose;
