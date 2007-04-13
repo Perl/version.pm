@@ -182,11 +182,6 @@ sub BaseTests {
     ok ( !eval { $version/1 }, "noop /" );
     ok ( !eval { $version*3 }, "noop *" );
     ok ( !eval { abs($version) }, "noop abs" );
-    ok ( !eval { $version cmp "1.2.3" }, "No string comparisons!" ); 
-    ok ( !eval { $version  eq "1.2.3" }, "No string comparisons!" ); 
-    ok ( !eval { $version  ne "1.2.3" }, "No string comparisons!" ); 
-    ok ( !eval { $version  lt "1.2.3" }, "No string comparisons!" ); 
-    ok ( !eval { $version  gt "1.2.3" }, "No string comparisons!" ); 
 
 SKIP: {
     skip "version require'd instead of use'd, cannot test qv", 3

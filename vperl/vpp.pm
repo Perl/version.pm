@@ -15,7 +15,7 @@ push @REGEXS, qr/
 use overload (
     '""'       => \&stringify,
     '0+'       => \&numify,
-    'cmp'      => \&vnoop,
+    'cmp'      => \&vcmp,
     '<=>'      => \&vcmp,
     'bool'     => \&vbool,
     'nomethod' => \&vnoop,
