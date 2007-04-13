@@ -50,12 +50,14 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     while (isSPACE(*s)) /* leading whitespace is OK */
 	s++;
 
+    start = last = s;
+
     if (*s == 'v') {
 	s++;  /* get past 'v' */
 	qv = 1; /* force quoted version processing */
     }
 
-    start = last = pos = s;
+    pos = s;
 
     /* pre-scan the input string to check for decimals/underbars */
     while ( *pos == '.' || *pos == '_' || isDIGIT(*pos) )
@@ -179,13 +181,22 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     if ( av_len(av) == -1 ) /* oops, someone forgot to pass a value */
 	av_push(av, newSViv(0));
 
+    /* And finally, store the AV in the hash */
+    hv_store((HV *)hv, "version", 7, newRV_noinc((SV *)av), 0);
+
+    /* need to save off the current version string for later */
+    if ( s > start ) {
+	hv_store((HV *)hv, "original", 8, newSVpvn(start,s-start), 0);
+    }
+    else {
+	hv_store((HV *)hv, "original", 8, newSVpvn("0",1), 0);
+    }
+
     /* fix RT#19517 - special case 'undef' as string */
     if ( *s == 'u' && strEQ(s,"undef") ) {
 	s += 5;
     }
 
-    /* And finally, store the AV in the hash */
-    hv_store((HV *)hv, "version", 7, newRV_noinc((SV *)av), 0);
     return s;
 }
 
@@ -530,6 +541,26 @@ Perl_vnormal(pTHX_ SV *vs)
 }
 
 /*
+=for apidoc voriginal
+
+Returns the original string used to initialize the version object,
+for use with the default stringification.
+
+=cut
+*/
+
+SV *
+Perl_voriginal (pTHX_ SV *vs)
+{
+    SV *pv = *hv_fetchs((HV*)vs, "original", FALSE);
+    if ( SvPOK(pv) ) 
+	return newSVsv(pv);
+    else
+	return &PL_sv_undef;
+}
+
+
+/*
 =for apidoc vstringify
 
 In order to maintain maximum compatibility with earlier versions
@@ -552,7 +583,7 @@ Perl_vstringify(pTHX_ SV *vs)
     if ( hv_exists((HV *)vs, "qv", 2) )
 	return vnormal(vs);
     else
-	return vnumify(vs);
+	return voriginal(vs);
 }
 
 /*

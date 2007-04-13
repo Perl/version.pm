@@ -161,7 +161,8 @@ if required:
   $v2 = version->new("1.2.3");   # v1.2.3
 
 In specific, version numbers initialized as L<Numeric Versions> will
-stringify in Numeric form.  Version numbers initialized as L<Extended Versions>
+stringify as they were originally created (i.e. the same string that was
+passed to C<new()>.  Version numbers initialized as L<Extended Versions>
 will be stringified as L<Normal Form>.
 
 =head2 Numeric Versions
@@ -177,11 +178,11 @@ will have trailing zeros added to make up the difference, but only for
 purposes of comparison with other version objects.  For example:
 
                                    # Prints     Equivalent to  
-  $v = version->new(      1.2);    # 1.200      v1.200.0
-  $v = version->new(     1.02);    # 1.020      v1.20.0
+  $v = version->new(      1.2);    # 1.2        v1.200.0
+  $v = version->new(     1.02);    # 1.02       v1.20.0
   $v = version->new(    1.002);    # 1.002      v1.2.0
-  $v = version->new(   1.0023);    # 1.002300   v1.2.300
-  $v = version->new(  1.00203);    # 1.002030   v1.2.30
+  $v = version->new(   1.0023);    # 1.0023     v1.2.300
+  $v = version->new(  1.00203);    # 1.00203    v1.2.30
   $v = version->new( 1.002003);    # 1.002003   v1.2.3
 
 All of the preceding examples are true whether or not the input value is 
@@ -233,16 +234,15 @@ is quoted.  For example Module::Example was released to CPAN with the
 following sequence of $VERSION's:
 
   # $VERSION    Stringified
-  0.01          0.010
-  0.02          0.020
-  0.02_01       0.02_0100
-  0.02_02       0.02_0200
-  0.03          0.030
+  0.01          0.01
+  0.02          0.02
+  0.02_01       0.02_01
+  0.02_02       0.02_02
+  0.03          0.03
   etc.
 
-As you can see, the version object created from the values in the first
-column may contain a trailing 0, but will otherwise be both mathematically
-equivalent and sorts alpha-numerically as would be expected.
+The stringified form of numeric versions will always be the same string
+that was used to initialize the version object.
 
 =head2 Object Methods
 
@@ -394,8 +394,8 @@ or L<Extended Version>.
 
 What this means in practice is that if the normal CPAN and Camel rules are
 followed ($VERSION is a floating point number with no more than 3 decimal
-points), the stringified output will be exactly the same as the numified
-output.  There will be no visible difference, although the internal 
+points), the stringified output will be exactly the same as the string
+input.  There will be no visible difference, although the internal 
 representation will be different, and the L<Comparison operators> will 
 function using the internal coding.
 
@@ -573,14 +573,9 @@ obeys the relationship
   12.03 < $alphaver < 12.04
 
 Alpha versions with a single decimal point will be treated exactly as if
-they were L<Numeric Versions>, for parsing purposes.  The stringification for
-alpha versions with a single decimal point may seem surprising, since any
-trailing zeros will visible.  For example, the above $alphaver will print as
-
-  12.03_0100
-
-which is mathematically equivalent and ASCII sorts exactly the same as
-without the trailing zeros.
+they were L<Numeric Versions>, for parsing and output purposes.  The
+underscore will be output when an alpha version is stringified, in the same
+place as it was when input.
 
 Alpha versions with more than a single decimal point will be treated 
 exactly as if they were L<Extended Versions>, and will display without any

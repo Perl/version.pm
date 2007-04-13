@@ -15,5 +15,6 @@ int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
 #define vverify(a)		Perl_vverify(aTHX_ a)
 #define vnumify(a)		Perl_vnumify(aTHX_ a)
 #define vnormal(a)		Perl_vnormal(aTHX_ a)
+#define voriginal(a)		Perl_voriginal(aTHX_ a)
 #define vstringify(a)		Perl_vstringify(aTHX_ a)
 #define vcmp(a,b)		Perl_vcmp(aTHX_ a,b)

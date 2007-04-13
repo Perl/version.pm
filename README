@@ -1,4 +1,4 @@
-version 0.71
+version 0.72
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and in the
@@ -9,6 +9,13 @@ with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
+
+Major changes in 0.72 - 2007-04-12
+=====================================
+
+Default stringification for numeric versions is the same string as was
+passed to version->new(), on the principal of least surprise.  If you want
+a normalized numeric value, use $v->numify.
 
 Major changes in 0.71 - 2007-03-18
 =====================================
@@ -24,14 +31,6 @@ first example above).
 
 All releases from Perl v5.6.0-v5.8.0 now fully support v-strings (which
 was already supported in 5.8.1 or better).
-
-Major changes in 0.70 - 2007-02-02
-=====================================
-
-Rewrite Makefile.PL again to make it run successfully with 5.005 and 5.6.x.
-Rewrite UNIVERSAL::VERSION error code to more closely echo what Perl itself
-outputs.  Don't install anything (just run tests) with bleadperl or better.
-Port upstream changes from bleadperl back into CPAN release.
 
 
 Please read the POD documentation for usage/details.  See the CHANGES file
