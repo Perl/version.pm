@@ -178,19 +178,22 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 	    av_push(av, newSViv(0));
     }
 
-    if ( av_len(av) == -1 ) /* oops, someone forgot to pass a value */
-	av_push(av, newSViv(0));
-
-    /* And finally, store the AV in the hash */
-    hv_store((HV *)hv, "version", 7, newRV_noinc((SV *)av), 0);
-
     /* need to save off the current version string for later */
     if ( s > start ) {
-	hv_store((HV *)hv, "original", 8, newSVpvn(start,s-start), 0);
+	SV * orig = newSVpvn(start,s-start);
+	if ( qv && saw_period == 1 && *start != 'v' ) {
+	    /* need to insert a v to be consistent */
+	    sv_insert(orig, 0, 0, "v", 1);
+	}
+	hv_store((HV *)hv, "original", 8, orig, 0);
     }
     else {
 	hv_store((HV *)hv, "original", 8, newSVpvn("0",1), 0);
+	av_push(av, newSViv(0));
     }
+
+    /* And finally, store the AV in the hash */
+    hv_store((HV *)hv, "version", 7, newRV_noinc((SV *)av), 0);
 
     /* fix RT#19517 - special case 'undef' as string */
     if ( *s == 'u' && strEQ(s,"undef") ) {
@@ -309,6 +312,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	setlocale(LC_NUMERIC, loc);
 #endif
 	while (tbuf[len-1] == '0' && len > 0) len--;
+	if ( tbuf[len-1] == '.' ) len--; /* eat the trailing decimal */
 	version = savepvn(tbuf, len);
     }
 #ifdef SvVOK
@@ -541,26 +545,6 @@ Perl_vnormal(pTHX_ SV *vs)
 }
 
 /*
-=for apidoc voriginal
-
-Returns the original string used to initialize the version object,
-for use with the default stringification.
-
-=cut
-*/
-
-SV *
-Perl_voriginal (pTHX_ SV *vs)
-{
-    SV *pv = *hv_fetchs((HV*)vs, "original", FALSE);
-    if ( SvPOK(pv) ) 
-	return newSVsv(pv);
-    else
-	return &PL_sv_undef;
-}
-
-
-/*
 =for apidoc vstringify
 
 In order to maintain maximum compatibility with earlier versions
@@ -574,16 +558,18 @@ the original version contained 1 or more dots, respectively
 SV *
 Perl_vstringify(pTHX_ SV *vs)
 {
+    SV *pv;
     if ( SvROK(vs) )
 	vs = SvRV(vs);
     
     if ( !vverify(vs) )
 	Perl_croak(aTHX_ "Invalid version object");
 
-    if ( hv_exists((HV *)vs, "qv", 2) )
-	return vnormal(vs);
+    pv = *hv_fetchs((HV*)vs, "original", FALSE);
+    if ( SvPOK(pv) ) 
+	return newSVsv(pv);
     else
-	return voriginal(vs);
+	return &PL_sv_undef;
 }
 
 /*

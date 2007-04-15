@@ -3,7 +3,7 @@ use strict;
 
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.72;
+$VERSION = 0.7201;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -305,12 +305,6 @@ sub normal
     return $string;
 }
 
-sub original {
-    my $self = shift;
-    $self->{original} = shift if @_;
-    return $self->{original};
-}
-
 sub stringify
 {
     my ($self) = @_;
@@ -318,12 +312,7 @@ sub stringify
 	require Carp;
 	Carp::croak("Invalid version object");
     }
-    if ( exists $self->{qv} ) {
-	return $self->normal;
-    }
-    else {
-	return $self->original;
-    }
+    return $self->{original};
 }
 
 sub vcmp
@@ -414,9 +403,8 @@ sub qv {
     my ($value) = @_;
 
     $value = _un_vstring($value);
-    $value = 'v'.$value unless $value =~ /^v/;
+    $value = 'v'.$value unless $value =~ /(^v|\d+\.\d+\.\d)/;
     my $version = version->new($value); # always use base class
-    $version->original($_[0]);
     return $version;
 }
 
@@ -506,13 +494,13 @@ sub _un_vstring {
 		    Carp::croak( 
 			sprintf ("%s version %s required--".
 			    "this is only version %s", $class,
-			    $req->numify, $version->numify)
+			    $req->stringify, $version->stringify)
 		    );
 		}
 	    }
 	}
 
-	return defined $version ? $version->numify : undef;
+	return defined $version ? $version->stringify : undef;
     };
 }
 

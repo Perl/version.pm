@@ -22,16 +22,16 @@ sub BaseTests {
     $version = $CLASS->new("5.005_03");
     is ( "$version" , "5.005_03" , '"5.005_03" eq "5.005_03"' );
     $version = $CLASS->new("v1.23");
-    is ( "$version" , "v1.23.0" , '"v1.23" eq "v1.23.0"' );
+    is ( "$version" , "v1.23" , '"v1.23" eq "v1.23"' );
     
     # Test stringify operator
     diag "tests with stringify" if $Verbose;
     $version = $CLASS->new("5.005");
     is ( "$version" , "5.005" , '5.005 eq "5.005"' );
     $version = $CLASS->new("5.006.001");
-    is ( "$version" , "v5.6.1" , '5.006.001 eq v5.6.1' );
+    is ( "$version" , "5.006.001" , '5.006.001 eq v5.6.1' );
     $version = $CLASS->new("1.2.3_4");
-    is ( "$version" , "v1.2.3_4" , 'alpha version 1.2.3_4 eq v1.2.3_4' );
+    is ( "$version" , "1.2.3_4" , 'alpha version 1.2.3_4 eq v1.2.3_4' );
     
     # test illegal formats
     diag "test illegal formats" if $Verbose;
@@ -189,9 +189,9 @@ SKIP: {
     # test the qv() sub
     diag "testing qv" if $Verbose;
     $version = qv("1.2");
-    is ( "$version", "v1.2.0", 'qv("1.2") == "1.2.0"' );
+    is ( "$version", "v1.2", 'qv("1.2") == "1.2.0"' );
     $version = qv(1.2);
-    is ( "$version", "v1.2.0", 'qv(1.2) == "1.2.0"' );
+    is ( "$version", "v1.2", 'qv(1.2) == "1.2.0"' );
     isa_ok( qv('5.008'), $CLASS );
 }
 
@@ -204,7 +204,7 @@ SKIP: {
     isa_ok ($new_version, $CLASS );
     is ($new_version, "0", "version->new() doesn't clone");
     $new_version = $version->new("1.2.3");
-    is ($new_version, "v1.2.3" , '$version->new("1.2.3") works too');
+    is ($new_version, "1.2.3" , '$version->new("1.2.3") works too');
 
     # test the CVS revision mode
     diag "testing CVS Revision" if $Verbose;
@@ -232,7 +232,7 @@ SKIP: {
 	print F "package aaa;\n\$aaa::VERSION=0.58;\n1;\n";
 	close F;
 
-	$version = 0.58; $version = sprintf("%.3f",$version);
+	$version = 0.58;
 	eval "use lib '.'; use aaa $version";
 	unlike($@, qr/aaa version $version/,
 		'Replacement eval works with exact version');
@@ -252,7 +252,7 @@ SKIP: {
 	}
 
 	# this should fail even with old UNIVERSAL::VERSION
-	$version += 0.01; $version = sprintf("%.3f",$version);
+	$version += 0.01;
 	eval "use lib '.'; use aaa $version";
 	like($@, qr/aaa version $version/,
 		'Replacement eval works with incremented version');
@@ -264,7 +264,7 @@ SKIP: {
 		'Replacement eval works with single digit');
 	
 	# this would fail with old UNIVERSAL::VERSION
-	$version += 0.1; $version = sprintf("%.3f",$version);
+	$version += 0.1;
 	eval "use lib '.'; use aaa $version";
 	like($@, qr/aaa version $version/,
 		'Replacement eval works with incremented digit');
@@ -323,14 +323,14 @@ SKIP: 	{
 		if $] < 5.006_000; 
 	diag "Tests with v-strings" if $Verbose;
 	$version = $CLASS->new(1.2.3);
-	ok("$version" == "v1.2.3", '"$version" == 1.2.3');
+	ok("$version" == "1.2.3", '"$version" == 1.2.3');
 	$version = $CLASS->new(1.0.0);
 	$new_version = $CLASS->new(1);
 	ok($version == $new_version, '$version == $new_version');
 	skip "version require'd instead of use'd, cannot test qv", 1
 	    if defined $no_qv;
 	$version = qv(1.2.3);
-	ok("$version" == "v1.2.3", 'v-string initialized qv()');
+	ok("$version" == "1.2.3", 'v-string initialized qv()');
     }
 
     diag "Tests with real-world (malformed) data" if $Verbose;
@@ -389,10 +389,10 @@ EOF
 	like ($@, qr/^www version 0.000008 required/,
 	    "Make sure very small versions don't freak"); 
 	eval "use lib '.'; use www 1;";
-	like ($@, qr/^www version 1.000 required/,
+	like ($@, qr/^www version 1 required/,
 	    "Comparing vs. version with no decimal"); 
 	eval "use lib '.'; use www 1.;";
-	like ($@, qr/^www version 1.000 required/,
+	like ($@, qr/^www version 1 required/,
 	    "Comparing vs. version with decimal only"); 
 
 	if ( $] < 5.006_000 ) {
@@ -406,7 +406,7 @@ EOF
 	$regex =~ s/8/4/; # set for second test
 	eval "use lib '.'; use www v0.0.4;";
 	unlike($@, qr/$regex/, 'Succeed - required == VERSION');
-	cmp_ok ( "www"->VERSION, 'eq', '0.000004', 'No undef warnings' );
+	cmp_ok ( "www"->VERSION, 'eq', '0.0.4', 'No undef warnings' );
 
 	unlink 'www.pm';
     }
