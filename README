@@ -1,4 +1,4 @@
-version 0.7201
+version 0.7202
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and in the
@@ -10,13 +10,14 @@ in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
 
-Major changes in 0.7201 - 2007-04-13
+Major changes in 0.7202 - 2007-04-17
 =====================================
 
 Default stringification for numeric versions is the same string as was
 passed to version->new(), on the principal of least surprise.  If you want
 a normalized numeric value, use $v->numify.  Includes return value of
-replacement UNIVERSAL::VERSION as well.
+replacement UNIVERSAL::VERSION as well.  version->new() correctly
+duplicates version objects without a hitch.
 
 Major changes in 0.71 - 2007-03-18
 =====================================

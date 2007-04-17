@@ -249,6 +249,12 @@ Perl_new_version(pTHX_ SV *ver)
 	    hv_store((HV *)hv, "width", 5, newSViv(width), 0);
 	}
 
+	if ( hv_exists((HV*)ver, "original", 8 ) )
+	{
+	    SV * pv = *hv_fetchs((HV*)ver, "original", FALSE);
+	    hv_store((HV *)hv, "original", 8, newSVsv(pv), 0);
+	}
+
 	sav = (AV *)SvRV(*hv_fetchs((HV*)ver, "version", FALSE));
 	/* This will get reblessed later if a derived class*/
 	for ( key = 0; key <= av_len(sav); key++ )

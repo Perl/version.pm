@@ -3,7 +3,7 @@ use strict;
 
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.7201;
+$VERSION = 0.7202;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -25,6 +25,16 @@ sub new
 {
 	my ($class, $value) = @_;
 	my $self = bless ({}, ref ($class) || $class);
+	
+	if ( ref($value) && eval("$value->isa('version')") ) {
+	    # Can copy the elements directly
+	    $self->{version} = [ @{$value->{version} } ];
+	    $self->{qv} = 1 if $value->{qv};
+	    $self->{alpha} = 1 if $value->{alpha};
+	    $self->{original} = ''.$value->{original};
+	    return $self;
+	}
+
 	require POSIX;
 	my $currlocale = POSIX::setlocale(&POSIX::LC_ALL);
 	my $radix_comma = ( POSIX::localeconv()->{decimal_point} eq ',' );
