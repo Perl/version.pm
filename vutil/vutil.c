@@ -343,10 +343,11 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	    const char *nver;
 	    const char *pos;
 	    int saw_period = 0;
-	    sv_setpvf(nsv,"%vd",ver);
+	    sv_setpvf(nsv,"v%vd",ver);
 	    pos = nver = savepv(SvPV_nolen(nsv));
 
 	    /* scan the resulting formatted string */
+	    pos++; /* skip the leading 'v' */
 	    while ( *pos == '.' || isDIGIT(*pos) ) {
 		if ( *pos == '.' )
 		    saw_period++ ;
