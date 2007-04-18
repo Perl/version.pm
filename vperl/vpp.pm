@@ -441,8 +441,9 @@ sub _un_vstring {
     my $value = shift;
     # may be a v-string
     if ( $] >= 5.006_000 && length($value) >= 3 && $value !~ /[._]/ ) {
-	my $tvalue = sprintf("%vd",$value);
-	if ( $tvalue =~ /^\d+\.\d+\.\d+$/ ) {
+	$DB::single = 1;
+	my $tvalue = sprintf("v%vd",$value);
+	if ( $tvalue =~ /^v\d+\.\d+\.\d+$/ ) {
 	    # must be a v-string
 	    $value = $tvalue;
 	}

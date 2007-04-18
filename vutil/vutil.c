@@ -273,6 +273,9 @@ Perl_new_version(pTHX_ SV *ver)
 	    const STRLEN len = mg->mg_len;
 	    char * const version = savepvn( (const char*)mg->mg_ptr, len);
 	    sv_setpvn(rv,version,len);
+	    /* this is for consistency with the pure Perl class */
+	    if ( *version != 'v' ) 
+		sv_insert(rv, 0, 0, "v", 1);
 	    Safefree(version);
 	}
 	else {

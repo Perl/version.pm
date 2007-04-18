@@ -323,14 +323,14 @@ SKIP: 	{
 		if $] < 5.006_000; 
 	diag "Tests with v-strings" if $Verbose;
 	$version = $CLASS->new(1.2.3);
-	ok("$version" == "1.2.3", '"$version" == 1.2.3');
+	ok("$version" == "v1.2.3", '"$version" == 1.2.3');
 	$version = $CLASS->new(1.0.0);
 	$new_version = $CLASS->new(1);
 	ok($version == $new_version, '$version == $new_version');
 	skip "version require'd instead of use'd, cannot test qv", 1
 	    if defined $no_qv;
 	$version = qv(1.2.3);
-	ok("$version" == "1.2.3", 'v-string initialized qv()');
+	ok("$version" == "v1.2.3", 'v-string initialized qv()');
     }
 
     diag "Tests with real-world (malformed) data" if $Verbose;

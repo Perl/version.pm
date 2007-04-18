@@ -538,6 +538,10 @@ version, e.g. 1.2.3 or v1.2.3 in order for this heuristic to be successful.
 core to be magical, which means that the version.pm code can automatically
 determine whether the v-string encoding was used.
 
+3) In all cases, a version created using v-strings will have a stringified
+form that has a leading 'v' character, for the simple reason that sometimes
+it is impossible to tell whether one was present initially.
+
 =head2 Types of Versions Objects
 
 There are two types of Version Objects:
