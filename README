@@ -1,4 +1,4 @@
-version 0.7203
+version 0.73
 ==================================
 
 Provides the same version objects as included in Perl v5.9.x (and in the
@@ -9,6 +9,12 @@ with the interim 5.9.0, 5.9.1, and 5.9.2 releases (since it duplicates code
 in the core).  If you are testing 5.9.x, you must check out bleadperl in
 order to get the current changes (the CPAN release has no effect in
 bleadperl).
+
+Major Changes in 0.73 - 2007-09-18
+===================================
+
+Provide special handling for version numbers too large to represent as an
+ordinary integer.
 
 Major changes in 0.7203 - 2007-04-17
 =====================================

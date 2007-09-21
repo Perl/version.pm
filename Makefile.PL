@@ -11,6 +11,11 @@ use File::Spec;
 
 use vars qw ($no_xs $force_xs);
 
+if ( $] >= 5.009_001 && $] < 5.010_000 ) {
+    die "The CPAN module cannot be tested with Perl $]\n".
+    	"Please update to the latest bleadperl...";
+}
+
 for (@ARGV)
 {
     /^--perl_only/ and $no_xs = 1;
@@ -75,6 +80,7 @@ sub init
             print MAKEFILE $_;
         }
         close MAKEFILE;
+        sleep(1);
         @{ $hash }{ 'DIR' } = ['vutil'];
     }
 
