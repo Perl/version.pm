@@ -3,7 +3,7 @@ use strict;
 
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.73;
+$VERSION = 0.74;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
