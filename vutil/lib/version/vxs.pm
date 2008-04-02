@@ -4,17 +4,23 @@ package version::vxs;
 use 5.005_03;
 use strict;
 
-require DynaLoader;
 use vars qw(@ISA $VERSION $CLASS );
 
-@ISA = qw(DynaLoader);
-
-$VERSION = 0.74;
+$VERSION = 0.75;
 
 $CLASS = 'version::vxs';
 
-local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
-bootstrap version::vxs if $] < 5.009;
+eval {
+    require XSLoader;
+    local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
+    XSLoader::load('version::vxs', $VERSION);
+    1;
+} or do {
+    require DynaLoader;
+    push @ISA, 'DynaLoader'; 
+    local $^W; # shut up the 'redefined' warning for UNIVERSAL::VERSION
+    bootstrap version::vxs $VERSION;
+};
 
 # Preloaded methods go here.
 
