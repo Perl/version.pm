@@ -45,6 +45,10 @@ sub write_makefile
                        AUTHOR      => 'John Peacock <jpeacock@cpan.org>') :
                      ()
                    ), 
+		   ( $] >= 5.009001 ?
+		     ( INSTALLDIRS => 'perl' ) :
+		     ()
+		   ),
                    PM              => 
                        {'lib/version.pm'  => '$(INST_LIBDIR)/version.pm',
                         'lib/version.pod' => '$(INST_LIBDIR)/version.pod'},
@@ -65,9 +69,7 @@ sub write_makefile
 sub init
 {
     my $hash = $_[1];
-    if ( $] >= 5.009001 ) { # included in bleadperl
-	$hash->{'PM'} = {};
-	$hash->{'MAN3PODS'} = {};
+    if ( $] > 5.009001 ) { # included in bleadperl
 	return $hash;
     }
 

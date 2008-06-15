@@ -1,4 +1,4 @@
-version 0.75
+version 0.7501
 ==================================
 
 Provides the same version objects as included in Perl v5.10.0 release. 
@@ -6,17 +6,30 @@ In fact, if you attempt to use this module with a version of Perl >= v5.9.0,
 the CPAN release of this module will not do anything, since the code already
 exists in the Perl core.  
 
-All prior releases of version.pm are considered obsolete and should not be
-used (and have been deleted from CPAN), due to API changes leading up to
-Perl v5.10.0.  If you 'use version' in your code, you are strongly urged to
+All releases of version.pm prior to 0.74 are considered obsolete and should
+not be used (and have been deleted from CPAN), due to API changes leading up
+to Perl v5.10.0.  If you 'use version' in your code, you are strongly urged to
 set a minimum, e.g. 'use version 0.74' (to remain compatible with Perl
 v5.10.0).  
 
 NOTE: unless otherwise noted in 40 foot tall block letters, any subsequent CPAN
 release is 100% code equivalent with the core Perl v5.10.0 version.pm objects,
 and exists only to improve documentation (and/or backwards compatibility for
-Perl versions before v5.10.0).  If you 'use version 0.75' you will needlessly
-cause people running Perl v5.10.0 to install a useless update.
+Perl versions before v5.10.0).  If you 'use version 0.75', you will cause 
+a meanlingless upgrade for Perl v5.10.0 (it only installs the
+documentation).
+
+
+Major Changes in 0.7501 - 2008-06-14
+=====================================
+
+Installs correctly on Perl v5.10.0 (only the version.pm and
+version.pod) with both Makefile.PL and Build.PL.  Unify version.pm
+with core copy for future Perl releases.
+Resolves:
+
+	http://rt.cpan.org/Ticket/Display.html?id=36598
+
 
 Major Changes in 0.75 - 2008-06-07
 ===================================
@@ -26,14 +39,14 @@ Resolves:
 
 	http://rt.cpan.org//Ticket/Display.html?id=34590
 
-Improved documentation on stringification and round-trip behavior to
-resolve:
+Improved documentation on stringification and round-trip behavior.
+Resolves:
 
 	https://rt.cpan.org/Ticket/Display.html?id=28206
 
 Much more strident documentation that you should not use a release of
 version.pm earlier than 0.74 (due to incompatible API changes) and you
-should always require 0.74 (to prevent useless upgrades).
+should always require 0.74 (to prevent meaningless upgrades).
 
 Major Changes in 0.74 - 2007-10-24
 ===================================

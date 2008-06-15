@@ -6,9 +6,11 @@ use strict;
 
 use vars qw(@ISA $VERSION $CLASS *qv);
 
-$VERSION = 0.75;
+$VERSION = 0.7501;
 
 $CLASS = 'version';
+
+return 1 if ( $] > 5.009001 ); # included in bleadperl
 
 eval "use version::vxs $VERSION";
 if ( $@ ) { # don't have the XS version installed
@@ -31,15 +33,6 @@ sub import {
     *{$callpkg."::qv"} = 
 	    sub {return bless version::qv(shift), $class }
 	unless defined(&{"$callpkg\::qv"});
-
-#    if (@_) { # must have initialization on the use line
-#	if ( defined $_[2] ) { # CVS style
-#	    $_[0] = version::qv($_[2]);
-#	}
-#	else {
-#	    $_[0] = version->new($_[1]);
-#	}
-#    }
 }
 
 1;

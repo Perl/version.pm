@@ -7,12 +7,12 @@ my $class = Module::Build->subclass
 (
 #    class => 'version::Builder',
     code => q{
-    sub ACTION_dist{
-        my $self = shift;
-    	$self->do_system('svk log -x | gnuify-changelog.pl > Changes');
-	$self->SUPER::ACTION_dist();
+	sub ACTION_dist{
+	    my $self = shift;
+	    $self->do_system('svk log -x | gnuify-changelog.pl > Changes');
+	    $self->SUPER::ACTION_dist();
 	};
-    sub have_c_compiler{
+	sub have_c_compiler{
 	my $self = shift;
 	my $have = eval {$self->SUPER::have_c_compiler};
 	$have = 0 if $@;
@@ -33,45 +33,46 @@ my %build_arguments = (
     dist_version_from => 'lib/version.pm',
     license         => 'perl',
     requires        => {
-	perl => '> 5.005, < 5.009',
+	perl => '> 5.005',
     },
     dynamic_config  => 1,
 );
 
 mkdir($t->config_dir(),0777);
 
-if ( $] < 5.005_04 ) {
-    # Cannot support 5.005_03 with the XS code
-    $perl_only = 1;
-}
-
-if ( $perl_only or not $t->have_c_compiler() ) {
-    $build_arguments{module_name} = 'version::vpp';
-    $build_arguments{pm_files} = {
-	'./lib/version.pm' => './lib/version.pm',
-	'./vperl/vpp.pm' => './lib/version/vpp.pm',
-    };
-}
-else {
-    $build_arguments{c_source} = './vutil';
-    $build_arguments{module_name} = 'version::vxs';
-    $build_arguments{pm_files} = {
-	'./lib/version.pm' => './lib/version.pm',
-	'./vutil/lib/version/vxs.pm' => './lib/version/vxs.pm'
-    };
-    $build_arguments{xs_files} = {
-	'./vutil/vxs.xs' => './lib/version/vxs.xs'
-    };
-    $build_arguments{add_to_cleanup} = 
-    	['lib/version/vxs.*'];
-}
-
-if ( $] >= 5.009 ) { # already included in bleadperl
+if ( $] > 5.009001 ) { # already included in bleadperl
     $build_arguments{c_source} = '';
-    $build_arguments{pm_files} = {};
+    $build_arguments{pm_files} = {'./lib/version.pm' => './lib/version.pm'};
     $build_arguments{xs_files} = {};
     $build_arguments{add_to_cleanup} = [];
     $build_arguments{manpages} = {};
+    $build_arguments{installdirs} = 'core';
+}
+else {
+    if ( $] < 5.005_04 ) {
+        # Cannot support 5.005_03 with the XS code
+        $perl_only = 1;
+    }
+    if ( $perl_only or not $t->have_c_compiler() ) {
+        $build_arguments{module_name} = 'version::vpp';
+        $build_arguments{pm_files} = {
+            './lib/version.pm' => './lib/version.pm',
+            './vperl/vpp.pm' => './lib/version/vpp.pm',
+        };
+    }
+    else {
+        $build_arguments{c_source} = './vutil';
+        $build_arguments{module_name} = 'version::vxs';
+        $build_arguments{pm_files} = {
+            './lib/version.pm' => './lib/version.pm',
+            './vutil/lib/version/vxs.pm' => './lib/version/vxs.pm'
+        };
+        $build_arguments{xs_files} = {
+            './vutil/vxs.xs' => './lib/version/vxs.xs'
+        };
+        $build_arguments{add_to_cleanup} = 
+            ['lib/version/vxs.*'];
+    }
 }
 
 my $m = $class->new(%build_arguments);
