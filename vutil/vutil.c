@@ -592,6 +592,12 @@ the original version contained 1 or more dots, respectively
 */
 
 SV *
+Perl_vstringify(pTHX_ SV *vs)
+{
+    return vstringify2(vs);
+}
+
+SV *
 Perl_vstringify2(pTHX_ SV *vs)
 {
     if ( SvROK(vs) )
@@ -610,10 +616,10 @@ Perl_vstringify2(pTHX_ SV *vs)
     }
     else {
 	I32 len = av_len((AV *)SvRV(*hv_fetchs((HV*)vs, "version", FALSE)));
-	if ( len >= 2 ) 
-	    return vnormal(vs);
-	else
+	if ( len < 2 ) 
 	    return vnumify(vs);
+	else
+	    return vnormal(vs);
     }
 }
 

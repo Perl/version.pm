@@ -19,8 +19,8 @@ if ( $@ ) { # don't have the XS version installed
     *version::qv = \&version::vpp::qv;
     if ($] > 5.009001 && $] <= 5.010000) {
 	no strict 'refs';
-	*{'version::stringify'} = \*version::vpp::stringify2;
-	*{'version::(""'} = \*version::vpp::stringify2;
+	*{'version::stringify'} = \*version::vpp::stringify;
+	*{'version::(""'} = \*version::vpp::stringify;
     }
 }
 else { # use XS module
@@ -29,13 +29,10 @@ else { # use XS module
     *version::qv = \&version::vxs::qv;
     if ($] > 5.009001 && $] <= 5.010000) {
 	no strict 'refs';
-	*{'version::stringify'} = \*version::vxs::stringify2;
-	*{'version::(""'} = \*version::vxs::stringify2;
+	*{'version::stringify'} = \*version::vxs::stringify;
+	*{'version::(""'} = \*version::vxs::stringify;
     }
 }
-
-#use Data::Dumper;
-#print STDERR "#".Data::Dumper->Dump([\%version::],[qw/%version/]);
 
 # Preloaded methods go here.
 sub import {

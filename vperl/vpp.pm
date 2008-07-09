@@ -13,7 +13,7 @@ push @REGEXS, qr/
 	/x;
 
 use overload (
-    '""'       => \&stringify2,
+    '""'       => \&stringify,
     '0+'       => \&numify,
     'cmp'      => \&vcmp,
     '<=>'      => \&vcmp,
@@ -349,11 +349,6 @@ sub normal
 }
 
 sub stringify
-{
-    return stringify2(@_);
-}
-
-sub stringify2
 {
     my ($self) = @_;
     unless (_verify($self)) {

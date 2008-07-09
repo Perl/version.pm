@@ -20,7 +20,7 @@ BOOT:
 	/* register the overloading (type 'A') magic */
 	PL_amagic_generation++;
 	newXS("version::vxs::()", XS_version__vxs_noop, file);
-	newXS("version::vxs::(\"\"", XS_version__vxs_stringify2, file);
+	newXS("version::vxs::(\"\"", XS_version__vxs_stringify, file);
 	newXS("version::vxs::(0+", XS_version__vxs_numify, file);
 	newXS("version::vxs::(cmp", XS_version__vxs_vcmp, file);
 	newXS("version::vxs::(<=>", XS_version__vxs_vcmp, file);
@@ -66,14 +66,6 @@ PPCODE:
 
 void
 stringify (lobj,...)
-    version_vxs	lobj
-PPCODE:
-{
-    PUSHs(sv_2mortal(vstringify2(lobj)));
-}
-
-void
-stringify2 (lobj,...)
     version_vxs	lobj
 PPCODE:
 {
