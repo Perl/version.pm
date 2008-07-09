@@ -3,7 +3,7 @@ use strict;
 
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.7501;
+$VERSION = 0.76;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -13,7 +13,7 @@ push @REGEXS, qr/
 	/x;
 
 use overload (
-    '""'       => \&stringify,
+    '""'       => \&stringify2,
     '0+'       => \&numify,
     'cmp'      => \&vcmp,
     '<=>'      => \&vcmp,
@@ -350,12 +350,21 @@ sub normal
 
 sub stringify
 {
+    return stringify2(@_);
+}
+
+sub stringify2
+{
     my ($self) = @_;
     unless (_verify($self)) {
 	require Carp;
 	Carp::croak("Invalid version object");
     }
-    return $self->{original};
+    return exists $self->{original} 
+    	? $self->{original} 
+	: $#{$self->{version}} < 2 
+	    ? $self->numify
+	    : $self->normal;
 }
 
 sub vcmp
@@ -486,7 +495,8 @@ sub _un_vstring {
 # Thanks to Yitzchak Scott-Thoennes for this mode of operation
 {
     local $^W;
-    *UNIVERSAL::VERSION = sub {
+    *UNIVERSAL::VERSION # Module::Build::ModuleInfo doesn't see this now
+      = sub {
 	my ($obj, $req) = @_;
 	my $class = ref($obj) || $obj;
 

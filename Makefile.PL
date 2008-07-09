@@ -69,9 +69,6 @@ sub write_makefile
 sub init
 {
     my $hash = $_[1];
-    if ( $] > 5.009001 ) { # included in bleadperl
-	return $hash;
-    }
 
     if ($no_xs) {
         $hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';

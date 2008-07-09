@@ -491,7 +491,11 @@ SKIP: {
 	is $alpha2, $alpha1, "Don't fall for Data::Dumper's tricks";
     }
 
-
+    {
+	# http://rt.perl.org/rt3/Ticket/Display.html?id=56606
+	my $badv = bless { version => [1,2,3] }, "version";
+	is $badv, 'v1.2.3', "Deal with more stupidity from Data::Dumper";	
+    }
 }
 
 1;

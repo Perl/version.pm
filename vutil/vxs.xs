@@ -20,7 +20,7 @@ BOOT:
 	/* register the overloading (type 'A') magic */
 	PL_amagic_generation++;
 	newXS("version::vxs::()", XS_version__vxs_noop, file);
-	newXS("version::vxs::(\"\"", XS_version__vxs_stringify, file);
+	newXS("version::vxs::(\"\"", XS_version__vxs_stringify2, file);
 	newXS("version::vxs::(0+", XS_version__vxs_numify, file);
 	newXS("version::vxs::(cmp", XS_version__vxs_vcmp, file);
 	newXS("version::vxs::(<=>", XS_version__vxs_vcmp, file);
@@ -69,7 +69,15 @@ stringify (lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    PUSHs(sv_2mortal(vstringify(lobj)));
+    PUSHs(sv_2mortal(vstringify2(lobj)));
+}
+
+void
+stringify2 (lobj,...)
+    version_vxs	lobj
+PPCODE:
+{
+    PUSHs(sv_2mortal(vstringify2(lobj)));
 }
 
 void
@@ -217,7 +225,7 @@ PPCODE:
 	     }
 	     else {
 		 const char * const name = SvPVx(ST(0), len);
-#if PERL_VERSION == 8
+#if PERL_VERSION >= 8
 		 Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed", name );
 #else
 		 Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
@@ -242,14 +250,14 @@ PPCODE:
 	    else {
 		Perl_croak(aTHX_ "%s version %"SVf" required--"
 		   "this is only version %"SVf" ", HvNAME(pkg),
-		       SVfARG(vstringify(req)),
-		       SVfARG(vstringify(sv)));
+		       SVfARG(vstringify2(req)),
+		       SVfARG(vstringify2(sv)));
 	    }
 	}
     }
 
     if ( SvOK(sv) && sv_derived_from(sv, "version::vxs") ) {
-	ST(0) = vstringify(sv);
+	ST(0) = vstringify2(sv);
     } else {
 	ST(0) = sv;
     }
