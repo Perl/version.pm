@@ -494,7 +494,9 @@ SKIP: {
     {
 	# http://rt.perl.org/rt3/Ticket/Display.html?id=56606
 	my $badv = bless { version => [1,2,3] }, "version";
-	is $badv, 'v1.2.3', "Deal with more stupidity from Data::Dumper";	
+	is $badv, '1.002003', "Deal with badly serialized versions from YAML";	
+	my $badv2 = bless { qv => 1, version => [1,2,3] }, "version";
+	is $badv2, 'v1.2.3', "Deal with badly serialized versions from YAML ";	
     }
 }
 

@@ -357,9 +357,9 @@ sub stringify
     }
     return exists $self->{original} 
     	? $self->{original} 
-	: $#{$self->{version}} < 2 
-	    ? $self->numify
-	    : $self->normal;
+	: exists $self->{qv} 
+	    ? $self->normal
+	    : $self->numify;
 }
 
 sub vcmp

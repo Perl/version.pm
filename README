@@ -1,23 +1,23 @@
-version 0.7501
+version 0.76
 ==================================
 
-Provides the same version objects as included in Perl v5.10.0 release. 
-In fact, if you attempt to use this module with a version of Perl >= v5.9.0,
-the CPAN release of this module will not do anything, since the code already
-exists in the Perl core.  
+Full version object support, with patch for bug in Perl 5.10.0 core
+version support.
 
-All releases of version.pm prior to 0.74 are considered obsolete and should
-not be used (and have been deleted from CPAN), due to API changes leading up
-to Perl v5.10.0.  If you 'use version' in your code, you are strongly urged to
-set a minimum, e.g. 'use version 0.74' (to remain compatible with Perl
-v5.10.0).  
+YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
+There was a bug caused by objects serialized by YAML that will cause Perl
+5.10.0 to segfault.  As long as some module calls 'use version', then the
+replacement code will take effect and Perl will not crash.
 
-NOTE: unless otherwise noted in 40 foot tall block letters, any subsequent CPAN
-release is 100% code equivalent with the core Perl v5.10.0 version.pm objects,
-and exists only to improve documentation (and/or backwards compatibility for
-Perl versions before v5.10.0).  If you 'use version 0.75', you will cause 
-a meanlingless upgrade for Perl v5.10.0 (it only installs the
-documentation).
+Major Changes in 0.76 - 2008-07-08
+===================================
+Fix segfault with core version stringification of serialized version 
+objects without an 'original' entry.  See
+
+	http://rt.perl.org/rt3/Public/Bug/Display.html?id=56606
+
+for more details.  I cannot make this 100% automatic; some module has to
+call 'use version;' for the fixed code to take effect.
 
 
 Major Changes in 0.7501 - 2008-06-14
@@ -30,29 +30,6 @@ Resolves:
 
 	http://rt.cpan.org/Ticket/Display.html?id=36598
 
-
-Major Changes in 0.75 - 2008-06-07
-===================================
-
-Optionally use XSLoader instead of DynaLoader for Perl 5.6.0 or better.
-Resolves: 
-
-	http://rt.cpan.org//Ticket/Display.html?id=34590
-
-Improved documentation on stringification and round-trip behavior.
-Resolves:
-
-	https://rt.cpan.org/Ticket/Display.html?id=28206
-
-Much more strident documentation that you should not use a release of
-version.pm earlier than 0.74 (due to incompatible API changes) and you
-should always require 0.74 (to prevent meaningless upgrades).
-
-Major Changes in 0.74 - 2007-10-24
-===================================
-
-Final release before Perl v5.10.0.  API now frozen for all eternity.  Fixes
-problem with Data::Dumper being too clever by half.
 
 Please read the POD documentation for usage/details.  See the CHANGES file
 for full details of all changes to the module behavior.

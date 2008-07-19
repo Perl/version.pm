@@ -29,8 +29,7 @@ my $t = $class->new(
 );
 
 my %build_arguments = (
-    dist_name       => 'version',
-    dist_version_from => 'lib/version.pm',
+    module_name     => 'version',
     license         => 'perl',
     requires        => {
 	perl => '> 5.005',
@@ -47,7 +46,6 @@ if ( $] < 5.005_04 ) {
     $perl_only = 1;
 }
 if ( $perl_only or not $t->have_c_compiler() ) {
-    $build_arguments{module_name} = 'version::vpp';
     $build_arguments{pm_files} = {
 	'./lib/version.pm' => './lib/version.pm',
 	'./vperl/vpp.pm' => './lib/version/vpp.pm',
@@ -55,7 +53,6 @@ if ( $perl_only or not $t->have_c_compiler() ) {
 }
 else {
     $build_arguments{c_source} = './vutil';
-    $build_arguments{module_name} = 'version::vxs';
     $build_arguments{pm_files} = {
 	'./lib/version.pm' => './lib/version.pm',
 	'./vutil/lib/version/vxs.pm' => './lib/version/vxs.pm'
