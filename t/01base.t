@@ -15,10 +15,13 @@ require "t/coretests.pm";
 
 diag "Tests with base class" if $Verbose;
 
-BaseTests("version");
+BaseTests("version","new","qv");
+BaseTests("version","new","declare");
+BaseTests("version","parse", "qv");
+BaseTests("version","parse", "declare");
 
 # dummy up a redundant call to satify David Wheeler
 local $SIG{__WARN__} = sub { die $_[0] };
 eval 'use version;';
-unlike ($@, qr/^Subroutine main::qv redefined/,
-    "Only export qv once per package (to prevent redefined warnings)."); 
+unlike ($@, qr/^Subroutine main::declare redefined/,
+    "Only export declare once per package (to prevent redefined warnings)."); 

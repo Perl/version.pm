@@ -4,9 +4,9 @@ package version;
 use 5.005_04;
 use strict;
 
-use vars qw(@ISA $VERSION $CLASS *qv);
+use vars qw(@ISA $VERSION $CLASS *declare *qv);
 
-$VERSION = 0.76;
+$VERSION = 0.7601;
 
 $CLASS = 'version';
 
@@ -17,6 +17,8 @@ if ( $@ ) { # don't have the XS version installed
     push @ISA, "version::vpp";
     local $^W;
     *version::qv = \&version::vpp::qv;
+    *version::declare = \&version::vpp::declare;
+    *version::_VERSION = \&version::vpp::_VERSION;
     if ($] > 5.009001 && $] <= 5.010000) {
 	no strict 'refs';
 	*{'version::stringify'} = \*version::vpp::stringify;
@@ -26,7 +28,9 @@ if ( $@ ) { # don't have the XS version installed
 else { # use XS module
     push @ISA, "version::vxs";
     local $^W;
+    *version::declare = \&version::vxs::declare;
     *version::qv = \&version::vxs::qv;
+    *version::_VERSION = \&version::vxs::_VERSION;
     if ($] > 5.009001 && $] <= 5.010000) {
 	no strict 'refs';
 	*{'version::stringify'} = \*version::vxs::stringify;
@@ -36,13 +40,44 @@ else { # use XS module
 
 # Preloaded methods go here.
 sub import {
+    $DB::single = 1;
     my ($class) = shift;
+    my %args;
+    if (@_) { # any remaining terms are arguments
+	map { $args{$_} = 1 } @_
+    }
+    else { # no parameters at all on use line
+    	%args = 
+	(
+	    qv => 1,
+	    declare => 1,
+	    'UNIVERSAL::VERSION' => 1,
+	);
+    }
+
     my $callpkg = caller();
     no strict 'refs';
     
-    *{$callpkg."::qv"} = 
+    if (exists($args{declare})) {
+	*{$callpkg."::declare"} = 
+	    sub {return bless version::declare(shift), $class }
+	  unless defined(&{"$callpkg\::declare"});
+    }
+
+    if (exists($args{qv})) {
+	*{$callpkg."::qv"} = 
 	    sub {return bless version::qv(shift), $class }
-	unless defined(&{"$callpkg\::qv"});
+	  unless defined(&{"$callpkg\::qv"});
+    }
+
+    if (exists($args{'UNIVERSAL::VERSION'})) {
+	local $^W;
+	*UNIVERSAL::VERSION = \&version::_VERSION;
+    }
+
+    if (exists($args{'VERSION'})) {
+	*{$callpkg."::VERSION"} = \&version::_VERSION;
+    }
 }
 
 1;

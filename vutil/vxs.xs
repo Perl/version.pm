@@ -26,10 +26,11 @@ BOOT:
 	newXS("version::vxs::(<=>", XS_version__vxs_vcmp, file);
 	newXS("version::vxs::(bool", XS_version__vxs_boolean, file);
 	newXS("version::vxs::(nomethod", XS_version__vxs_noop, file);
-	newXS("UNIVERSAL::VERSION", XS_version__vxs_VERSION, file);
 
 void
 new(...)
+ALIAS:
+    parse  =  1
 PPCODE:
 {
     SV *vs = ST(1);
@@ -145,8 +146,10 @@ PPCODE:
 }
 
 void
-qv(ver)
+declare(ver)
     SV *ver
+ALIAS:
+    qv = 1
 PPCODE:
 {
 #ifdef SvVOK
@@ -166,7 +169,7 @@ PPCODE:
 }
 
 void
-VERSION(sv,...)
+_VERSION(sv,...)
     SV *sv
 PPCODE:
 {

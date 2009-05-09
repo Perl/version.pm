@@ -3,7 +3,7 @@ use strict;
 
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.76;
+$VERSION = 0.7601;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -487,69 +487,64 @@ sub _un_vstring {
     return $value;
 }
 
-# Thanks to Yitzchak Scott-Thoennes for this mode of operation
-{
-    local $^W;
-    *UNIVERSAL::VERSION # Module::Build::ModuleInfo doesn't see this now
-      = sub {
-	my ($obj, $req) = @_;
-	my $class = ref($obj) || $obj;
+sub _VERSION {
+    my ($obj, $req) = @_;
+    my $class = ref($obj) || $obj;
 
-	no strict 'refs';
-	eval "require $class" unless %{"$class\::"}; # already existing
-	return undef if $@ =~ /Can't locate/ and not defined $req;
-	
-	if ( not %{"$class\::"} and $] >= 5.008) { # file but no package
+    no strict 'refs';
+    eval "require $class" unless %{"$class\::"}; # already existing
+    return undef if $@ =~ /Can't locate/ and not defined $req;
+    
+    if ( not %{"$class\::"} and $] >= 5.008) { # file but no package
+	require Carp;
+	Carp::croak( "$class defines neither package nor VERSION"
+	    ."--version check failed");
+    }
+    
+    my $version = eval "\$$class\::VERSION";
+    if ( defined $version ) {
+	local $^W if $] <= 5.008;
+	$version = version::vpp->new($version);
+    }
+
+    if ( defined $req ) {
+	unless ( defined $version ) {
 	    require Carp;
-	    Carp::croak( "$class defines neither package nor VERSION"
-		."--version check failed");
-	}
-	
-	my $version = eval "\$$class\::VERSION";
-	if ( defined $version ) {
-	    local $^W if $] <= 5.008;
-	    $version = version::vpp->new($version);
-	}
+	    my $msg =  $] < 5.006 
+	    ? "$class version $req required--this is only version "
+	    : "$class does not define \$$class\::VERSION"
+	      ."--version check failed";
 
-	if ( defined $req ) {
-	    unless ( defined $version ) {
-		require Carp;
-		my $msg =  $] < 5.006 
-		? "$class version $req required--this is only version "
-		: "$class does not define \$$class\::VERSION"
-		  ."--version check failed";
-
-		if ( $ENV{VERSION_DEBUG} ) {
-		    Carp::confess($msg);
-		}
-		else {
-		    Carp::croak($msg);
-		}
+	    if ( $ENV{VERSION_DEBUG} ) {
+		Carp::confess($msg);
 	    }
-
-	    $req = version::vpp->new($req);
-
-	    if ( $req > $version ) {
-		require Carp;
-		if ( $req->is_qv ) {
-		    Carp::croak( 
-			sprintf ("%s version %s required--".
-			    "this is only version %s", $class,
-			    $req->normal, $version->normal)
-		    );
-		}
-		else {
-		    Carp::croak( 
-			sprintf ("%s version %s required--".
-			    "this is only version %s", $class,
-			    $req->stringify, $version->stringify)
-		    );
-		}
+	    else {
+		Carp::croak($msg);
 	    }
 	}
 
-	return defined $version ? $version->stringify : undef;
-    };
+	$req = version::vpp->new($req);
+
+	if ( $req > $version ) {
+	    require Carp;
+	    if ( $req->is_qv ) {
+		Carp::croak( 
+		    sprintf ("%s version %s required--".
+			"this is only version %s", $class,
+			$req->normal, $version->normal)
+		);
+	    }
+	    else {
+		Carp::croak( 
+		    sprintf ("%s version %s required--".
+			"this is only version %s", $class,
+			$req->stringify, $version->stringify)
+		);
+	    }
+	}
+    }
+
+    return defined $version ? $version->stringify : undef;
 }
 
 1; #this line is important and will help the module return a true value
