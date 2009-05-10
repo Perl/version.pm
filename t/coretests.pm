@@ -185,7 +185,7 @@ sub BaseTests {
     ok ( !eval { abs($version) }, "noop abs" );
 
 SKIP: {
-    skip "version require'd instead of use'd, cannot test declare", 3
+    skip "version require'd instead of use'd, cannot test $qv_declare", 3
     	unless defined $qv_declare;
     # test the $qv_declare() sub
     diag "testing $qv_declare" if $Verbose;
@@ -381,7 +381,7 @@ SKIP: {
 	open F, ">www.pm" or die "Cannot open www.pm: $!\n";
 	print F <<"EOF";
 package www;
-use version; \$VERSION = $qv_declare('0.0.4');
+use $CLASS; \$VERSION = ${CLASS}->new('0.0.4');
 1;
 EOF
 	close F;
@@ -413,7 +413,8 @@ EOF
     }
 
 SKIP: {
-    skip 'Cannot test "use base qw(version)"  when require is used', 3;
+    skip 'Cannot test "use base qw(version)"  when require is used', 3
+    	unless defined $qv_declare;
     open F, ">vvv.pm" or die "Cannot open vvv.pm: $!\n";
     print F <<"EOF";
 package vvv;

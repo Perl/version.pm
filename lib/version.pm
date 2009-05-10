@@ -6,7 +6,7 @@ use strict;
 
 use vars qw(@ISA $VERSION $CLASS *declare *qv);
 
-$VERSION = 0.7601;
+$VERSION = '0.77';
 
 $CLASS = 'version';
 
@@ -40,8 +40,16 @@ else { # use XS module
 
 # Preloaded methods go here.
 sub import {
+    no strict 'refs';
     $DB::single = 1;
     my ($class) = shift;
+
+    # Set up any derived class
+    unless ($class eq 'version') {
+	*{$class.'::declare'} =  *version::declare;
+	*{$class.'::qv'} = *version::qv;
+    }
+
     my %args;
     if (@_) { # any remaining terms are arguments
 	map { $args{$_} = 1 } @_
@@ -56,17 +64,16 @@ sub import {
     }
 
     my $callpkg = caller();
-    no strict 'refs';
     
     if (exists($args{declare})) {
 	*{$callpkg."::declare"} = 
-	    sub {return bless version::declare(shift), $class }
-	  unless defined(&{"$callpkg\::declare"});
+	    sub {return bless &{"$class\::declare"}(shift), $class }
+	  unless defined(&{$callpkg.'::declare'});
     }
 
     if (exists($args{qv})) {
-	*{$callpkg."::qv"} = 
-	    sub {return bless version::qv(shift), $class }
+	*{$callpkg."::qv"} =
+	    sub {return bless &{"$class\::qv"}(shift), $class }
 	  unless defined(&{"$callpkg\::qv"});
     }
 
