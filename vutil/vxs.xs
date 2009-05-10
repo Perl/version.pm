@@ -146,10 +146,10 @@ PPCODE:
 }
 
 void
-declare(ver)
+qv(ver)
     SV *ver
 ALIAS:
-    qv = 1
+    declare = 1
 PPCODE:
 {
 #ifdef SvVOK

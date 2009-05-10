@@ -1,6 +1,7 @@
 package version::vpp;
 use strict;
 
+use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
 $VERSION = '0.77';
@@ -46,9 +47,8 @@ sub new
 	    return $self;
 	}
 
-	require POSIX;
-	my $currlocale = POSIX::setlocale(&POSIX::LC_ALL);
-	my $radix_comma = ( POSIX::localeconv()->{decimal_point} eq ',' );
+	my $currlocale = setlocale(LC_ALL);
+	my $radix_comma = ( localeconv()->{decimal_point} eq ',' );
 
 	if ( not defined $value or $value =~ /^undef$/ ) {
 	    # RT #19517 - special case for undef comparison
@@ -271,6 +271,8 @@ sub new
 	return ($self);
 }
 
+*parse = \&new;
+
 sub numify 
 {
     my ($self) = @_;
@@ -454,6 +456,8 @@ sub qv {
     my $version = version->new($value); # always use base class
     return $version;
 }
+
+*declare = \&qv;
 
 sub is_qv {
     my ($self) = @_;

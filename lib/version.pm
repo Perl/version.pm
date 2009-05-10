@@ -41,7 +41,6 @@ else { # use XS module
 # Preloaded methods go here.
 sub import {
     no strict 'refs';
-    $DB::single = 1;
     my ($class) = shift;
 
     # Set up any derived class

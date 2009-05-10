@@ -3,6 +3,7 @@ package main;
 require Test::Harness;
 *Verbose = \$Test::Harness::Verbose;
 use Data::Dumper;
+use POSIX qw/locale_h/;
 
 sub BaseTests {
 
@@ -456,11 +457,12 @@ SKIP: {
 	my $warning;
 	local $SIG{__WARN__} = sub { $warning = $_[0] };
 	my $ver = 1.23;  # has to be floating point number
+	my $orig_loc = setlocale( LC_ALL );
 	my $loc;
 	while (<DATA>) {
 	    chomp;
-	    $loc = POSIX::setlocale( &POSIX::LC_ALL, $_);
-	    last if POSIX::localeconv()->{decimal_point} eq ',';
+	    $loc = setlocale( LC_ALL, $_);
+	    last if localeconv()->{decimal_point} eq ',';
 	}
 	skip 'Cannot test locale handling without a comma locale', 4
 	    unless ( $loc and ($ver eq '1,23') );
@@ -472,6 +474,7 @@ SKIP: {
 	    "Process locale-dependent floating point");
 	is ($v, "1.23", "Locale doesn't apply to version objects");
 	ok ($v == $ver, "Comparison to locale floating point");
+	$loc = setlocale( LC_ALL, $orig_loc);
     }
 
     eval 'my $v = $CLASS->$method("1._1");';
