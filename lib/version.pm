@@ -46,8 +46,9 @@ sub import {
 
     # Set up any derived class
     unless ($class eq 'version') {
-	*{$class.'::declare'} =  *version::declare;
-	*{$class.'::qv'} = *version::qv;
+	local $^W;
+	*{$class.'::declare'} =  \&version::declare;
+	*{$class.'::qv'} = \&version::qv;
     }
 
     my %args;
