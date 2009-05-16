@@ -58,7 +58,6 @@ sub import {
     	%args = 
 	(
 	    qv => 1,
-	    declare => 1,
 	    'UNIVERSAL::VERSION' => 1,
 	);
     }

@@ -426,7 +426,7 @@ EOF
     # need to eliminate any other $qv_declare()'s
     undef *{"main\::$qv_declare"};
     ok(!defined(&{"main\::$qv_declare"}), "make sure we cleared $qv_declare() properly");
-    eval "use lib '.'; use vvv;";
+    eval "use lib '.'; use vvv qw/declare qv/;";
     ok(defined(&{"main\::$qv_declare"}), "make sure we exported $qv_declare() properly");
     isa_ok( &$qv_declare(1.2), "vvv");
     unlink 'vvv.pm';

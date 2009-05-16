@@ -39,13 +39,13 @@ ok( $verobj > $testobj, "Comparison vs parent class" );
 
 BaseTests("version::Empty", "new", "qv");
 main_reset;
-use_ok("version::Empty", 0.001);
+use_ok("version::Empty", 0.001, "declare");
 BaseTests("version::Empty", "new", "declare");
 main_reset;
 use_ok("version::Empty", 0.001);
 BaseTests("version::Empty", "parse", "qv");
 main_reset;
-use_ok("version::Empty", 0.001);
+use_ok("version::Empty", 0.001, "declare");
 BaseTests("version::Empty", "parse", "declare");
 main_reset;
 use_ok("version::Empty", 0.001);

@@ -7,7 +7,8 @@
 use Test::More qw/no_plan/;
 
 BEGIN {
-    use_ok("version", 0.77); # If we made it this far, we are ok.
+    use_ok("version", 0.77, qw/qv declare UNIVERSAL::VERSION/);
+    # If we made it this far, we are ok.
 }
 
 my $Verbose;
