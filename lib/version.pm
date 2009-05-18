@@ -66,13 +66,13 @@ sub import {
     
     if (exists($args{declare})) {
 	*{$callpkg."::declare"} = 
-	    sub {return bless &{"$class\::declare"}(shift), $class }
+	    sub {return $class->declare(shift) }
 	  unless defined(&{$callpkg.'::declare'});
     }
 
     if (exists($args{qv})) {
 	*{$callpkg."::qv"} =
-	    sub {return bless &{"$class\::qv"}(shift), $class }
+	    sub {return $class->qv(shift) }
 	  unless defined(&{"$callpkg\::qv"});
     }
 

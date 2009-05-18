@@ -19,6 +19,7 @@ if ( $] >= 5.009_001 && $] < 5.010_000 ) {
 for (@ARGV)
 {
     /^--perl_only/ and $no_xs = 1;
+    /^--perl-only/ and $no_xs = 1;
     /^--xs/ and $no_xs = 0;
 }
 
@@ -51,7 +52,9 @@ sub write_makefile
 		   ),
                    PM              => 
                        {'lib/version.pm'  => '$(INST_LIBDIR)/version.pm',
-                        'lib/version.pod' => '$(INST_LIBDIR)/version.pod'},
+                        'lib/version.pod' => '$(INST_LIBDIR)/version.pod',
+                        'lib/version/Internals.pod' =>
+			    '$(INST_LIBDIR)/version/Internals.pod'},
                    PL_FILES        => {},
 
                    clean           => { FILES => 'vutil/Makefile.PL' },

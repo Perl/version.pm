@@ -146,25 +146,41 @@ PPCODE:
 }
 
 void
-qv(ver)
-    SV *ver
+qv(...)
 ALIAS:
     declare = 1
 PPCODE:
 {
+    SV *ver = ST(0);
+    SV * rv;
+    const char * classname = "";
+    if ( items == 2 && (ST(1)) != &PL_sv_undef ) {
+	/* getting called as object or class method */
+	ver = ST(1);
+	classname = 
+	    sv_isobject(ST(0)) /* get the class if called as an object method */
+		? HvNAME(SvSTASH(SvRV(ST(0))))
+		: (char *)SvPV_nolen(ST(0));
+    }
 #ifdef SvVOK
     if ( !SvVOK(ver) ) { /* not already a v-string */
 #endif
-	SV * const rv = sv_newmortal();
+	rv = sv_newmortal();
 	sv_setsv(rv,ver); /* make a duplicate */
 	upg_version(rv, TRUE);
-	PUSHs(rv);
 #ifdef SvVOK
     }
     else
     {
-	PUSHs(sv_2mortal(new_version(ver)));
+	rv = sv_2mortal(new_version(ver));
     }
+    if ( strcmp(classname,"version::vxs") != 0 ) /* inherited new() */
+#if PERL_VERSION == 5
+	sv_bless(rv, gv_stashpv((char *)classname, GV_ADD));
+#else
+	sv_bless(rv, gv_stashpv(classname, GV_ADD));
+#endif
+    PUSHs(rv);
 #endif
 }
 

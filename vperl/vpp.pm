@@ -449,11 +449,16 @@ sub is_alpha {
 }
 
 sub qv {
-    my ($value) = @_;
+    my $value = shift;
+    my $class = 'version';
+    if (@_) {
+	$class = ref($value) || $value;
+	$value = shift;
+    }
 
     $value = _un_vstring($value);
     $value = 'v'.$value unless $value =~ /(^v|\d+\.\d+\.\d)/;
-    my $version = version->new($value); # always use base class
+    my $version = $class->new($value);
     return $version;
 }
 

@@ -3,6 +3,7 @@ Changes
 lib/version.pm
 lib/version.pod
 lib/version/typemap
+lib/version/Internals.pod
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -12,6 +13,7 @@ t/01base.t
 t/02derived.t
 t/03require.t
 t/coretests.pm
+t/lib/version/Empty.pm
 vperl/vpp.pm
 vutil/lib/version/vxs.pm
 vutil/ppport.h

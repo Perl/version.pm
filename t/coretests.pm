@@ -4,6 +4,8 @@ require Test::Harness;
 *Verbose = \$Test::Harness::Verbose;
 use Data::Dumper;
 use POSIX qw/locale_h/;
+use File::Temp qw/tempfile/;
+use File::Basename;
 
 sub BaseTests {
 
@@ -189,12 +191,13 @@ SKIP: {
     skip "version require'd instead of use'd, cannot test $qv_declare", 3
     	unless defined $qv_declare;
     # test the $qv_declare() sub
+    $DB::single = 1;
     diag "testing $qv_declare" if $Verbose;
-    $version = &$qv_declare("1.2");
+    $version = $CLASS->$qv_declare("1.2");
     is ( "$version", "v1.2", $qv_declare.'("1.2") == "1.2.0"' );
-    $version = &$qv_declare(1.2);
+    $version = $CLASS->$qv_declare(1.2);
     is ( "$version", "v1.2", $qv_declare.'(1.2) == "1.2.0"' );
-    isa_ok( &$qv_declare('5.008'), $CLASS );
+    isa_ok( $CLASS->$qv_declare('5.008'), $CLASS );
 }
 
     # test creation from existing version object
@@ -227,20 +230,21 @@ SKIP: {
 
     my $error_regex = $] < 5.006
 	? 'version \d required'
-	: 'does not define \$...::VERSION';
+	: 'does not define \$t.{7}::VERSION';
     
     {
-	open F, ">aaa.pm" or die "Cannot open aaa.pm: $!\n";
-	print F "package aaa;\n\$aaa::VERSION=0.58;\n1;\n";
-	close F;
+	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+	(my $package = basename($filename)) =~ s/\.pm$//;
+	print $fh "package $package;\n\$$package\::VERSION=0.58;\n1;\n";
+	close $fh;
 
 	$version = 0.58;
-	eval "use lib '.'; use aaa $version";
-	unlike($@, qr/aaa version $version/,
+	eval "use lib '.'; use $package $version";
+	unlike($@, qr/$package version $version/,
 		'Replacement eval works with exact version');
 	
 	# test as class method
-	$new_version = "aaa"->VERSION;
+	$new_version = $package->VERSION;
 	cmp_ok($new_version,'==',$version, "Called as class method");
 
 	eval "print Completely::Unknown::Module->VERSION";
@@ -255,30 +259,31 @@ SKIP: {
 
 	# this should fail even with old UNIVERSAL::VERSION
 	$version += 0.01;
-	eval "use lib '.'; use aaa $version";
-	like($@, qr/aaa version $version/,
+	eval "use lib '.'; use $package $version";
+	like($@, qr/$package version $version/,
 		'Replacement eval works with incremented version');
 	
 	$version =~ s/0+$//; #convert to string and remove trailing 0's
 	chop($version);	# shorten by 1 digit, should still succeed
-	eval "use lib '.'; use aaa $version";
-	unlike($@, qr/aaa version $version/,
+	eval "use lib '.'; use $package $version";
+	unlike($@, qr/$package version $version/,
 		'Replacement eval works with single digit');
 	
 	# this would fail with old UNIVERSAL::VERSION
 	$version += 0.1;
-	eval "use lib '.'; use aaa $version";
-	like($@, qr/aaa version $version/,
+	eval "use lib '.'; use $package $version";
+	like($@, qr/$package version $version/,
 		'Replacement eval works with incremented digit');
-	unlink 'aaa.pm';
+	unlink $filename;
     }
 
     { # dummy up some variously broken modules for testing
-	open F, ">xxx.pm" or die "Cannot open xxx.pm: $!\n";
-	print F "1;\n";
-	close F;
+	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+	(my $package = basename($filename)) =~ s/\.pm$//;
+	print $fh "1;\n";
+	close $fh;
 
-	eval "use lib '.'; use xxx 3;";
+	eval "use lib '.'; use $package 3;";
 	if ( $] < 5.008 ) {
 	    like($@, qr/$error_regex/,
 		'Replacement handles modules without package or VERSION'); 
@@ -287,37 +292,39 @@ SKIP: {
 	    like($@, qr/defines neither package nor VERSION/,
 		'Replacement handles modules without package or VERSION'); 
 	}
-	eval "use lib '.'; use xxx; \$version = xxx->VERSION";
+	eval "use lib '.'; use $package; \$version = $package->VERSION";
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without package or VERSION'); 
 	ok (!defined($version), "Called as class method");
-	unlink 'xxx.pm';
+	unlink $filename;
     }
     
     { # dummy up some variously broken modules for testing
-	open F, ">yyy.pm" or die "Cannot open yyy.pm: $!\n";
-	print F "package yyy;\n#look ma no VERSION\n1;\n";
-	close F;
-	eval "use lib '.'; use yyy 3;";
+	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+	(my $package = basename($filename)) =~ s/\.pm$//;
+	print $fh "package $package;\n#look ma no VERSION\n1;\n";
+	close $fh;
+	eval "use lib '.'; use $package 3;";
 	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
-	eval "use lib '.'; use yyy; print yyy->VERSION";
+	eval "use lib '.'; use $package; print $package->VERSION";
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
-	unlink 'yyy.pm';
+	unlink $filename;
     }
 
     { # dummy up some variously broken modules for testing
-	open F, ">zzz.pm" or die "Cannot open zzz.pm: $!\n";
-	print F "package zzz;\n\@VERSION = ();\n1;\n";
-	close F;
-	eval "use lib '.'; use zzz 3;";
+	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+	(my $package = basename($filename)) =~ s/\.pm$//;
+	print $fh "package $package;\n\@VERSION = ();\n1;\n";
+	close $fh;
+	eval "use lib '.'; use $package 3;";
 	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
-	eval "use lib '.'; use zzz; print zzz->VERSION";
+	eval "use lib '.'; use $package; print $package->VERSION";
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
-	unlink 'zzz.pm';
+	unlink $filename;
     }
 
 SKIP: 	{
@@ -379,77 +386,78 @@ SKIP: 	{
 
 SKIP: {
 	# dummy up a legal module for testing RT#19017
-	open F, ">www.pm" or die "Cannot open www.pm: $!\n";
-	print F <<"EOF";
-package www;
+	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+	(my $package = basename($filename)) =~ s/\.pm$//;
+	print $fh <<"EOF";
+package $package;
 use $CLASS; \$VERSION = ${CLASS}->new('0.0.4');
 1;
 EOF
-	close F;
+	close $fh;
 
-	eval "use lib '.'; use www 0.000008;";
-	like ($@, qr/^www version 0.000008 required/,
+	eval "use lib '.'; use $package 0.000008;";
+	like ($@, qr/^$package version 0.000008 required/,
 	    "Make sure very small versions don't freak"); 
-	eval "use lib '.'; use www 1;";
-	like ($@, qr/^www version 1 required/,
+	eval "use lib '.'; use $package 1;";
+	like ($@, qr/^$package version 1 required/,
 	    "Comparing vs. version with no decimal"); 
-	eval "use lib '.'; use www 1.;";
-	like ($@, qr/^www version 1 required/,
+	eval "use lib '.'; use $package 1.;";
+	like ($@, qr/^$package version 1 required/,
 	    "Comparing vs. version with decimal only"); 
 
 	if ( $] < 5.006_000 ) {
-	    unlink 'www.pm';
 	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3; 
 	}
-	eval "use lib '.'; use www v0.0.8;";
-	my $regex = "^www version v0.0.8 required";
+	eval "use lib '.'; use $package v0.0.8;";
+	my $regex = "^$package version v0.0.8 required";
 	like ($@, qr/$regex/, "Make sure very small versions don't freak"); 
 
 	$regex =~ s/8/4/; # set for second test
-	eval "use lib '.'; use www v0.0.4;";
+	eval "use lib '.'; use $package v0.0.4;";
 	unlike($@, qr/$regex/, 'Succeed - required == VERSION');
-	cmp_ok ( "www"->VERSION, 'eq', '0.0.4', 'No undef warnings' );
-
-	unlink 'www.pm';
+	cmp_ok ( $package->VERSION, 'eq', '0.0.4', 'No undef warnings' );
+	unlink $filename;
     }
 
 SKIP: {
     skip 'Cannot test "use base qw(version)"  when require is used', 3
     	unless defined $qv_declare;
-    open F, ">vvv.pm" or die "Cannot open vvv.pm: $!\n";
-    print F <<"EOF";
-package vvv;
+    my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+    (my $package = basename($filename)) =~ s/\.pm$//;
+    print $fh <<"EOF";
+package $package;
 use base qw(version);
 1;
 EOF
-    close F;
+    close $fh;
     # need to eliminate any other $qv_declare()'s
     undef *{"main\::$qv_declare"};
     ok(!defined(&{"main\::$qv_declare"}), "make sure we cleared $qv_declare() properly");
-    eval "use lib '.'; use vvv qw/declare qv/;";
+    eval "use lib '.'; use $package qw/declare qv/;";
     ok(defined(&{"main\::$qv_declare"}), "make sure we exported $qv_declare() properly");
-    isa_ok( &$qv_declare(1.2), "vvv");
-    unlink 'vvv.pm';
+    isa_ok( &$qv_declare(1.2), $package);
+    unlink $filename;
 }
 
 SKIP: {
 	if ( $] < 5.006_000 ) {
 	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3; 
 	}
-	open F, ">uuu.pm" or die "Cannot open uuu.pm: $!\n";
-	print F <<"EOF";
-package uuu;
+	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+	(my $package = basename($filename)) =~ s/\.pm$//;
+	print $fh <<"EOF";
+package $package;
 \$VERSION = 1.0;
 1;
 EOF
-	close F;
-	eval "use lib '.'; use uuu 1.001;";
-	like ($@, qr/^uuu version 1.001 required/,
+	close $fh;
+	eval "use lib '.'; use $package 1.001;";
+	like ($@, qr/^$package version 1.001 required/,
 	    "User typed numeric so we error with numeric"); 
-	eval "use lib '.'; use uuu v1.1.0;";
-	like ($@, qr/^uuu version v1.1.0 required/,
+	eval "use lib '.'; use $package v1.1.0;";
+	like ($@, qr/^$package version v1.1.0 required/,
 	    "User typed extended so we error with extended"); 
-	unlink 'uuu.pm';
+	unlink $filename;
     }
 
 SKIP: {

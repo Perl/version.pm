@@ -18,8 +18,8 @@ diag "Tests with empty derived class"  if $Verbose;
 
 sub main_reset {
     delete $main::INC{'version::Empty'};
-    undef $qv; undef *::qv; # avoid 'used once' warning
-    undef $declare; undef *::declare; # avoid 'used once' warning
+    undef &qv; undef *::qv; # avoid 'used once' warning
+    undef &declare; undef *::declare; # avoid 'used once' warning
 }
 
 package version::Bad;

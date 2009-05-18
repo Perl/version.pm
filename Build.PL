@@ -25,6 +25,7 @@ my $t = $class->new(
     module_name     => 'version',
     get_options     => {
        'perl_only' => { store => \$perl_only },
+       'perl-only' => { store => \$perl_only },
     },
 );
 
