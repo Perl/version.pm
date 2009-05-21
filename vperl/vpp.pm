@@ -38,7 +38,7 @@ sub new
 	my ($class, $value) = @_;
 	my $self = bless ({}, ref ($class) || $class);
 	
-	if ( ref($value) && eval("$value->isa('version')") ) {
+	if ( ref($value) && eval('$value->isa("version")') ) {
 	    # Can copy the elements directly
 	    $self->{version} = [ @{$value->{version} } ];
 	    $self->{qv} = 1 if $value->{qv};

@@ -191,7 +191,6 @@ SKIP: {
     skip "version require'd instead of use'd, cannot test $qv_declare", 3
     	unless defined $qv_declare;
     # test the $qv_declare() sub
-    $DB::single = 1;
     diag "testing $qv_declare" if $Verbose;
     $version = $CLASS->$qv_declare("1.2");
     is ( "$version", "v1.2", $qv_declare.'("1.2") == "1.2.0"' );
@@ -404,7 +403,6 @@ EOF
 	eval "use lib '.'; use $package 1.;";
 	like ($@, qr/^$package version 1 required/,
 	    "Comparing vs. version with decimal only"); 
-
 	if ( $] < 5.006_000 ) {
 	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3; 
 	}
