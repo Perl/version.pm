@@ -174,6 +174,7 @@ PPCODE:
     {
 	rv = sv_2mortal(new_version(ver));
     }
+#endif
     if ( strcmp(classname,"version::vxs") != 0 ) /* inherited new() */
 #if PERL_VERSION == 5
 	sv_bless(rv, gv_stashpv((char *)classname, GV_ADD));
@@ -181,7 +182,17 @@ PPCODE:
 	sv_bless(rv, gv_stashpv(classname, GV_ADD));
 #endif
     PUSHs(rv);
-#endif
+}
+
+void
+is_qv(lobj)
+    version_vxs	lobj	
+PPCODE:
+{
+    if ( hv_exists((HV*)lobj, "qv", 2 ) )
+	XSRETURN_YES;
+    else
+	XSRETURN_NO;
 }
 
 void

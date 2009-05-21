@@ -200,6 +200,16 @@ determine whether the v-string encoding was used.
 form that has a leading 'v' character, for the simple reason that sometimes
 it is impossible to tell whether one was present initially.
 
+=head1 METHODS
+
+=over 2
+
+=item is_qv
+
+True only if the version object is a dotted-decimal version, e.g.
+
+  version->new('1.2.0') == qv('1.2') == version->parse('v1.2');
+
 =head1 EXPORT
 
 qv - Extended Version initialization operator
