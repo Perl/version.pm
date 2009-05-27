@@ -40,6 +40,11 @@ version' in your code, you are strongly urged to set a minimum, e.g.
 
   use version 0.74; # to remain compatible with Perl v5.10.0
 
+If you use either of the two new methods, C<<version->parse>> or
+C<<version->declare>>, you must use this instead:
+
+  use version 0.77; # requires an update even for Perl v.5.10.0
+
 =head2 For CPAN Authors
 
 If you have a module that uses a decimal $VERSION (floating point), and you
@@ -49,7 +54,7 @@ nothing that version.pm gains you over a simple $VERSION assignment:
   our $VERSION = 1.02;
 
 and since Perl v5.10.0 includes the version.pm comparison logic anyways, 
-you don't need to do anything.
+you don't need to do anything at all.
 
 If you have used a decimal $VERSION in the past and wish to switch to a
 dotted-decimal $VERSION, then you need to make a one-time conversion to
@@ -95,7 +100,7 @@ equivalent:
 
 What is important is that 5.005_04 == 5.00504 == 5.005040.  And hence
 5.005_04 == 5.5.40.
- 
+
 This was the method that version.pm adopted as well.  The internal 
 representation of a version object is discussed in L<version::Internals>,
 but suffice it to say that for comparison purposes, all version objects are
@@ -128,24 +133,11 @@ to prevent any confusion.
 
 Because of the nature of the Perl parsing and tokenizing routines,
 certain initialization values B<must> be quoted in order to correctly
-parse as the intended version, especially when using the L<qv()> operator.
-In all cases, a floating point number passed to version->new() will be
-identically converted whether or not the value itself is quoted.  This is
-not true for L<qv()>, however, when trailing zeros would be stripped on
-an unquoted input, which would result in a very different version object.
-
-In addition, in order to be compatible with earlier Perl version styles,
-any use of versions of the form 5.006001 will be translated as v5.6.1.  
-In other words, a version with a single decimal point will be parsed as
-implicitly having three digits between subversions, but only for internal
-comparison purposes.
-
-The complicating factor is that in bare numbers (i.e. unquoted), the
-underscore is a legal numeric character and is automatically stripped
-by the Perl tokenizer before the version code is called.  However, if
-a number containing one or more decimals and an underscore is quoted, i.e.
-not bare, that is considered a L<Alpha Version> and the underscore is
-significant.
+parse as the intended version, especially when using the L<declare> or
+L<qv> methods.  While you do not have to quote decimal numbers when
+creating version objects, it is always safe to quote B<all> initial values
+when using version.pm methods, as this will ensure that what you type is
+what is used.
 
 If you use a mathematic formula that resolves to a floating point number,
 you are dependent on Perl's conversion routines to yield the version you
@@ -165,13 +157,6 @@ that is not possible in earlier versions of Perl.  In other words:
 
 =head2 What about v-strings?
 
-Beginning with Perl 5.6.0, an alternate method to code arbitrary strings
-of bytes was introduced, called v-strings.  They were intended to be an
-easy way to enter, for example, Unicode strings (which contain two bytes
-per character).  Some programs have used them to encode printer control
-characters (e.g. CRLF).  They were also intended to be used for $VERSION,
-but their use as such has been problematic from the start.
-
 There are two ways to enter v-strings: a bare number with two or more
 decimal points, or a bare number with one or more decimal points and a 
 leading 'v' character (also bare).  For example:
@@ -182,7 +167,7 @@ leading 'v' character (also bare).  For example:
 However, the use of bare v-strings to initialize version objects is
 B<strongly> discouraged in all circumstances (especially the leading 
 'v' style), since the meaning will change depending on which Perl you 
-are running.  It is better to directly use L<"Extended Versions"> to 
+are running.  It is better to directly use L<Dotted Decimal Versions> to 
 ensure the proper interpretation.
 
 If you insist on using bare v-strings with Perl > 5.6.0, be aware of the 
@@ -204,21 +189,66 @@ it is impossible to tell whether one was present initially.
 
 =over 2
 
+=item version->parse()
+
+This is the generic way to create version objects, equivalent to using
+L<<version->new()>>.  No special interpretation of the value is done; what
+you type is what you get (as long as you quote the value).  You can use
+this to create version objects using either decimal or dotted-decimal (with
+or without leading 'v').
+
+=item version->declare()
+
+This method always creates dotted-decimal version objects and is equivalent
+to the exported L<qv> function.  Even if you pass in what looks like a
+decimal number, a dotted-decimal will be formed, using the rules given in
+the discussion about L<Converting between Decimal and Dotted-Decimal
+Versions> above.  For this reason, you are B<STRONGLY> encouraged to always
+pass a dotted-decimal, e.g. C<<version->declare("1.2.3")>>, so that there
+is no opportunity for confusion.
+
+=item version->new()
+
+Equivalent to L<<version->parse()>>, use of this method is no longer
+encouraged.
+
+=item version->qv()
+
+A class method equivalent to the exported L<qv> function; you are urged
+to use L<<version->declare()>> instead for future development.
+
 =item is_qv
 
 True only if the version object is a dotted-decimal version, e.g.
 
-  version->new('1.2.0') == qv('1.2') == version->parse('v1.2');
+  version->parse('1.2.0') == qv('1.2') == version->declare('v1.2');
+
+=item is_alpha
+
+True if and only if the version object was created with a underscore, e.g.
+
+  version->parse('1.002_03');
+  version->declare('1.2.3_4');
+
+=back
 
 =head1 EXPORT
 
-qv - Extended Version initialization operator
+qv - Dotted Decimal Version initialization operator
+
+This function is no longer recommended for use, but is maintained for
+compatibility with existing code.  If you do not want to have it exported
+to your namespace, use this form:
+
+  use version 0.77 ();
 
 =head1 AUTHOR
 
 John Peacock E<lt>jpeacock@cpan.orgE<gt>
 
 =head1 SEE ALSO
+
+L<version::Internal>.
 
 L<perl>.
 
