@@ -5,6 +5,7 @@ use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
 $VERSION = '0.76_01';
+$VERSION = eval $VERSION;
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -48,7 +49,13 @@ sub new
 	}
 
 	my $currlocale = setlocale(LC_ALL);
-	my $radix_comma = ( localeconv()->{decimal_point} eq ',' );
+
+	# if the current locale uses commas for decimal points, we
+	# just replace commas with decimal places, rather than changing
+	# locales
+	if ( localeconv()->{decimal_point} eq ',' ) {
+	    $value =~ tr/,/./;
+	}
 
 	if ( not defined $value or $value =~ /^undef$/ ) {
 	    # RT #19517 - special case for undef comparison
@@ -67,16 +74,9 @@ sub new
 	# exponential notation
 	if ( $value =~ /\d+.?\d*e[-+]?\d+/ ) {
 	    $value = sprintf("%.9f",$value);
-	    $value =~ s/(0+)$//;
+	    $value =~ s/(0+)$//; # trim trailing zeros
 	}
 	
-	# if the original locale used commas for decimal points, we
-	# just replace commas with decimal places, rather than changing
-	# locales
-	if ( $radix_comma ) {
-	    $value =~ tr/,/./;
-	}
-
 	# This is not very efficient, but it is morally equivalent
 	# to the XS code (as that is the reference implementation).
 	# See vutil/vutil.c for details
@@ -100,7 +100,7 @@ sub new
 	$start = $last = $pos = $s;
 		
 	# pre-scan the input string to check for decimals/underbars
-	while ( substr($value,$pos,1) =~ /[._\d]/ ) {
+	while ( substr($value,$pos,1) =~ /[._\d,]/ ) {
 	    if ( substr($value,$pos,1) eq '.' ) {
 		if ($alpha) {
 		    Carp::croak("Invalid version format ".
@@ -117,6 +117,12 @@ sub new
 		}
 		$alpha = 1;
 		$width = $pos - $last - 1; # natural width of sub-version
+	    }
+	    elsif ( substr($value,$pos,1) eq ','
+		    and substr($value,$pos+1,1) =~ /[0-9]/ ) {
+		# looks like an unhandled locale
+		$saw_period++;
+		$last = $pos;
 	    }
 	    $pos++;
 	}
@@ -217,6 +223,10 @@ sub new
 		    $s = ++$pos;
 		}
 		elsif ( substr($value,$pos,1) eq '_' 
+		    && substr($value,$pos+1,1) =~ /\d/ ) {
+		    $s = ++$pos;
+		}
+		elsif ( substr($value,$pos,1) eq ',' 
 		    && substr($value,$pos+1,1) =~ /\d/ ) {
 		    $s = ++$pos;
 		}

@@ -75,6 +75,17 @@ when your $VERSION is printed (stringified).  If you do not quote your value,
 Perl's normal numeric handling comes into play and you may not get back what
 you were expecting.  See L<Quoting Rules> for more details.
 
+=head2 Types of version objects
+
+There are two different types of version objects, corresponding to the two
+different styles of versions in use:
+
+=over 2
+
+=item Decimal Versions
+
+The classic 
+
 =head2 Converting between Decimal and Dotted-Decimal Versions
 
 When Perl 5.6.0 was released, the decision was made to provide a
@@ -185,11 +196,11 @@ determine whether the v-string encoding was used.
 form that has a leading 'v' character, for the simple reason that sometimes
 it is impossible to tell whether one was present initially.
 
-=head1 METHODS
+=head1 CLASS METHODS
 
 =over 2
 
-=item version->parse()
+=item parse
 
 This is the generic way to create version objects, equivalent to using
 L<<version->new()>>.  No special interpretation of the value is done; what
@@ -197,7 +208,7 @@ you type is what you get (as long as you quote the value).  You can use
 this to create version objects using either decimal or dotted-decimal (with
 or without leading 'v').
 
-=item version->declare()
+=item declare
 
 This method always creates dotted-decimal version objects and is equivalent
 to the exported L<qv> function.  Even if you pass in what looks like a
@@ -207,12 +218,12 @@ Versions> above.  For this reason, you are B<STRONGLY> encouraged to always
 pass a dotted-decimal, e.g. C<<version->declare("1.2.3")>>, so that there
 is no opportunity for confusion.
 
-=item version->new()
+=item new
 
 Equivalent to L<<version->parse()>>, use of this method is no longer
 encouraged.
 
-=item version->qv()
+=item qv
 
 A class method equivalent to the exported L<qv> function; you are urged
 to use L<<version->declare()>> instead for future development.

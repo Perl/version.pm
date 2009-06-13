@@ -384,6 +384,8 @@ SKIP: 	{
     }
 
 SKIP: {
+	my $warning;
+	local $SIG{__WARN__} = sub { $warning = $_[0] };
 	# dummy up a legal module for testing RT#19017
 	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
 	(my $package = basename($filename)) =~ s/\.pm$//;
@@ -462,6 +464,11 @@ SKIP: {
 	# test locale handling
 	my $warning;
 	local $SIG{__WARN__} = sub { $warning = $_[0] };
+
+	my $v = $CLASS->new('1,7');
+	unlike($warning, qr"Version string '1,7' contains invalid data",
+	    'Directly test comma as decimal compliance');
+
 	my $ver = 1.23;  # has to be floating point number
 	my $orig_loc = setlocale( LC_ALL );
 	my $loc;
@@ -475,12 +482,34 @@ SKIP: {
 
 	diag ("Testing locale handling with $loc") if $Verbose;
 
-	my $v = $CLASS->$method($ver);
-	unlike($warning,qr/Version string '1,23' contains invalid data/,
+	$v = $CLASS->$method($ver);
+	unlike($warning, qr/Version string '1,23' contains invalid data/,
 	    "Process locale-dependent floating point");
 	is ($v, "1.23", "Locale doesn't apply to version objects");
 	ok ($v == $ver, "Comparison to locale floating point");
-	$loc = setlocale( LC_ALL, $orig_loc);
+
+	setlocale( LC_ALL, $orig_loc); # reset this before possible skip
+	skip 'Cannot test RT#46921 with Perl < 5.008', 1
+	    if ($] < 5.008);
+	skip 'Cannot test RT#46921 with pure Perl module', 1
+	    if exists $INC{'version/vpp.pm'};
+	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+	(my $package = basename($filename)) =~ s/\.pm$//;
+	print $fh <<"EOF";
+package $package;
+use POSIX qw(locale_h);
+\$^W = 1;
+use $CLASS;
+setlocale (LC_ALL, '$loc');
+eval "use Socket 1.7";
+setlocale( LC_ALL, '$orig_loc');
+1;
+EOF
+	close $fh;
+
+	eval "use lib '.'; use $package;";
+	unlike($warning, qr"Version string '1,7' contains invalid data",
+	    'Handle locale action-at-a-distance');
     }
 
     eval 'my $v = $CLASS->$method("1._1");';
