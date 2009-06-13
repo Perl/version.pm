@@ -4,7 +4,7 @@ use strict;
 use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = '0.77';
+$VERSION = '0.76_01';
 
 push @REGEXS, qr/
 	^v?	# optional leading 'v'
@@ -65,7 +65,7 @@ sub new
 	$value = _un_vstring($value);
 
 	# exponential notation
-	if ( $value =~ /\d+.?\d*e-?\d+/ ) {
+	if ( $value =~ /\d+.?\d*e[-+]?\d+/ ) {
 	    $value = sprintf("%.9f",$value);
 	    $value =~ s/(0+)$//;
 	}
