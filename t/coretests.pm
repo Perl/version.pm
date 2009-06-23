@@ -465,7 +465,8 @@ SKIP: {
 	my $warning;
 	local $SIG{__WARN__} = sub { $warning = $_[0] };
 
-	my $v = $CLASS->new('1,7');
+$DB::single = 1;
+	my $v = $CLASS->$method('1,7');
 	unlike($warning, qr"Version string '1,7' contains invalid data",
 	    'Directly test comma as decimal compliance');
 
@@ -501,6 +502,7 @@ use POSIX qw(locale_h);
 \$^W = 1;
 use $CLASS;
 setlocale (LC_ALL, '$loc');
+use $CLASS ;
 eval "use Socket 1.7";
 setlocale( LC_ALL, '$orig_loc');
 1;

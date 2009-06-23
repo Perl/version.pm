@@ -32,11 +32,19 @@ else { # use XS module
     *version::declare = \&version::vxs::declare;
     *version::qv = \&version::vxs::qv;
     *version::_VERSION = \&version::vxs::_VERSION;
-    if ($] > 5.009001 && $] <= 5.010000) {
+    if ($] > 5.009001 && $] < 5.010000) {
 	no strict 'refs';
 	*{'version::stringify'} = \*version::vxs::stringify;
 	*{'version::(""'} = \*version::vxs::stringify;
     }
+    elsif ($] == 5.010000) {
+	no strict 'refs';
+	*{'version::stringify'} = \*version::vxs::stringify;
+	*{'version::(""'} = \*version::vxs::stringify;
+	*version::new = \&version::vxs::new;
+	*version::parse = \&version::vxs::parse;
+    }
+
 }
 
 # Preloaded methods go here.

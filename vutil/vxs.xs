@@ -167,7 +167,7 @@ PPCODE:
 #endif
 	rv = sv_newmortal();
 	sv_setsv(rv,ver); /* make a duplicate */
-	upg_version(rv, TRUE);
+	UPG_VERSION(rv, TRUE);
 #ifdef SvVOK
     }
     else
@@ -222,7 +222,7 @@ PPCODE:
         sv_setsv(nsv, sv);
         sv = nsv;
 	if ( !sv_derived_from(sv, "version::vxs"))
-	    upg_version(sv, FALSE);
+	    UPG_VERSION(sv, FALSE);
         undef = NULL;
     }
     else {

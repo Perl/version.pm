@@ -32,7 +32,11 @@ it doesn't.
 */
 
 const char *
+#if PERL_VERSION < 10
 Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
+#else
+Perl_scan_version2(pTHX_ const char *s, SV *rv, bool qv)
+#endif
 {
     const char *start;
     const char *pos;
@@ -319,7 +323,7 @@ Perl_new_version(pTHX_ SV *ver)
 	}
     }
 #endif
-    return upg_version(rv, FALSE);
+    return UPG_VERSION(rv, FALSE);
 }
 
 /*
@@ -336,13 +340,16 @@ to force this SV to be interpreted as an "extended" version.
 */
 
 SV *
+#if PERL_VERSION < 10
 Perl_upg_version(pTHX_ SV *ver, bool qv)
+#else
+Perl_upg_version2(pTHX_ SV *ver, bool qv)
+#endif
 {
     const char *version, *s;
 #ifdef SvVOK
     const MAGIC *mg;
 #endif
-
     if ( SvNOK(ver) && !( SvPOK(ver) && sv_len(ver) == 3 ) )
     {
 	/* may get too much accuracy */ 
@@ -398,7 +405,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 #endif
     }
 
-    s = scan_version(version, ver, qv);
+    s = SCAN_VERSION(version, ver, qv);
     if ( *s != '\0' ) 
 	if(ckWARN(WARN_MISC))
 	    Perl_warner(aTHX_ packWARN(WARN_MISC), 

@@ -11,18 +11,22 @@ BEGIN {
     # If we made it this far, we are ok.
 }
 
-my $Verbose;
-require "t/coretests.pm";
+SKIP: {
+    skip 'Cannot test with 5.10.0 yet', 518
+    	if $] == 5.010_000;
+    my $Verbose;
+    require "t/coretests.pm";
 
-diag "Tests with base class" if $Verbose;
+    diag "Tests with base class" if $Verbose;
 
-BaseTests("version","new","qv");
-BaseTests("version","new","declare");
-BaseTests("version","parse", "qv");
-BaseTests("version","parse", "declare");
+    BaseTests("version","new","qv");
+    BaseTests("version","new","declare");
+    BaseTests("version","parse", "qv");
+    BaseTests("version","parse", "declare");
 
 # dummy up a redundant call to satify David Wheeler
-local $SIG{__WARN__} = sub { die $_[0] };
-eval 'use version;';
-unlike ($@, qr/^Subroutine main::declare redefined/,
-    "Only export declare once per package (to prevent redefined warnings)."); 
+    local $SIG{__WARN__} = sub { die $_[0] };
+    eval 'use version;';
+    unlike ($@, qr/^Subroutine main::declare redefined/,
+	"Only export declare once per package (to prevent redefined warnings)."); 
+}
