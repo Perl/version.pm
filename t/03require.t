@@ -6,21 +6,18 @@
 
 use Test::More qw/no_plan/;
 
-SKIP: {
-    skip 'Cannot test with 5.10.0 yet', 261
-    	if $] == 5.010_000;
 
 # Don't want to use, because we need to make sure that the import doesn't
 # fire just yet (some code does this to avoid importing qv() and delare()).
-    require_ok("version");
-    ok(!"main"->can("qv"), "We don't have the imported qv()");
-    ok(!"main"->can("declare"), "We don't have the imported declare()");
+require_ok("version");
+is $version::VERSION, 0.76_02, "Make sure we have the correct class";
+ok(!"main"->can("qv"), "We don't have the imported qv()");
+ok(!"main"->can("declare"), "We don't have the imported declare()");
 
-    my $Verbose;
-    require "t/coretests.pm";
+my $Verbose;
+require "t/coretests.pm";
 
-    diag "Tests with base class" if $Verbose;
+diag "Tests with base class" if $Verbose;
 
-    BaseTests("version","new",undef);
-    BaseTests("version","parse",undef);
-}
+BaseTests("version","new",undef);
+BaseTests("version","parse",undef);

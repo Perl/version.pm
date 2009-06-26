@@ -54,7 +54,7 @@ PPCODE:
 	sv_setpvf(vs,"v%s",SvPV(ST(2),n_a));
     }
 
-    rv = new_version(vs);
+    rv = NEW_VERSION(vs);
     if ( strcmp(classname,"version::vxs") != 0 ) /* inherited new() */
 #if PERL_VERSION == 5
 	sv_bless(rv, gv_stashpv((char *)classname, GV_ADD));
@@ -101,7 +101,7 @@ PPCODE:
 
     if ( ! sv_derived_from(robj, "version::vxs") )
     {
-	robj = sv_2mortal(new_version(robj));
+	robj = sv_2mortal(NEW_VERSION(robj));
     }
     rvs = SvRV(robj);
 
@@ -122,7 +122,7 @@ boolean(lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    SV	* const rs = newSViv( vcmp(lobj,new_version(newSVpvs("0"))) );
+    SV	* const rs = newSViv( vcmp(lobj,NEW_VERSION(newSVpvs("0"))) );
     PUSHs(sv_2mortal(rs));
 }
 
@@ -172,7 +172,7 @@ PPCODE:
     }
     else
     {
-	rv = sv_2mortal(new_version(ver));
+	rv = sv_2mortal(NEW_VERSION(ver));
     }
 #endif
     if ( strcmp(classname,"version::vxs") != 0 ) /* inherited new() */
@@ -258,7 +258,7 @@ PPCODE:
 
         if ( !sv_derived_from(req, "version")) {
 	    /* req may very well be R/O, so create a new object */
-	    req = sv_2mortal( new_version(req) );
+	    req = sv_2mortal( NEW_VERSION(req) );
 	}
 	
 

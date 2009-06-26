@@ -255,7 +255,11 @@ want to upgrade the SV.
 */
 
 SV *
+#if PERL_VERSION < 10
 Perl_new_version(pTHX_ SV *ver)
+#else
+Perl_new_version2(pTHX_ SV *ver)
+#endif
 {
     dVAR;
     SV * const rv = newSV(0);
