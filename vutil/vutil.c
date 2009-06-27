@@ -634,16 +634,17 @@ Perl_vstringify(pTHX_ SV *vs)
 #endif
 {
     PERL_ARGS_ASSERT_VSTRINGIFY;
+
     if ( SvROK(vs) )
 	vs = SvRV(vs);
-    
+
     if ( !vverify(vs) )
 	Perl_croak(aTHX_ "Invalid version object");
 
     if (hv_exists(MUTABLE_HV(vs), "original",  sizeof("original") - 1)) {
 	SV *pv;
 	pv = *hv_fetchs(MUTABLE_HV(vs), "original", FALSE);
-	if ( SvPOK(pv) ) 
+	if ( SvPOK(pv) )
 	    return newSVsv(pv);
 	else
 	    return &PL_sv_undef;
