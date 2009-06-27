@@ -70,7 +70,7 @@ stringify (lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    PUSHs(sv_2mortal(vstringify2(lobj)));
+    PUSHs(sv_2mortal(VSTRINGIFY(lobj)));
 }
 
 void
@@ -272,14 +272,14 @@ PPCODE:
 	    else {
 		Perl_croak(aTHX_ "%s version %"SVf" required--"
 		   "this is only version %"SVf" ", HvNAME(pkg),
-		       SVfARG(vstringify2(req)),
-		       SVfARG(vstringify2(sv)));
+		       SVfARG(VSTRINGIFY(req)),
+		       SVfARG(VSTRINGIFY(sv)));
 	    }
 	}
     }
 
     if ( SvOK(sv) && sv_derived_from(sv, "version::vxs") ) {
-	ST(0) = vstringify2(sv);
+	ST(0) = VSTRINGIFY(sv);
     } else {
 	ST(0) = sv;
     }
