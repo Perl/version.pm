@@ -13,7 +13,6 @@ t/01base.t
 t/02derived.t
 t/03require.t
 t/coretests.pm
-t/lib/version/Empty.pm
 t/survey_locales
 vperl/vpp.pm
 vutil/lib/version/vxs.pm
