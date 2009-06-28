@@ -5,6 +5,7 @@
 #########################
 
 use Test::More qw/no_plan/;
+use File::Temp qw/tempfile/;
 
 BEGIN {
     use_ok("version", 0.76_03); # If we made it this far, we are ok.
@@ -12,24 +13,39 @@ BEGIN {
 
 my $Verbose;
 require "t/coretests.pm";
-use lib "t/lib";
-
-diag "Tests with empty derived class"  if $Verbose;
-
-sub main_reset {
-    delete $main::INC{'version::Empty'};
-    undef &qv; undef *::qv; # avoid 'used once' warning
-    undef &declare; undef *::declare; # avoid 'used once' warning
-}
+use lib qw/./;
 
 package version::Bad;
 use base 'version';
 sub new { my($self,$n)=@_;  bless \$n, $self }
 
 package main;
-use_ok("version::Empty", 0.001);
-my $testobj = version::Empty->new(1.002_003);
-isa_ok( $testobj, "version::Empty" );
+
+my $warning;
+local $SIG{__WARN__} = sub { $warning = $_[0] };
+# dummy up a legal module for testing RT#19017
+my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+(my $package = basename($filename)) =~ s/\.pm$//;
+print $fh <<"EOF";
+# This is an empty subclass
+package $package;
+use base 'version';
+use vars '\$VERSION';
+\$VERSION=0.001;
+EOF
+close $fh;
+
+sub main_reset {
+    delete $main::INC{'$package'};
+    undef &qv; undef *::qv; # avoid 'used once' warning
+    undef &declare; undef *::declare; # avoid 'used once' warning
+}
+
+diag "Tests with empty derived class"  if $Verbose;
+
+use_ok($package, 0.001);
+my $testobj = $package->new(1.002_003);
+isa_ok( $testobj, $package );
 ok( $testobj->numify == 1.002003, "Numified correctly" );
 ok( $testobj->stringify eq "1.002003", "Stringified correctly" );
 ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
@@ -37,18 +53,16 @@ ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 my $verobj = version::->new("1.2.4");
 ok( $verobj > $testobj, "Comparison vs parent class" );
 
-BaseTests("version::Empty", "new", "qv");
+BaseTests($package, "new", "qv");
 main_reset;
-use_ok("version::Empty", 0.001, "declare");
-BaseTests("version::Empty", "new", "declare");
+use_ok($package, 0.001, "declare");
+BaseTests($package, "new", "declare");
 main_reset;
-use_ok("version::Empty", 0.001);
-BaseTests("version::Empty", "parse", "qv");
+use_ok($package, 0.001);
+BaseTests($package, "parse", "qv");
 main_reset;
-use_ok("version::Empty", 0.001, "declare");
-BaseTests("version::Empty", "parse", "declare");
-main_reset;
-use_ok("version::Empty", 0.001);
+use_ok($package, 0.001, "declare");
+BaseTests($package, "parse", "declare");
 
 diag "tests with bad subclass"  if $Verbose;
 $testobj = version::Bad->new(1.002_003);
