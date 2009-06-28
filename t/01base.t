@@ -7,7 +7,7 @@
 use Test::More qw/no_plan/;
 
 BEGIN {
-    use_ok("version", 0.76_02);
+    use_ok("version", 0.76_03);
     # If we made it this far, we are ok.
 }
 
