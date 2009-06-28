@@ -7067,18 +7067,24 @@ DPPP_(my_pv_display)(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRL
  * AV *av2 = MUTABLE_AV(sv); <== GOOD: it may warn
  */
 
-#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define MUTABLE_PTR(p) ({ void *_p = (p); _p; })
-#else
-#  define MUTABLE_PTR(p) ((void *) (p))
+#ifndef MUTABLE_PTR
+#  if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+#    define MUTABLE_PTR(p) ({ void *_p = (p); _p; })
+#  else
+#    define MUTABLE_PTR(p) ((void *) (p))
+#  endif
+
+#  define MUTABLE_AV(p)	((AV *)MUTABLE_PTR(p))
+#  define MUTABLE_CV(p)	((CV *)MUTABLE_PTR(p))
+#  define MUTABLE_GV(p)	((GV *)MUTABLE_PTR(p))
+#  define MUTABLE_HV(p)	((HV *)MUTABLE_PTR(p))
+#  define MUTABLE_IO(p)	((IO *)MUTABLE_PTR(p))
+#  define MUTABLE_SV(p)	((SV *)MUTABLE_PTR(p))
 #endif
 
-#define MUTABLE_AV(p)	((AV *)MUTABLE_PTR(p))
-#define MUTABLE_CV(p)	((CV *)MUTABLE_PTR(p))
-#define MUTABLE_GV(p)	((GV *)MUTABLE_PTR(p))
-#define MUTABLE_HV(p)	((HV *)MUTABLE_PTR(p))
-#define MUTABLE_IO(p)	((IO *)MUTABLE_PTR(p))
-#define MUTABLE_SV(p)	((SV *)MUTABLE_PTR(p))
+#ifndef SvPVx_nolen_const
+#  define SvPVx_nolen_const(sv) ({SV *_sv = (sv); SvPV_nolen_const(_sv); })
+#endif
 
 #endif /* _P_P_PORTABILITY_H_ */
 

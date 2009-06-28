@@ -10,7 +10,7 @@ use Test::More qw/no_plan/;
 # Don't want to use, because we need to make sure that the import doesn't
 # fire just yet (some code does this to avoid importing qv() and delare()).
 require_ok("version");
-is $version::VERSION, 0.76_02, "Make sure we have the correct class";
+is $version::VERSION, 0.76_03, "Make sure we have the correct class";
 ok(!"main"->can("qv"), "We don't have the imported qv()");
 ok(!"main"->can("declare"), "We don't have the imported declare()");
 

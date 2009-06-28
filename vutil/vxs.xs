@@ -35,9 +35,10 @@ PPCODE:
 {
     SV *vs = ST(1);
     SV *rv;
+    PERL_UNUSED_ARG(ix);
     const char * const classname = 
     	sv_isobject(ST(0)) /* get the class if called as an object method */
-	    ? HvNAME(SvSTASH(SvRV(ST(0))))
+	    ? HvNAME_get(SvSTASH(SvRV(ST(0))))
 	    : (char *)SvPV_nolen(ST(0));
 
     if (items > 3)
@@ -46,12 +47,11 @@ PPCODE:
     if ( items == 1 || vs == &PL_sv_undef ) { /* no param or explicit undef */
 	/* create empty object */
 	vs = sv_newmortal();
-	sv_setpvn(vs,"",0);
+	sv_setpvs(vs,"");
     }
     else if (items == 3 ) {
-	STRLEN n_a;
 	vs = sv_newmortal();
-	sv_setpvf(vs,"v%s",SvPV(ST(2),n_a));
+	sv_setpvf(vs,"v%s",SvPV_nolen_const(ST(2)));
     }
 
     rv = NEW_VERSION(vs);
@@ -62,7 +62,7 @@ PPCODE:
 	sv_bless(rv, gv_stashpv(classname, GV_ADD));
 #endif
 
-    PUSHs(sv_2mortal(rv));
+    mPUSHs(rv);
 }
 
 void
@@ -70,7 +70,7 @@ stringify (lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    PUSHs(sv_2mortal(VSTRINGIFY(lobj)));
+    mPUSHs(VSTRINGIFY(lobj));
 }
 
 void
@@ -78,7 +78,7 @@ numify (lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    PUSHs(sv_2mortal(vnumify(lobj)));
+    mPUSHs(vnumify(lobj));
 }
 
 void
@@ -86,7 +86,7 @@ normal(ver)
     SV *ver
 PPCODE:
 {
-    PUSHs(sv_2mortal(vnormal(ver)));
+    mPUSHs(vnormal(ver));
 }
 
 void
@@ -101,20 +101,20 @@ PPCODE:
 
     if ( ! sv_derived_from(robj, "version::vxs") )
     {
-	robj = sv_2mortal(NEW_VERSION(robj));
+	robj = NEW_VERSION(robj);
     }
     rvs = SvRV(robj);
 
     if ( swap )
     {
-        rs = newSViv(vcmp(robj,lobj));
+        rs = newSViv(vcmp(rvs,lobj));
     }
     else
     {
-        rs = newSViv(vcmp(lobj,robj));
+        rs = newSViv(vcmp(lobj,rvs));
     }
 
-    PUSHs(sv_2mortal(rs));
+    mPUSHs(rs);
 }
 
 void
@@ -123,7 +123,7 @@ boolean(lobj,...)
 PPCODE:
 {
     SV	* const rs = newSViv( vcmp(lobj,NEW_VERSION(newSVpvs("0"))) );
-    PUSHs(sv_2mortal(rs));
+    mPUSHs(rs);
 }
 
 void
@@ -139,7 +139,7 @@ is_alpha(lobj)
     version_vxs	lobj	
 PPCODE:
 {
-    if ( hv_exists((HV*)lobj, "alpha", 5 ) )
+    if ( hv_exists(MUTABLE_HV(lobj), "alpha", 5 ) )
 	XSRETURN_YES;
     else
 	XSRETURN_NO;
@@ -153,13 +153,14 @@ PPCODE:
 {
     SV *ver = ST(0);
     SV * rv;
+    PERL_UNUSED_ARG(ix);
     const char * classname = "";
     if ( items == 2 && (ST(1)) != &PL_sv_undef ) {
 	/* getting called as object or class method */
 	ver = ST(1);
 	classname = 
 	    sv_isobject(ST(0)) /* get the class if called as an object method */
-		? HvNAME(SvSTASH(SvRV(ST(0))))
+		? HvNAME_get(SvSTASH(SvRV(ST(0))))
 		: (char *)SvPV_nolen(ST(0));
     }
 #ifdef SvVOK
@@ -189,7 +190,7 @@ is_qv(lobj)
     version_vxs	lobj	
 PPCODE:
 {
-    if ( hv_exists((HV*)lobj, "qv", 2 ) )
+    if ( hv_exists(MUTABLE_HV(lobj), "qv", 2 ) )
 	XSRETURN_YES;
     else
 	XSRETURN_NO;
@@ -232,26 +233,26 @@ PPCODE:
 
     if (items > 1) {
 	SV *req = ST(1);
-	STRLEN len;
 
 	if (undef) {
 	     if (pkg) {
-		 const char * const name = HvNAME(pkg);
+		 const char * const name = HvNAME_get(pkg);
 #if PERL_VERSION == 5
 		 Perl_croak(aTHX_ "%s version %s required--this is only version ",
-		 	    name, SvPVx(req, len));
+		 	    name, SvPVx_nolen_const(req));
 #else
 		 Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
 			    name, name);
 #endif
 	     }
 	     else {
-		 const char * const name = SvPVx(ST(0), len);
 #if PERL_VERSION >= 8
-		 Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed", name );
+		 Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed",
+			    SvPVx_nolen_const(ST(0)) );
 #else
 		 Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
-			    name, name);
+			    SvPVx_nolen_const(ST(0)),
+			    SvPVx_nolen_const(ST(0)) );
 #endif
 	     }
 	}
@@ -263,15 +264,15 @@ PPCODE:
 	
 
 	if ( vcmp( req, sv ) > 0 ) {
-	    if ( hv_exists((HV*)SvRV(req), "qv", 2 ) ) {
+	    if ( hv_exists(MUTABLE_HV(SvRV(req)), "qv", 2 ) ) {
 		Perl_croak(aTHX_ "%s version %"SVf" required--"
-		   "this is only version %"SVf" ", HvNAME(pkg),
+		   "this is only version %"SVf" ", HvNAME_get(pkg),
 		       SVfARG(vnormal(req)),
 		       SVfARG(vnormal(sv)));
 	    }
 	    else {
 		Perl_croak(aTHX_ "%s version %"SVf" required--"
-		   "this is only version %"SVf" ", HvNAME(pkg),
+		   "this is only version %"SVf" ", HvNAME_get(pkg),
 		       SVfARG(VSTRINGIFY(req)),
 		       SVfARG(VSTRINGIFY(sv)));
 	    }
