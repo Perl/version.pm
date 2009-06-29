@@ -24,6 +24,7 @@ if ( $@ ) { # don't have the XS version installed
 	no strict 'refs';
 	*{'version::stringify'} = \*version::vpp::stringify;
 	*{'version::(""'} = \*version::vpp::stringify;
+	*{'version::new'} = \*version::vpp::new;
     }
 }
 else { # use XS module
