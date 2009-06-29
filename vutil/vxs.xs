@@ -176,12 +176,14 @@ PPCODE:
 	rv = sv_2mortal(NEW_VERSION(ver));
     }
 #endif
-    if ( strcmp(classname,"version::vxs") != 0 ) /* inherited new() */
+    if ( items == 2 && strcmp(classname,"version") ) {
+	/* inherited new() */
 #if PERL_VERSION == 5
 	sv_bless(rv, gv_stashpv((char *)classname, GV_ADD));
 #else
 	sv_bless(rv, gv_stashpv(classname, GV_ADD));
 #endif
+    }
     PUSHs(rv);
 }
 
