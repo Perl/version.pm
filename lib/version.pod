@@ -84,7 +84,15 @@ different styles of versions in use:
 
 =item Decimal Versions
 
-The classic 
+The classic floating-point number $VERSION.  The advantage to this style is
+that you don't need to do anything special, just type a number (without
+quotes) into your source file.
+
+=item Dotted Decimal Versions
+
+The more modern form of version assignment, with 3 (or potentially more)
+integers seperated by decimal points (e.g. 1.2.3).  This is the form that
+Perl itself has used since 5.6.0 was released.
 
 =head2 Converting between Decimal and Dotted-Decimal Versions
 
