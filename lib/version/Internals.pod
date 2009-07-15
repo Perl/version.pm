@@ -1,84 +1,46 @@
 =head1 NAME
 
-version - Perl extension for Version Objects
-
-=head1 SYNOPSIS
-
-  use version;
-  $version = version->new("12.2.1"); # must be quoted for Perl < 5.8.1
-  print $version; 		# v12.2.1
-  print $version->numify; 	# 12.002001
-  if ( $version gt "12.2" )	# true
-
-  $alphaver = version->new("1.02_03"); # must be quoted!
-  print $alphaver;		# 1.02_0300
-  print $alphaver->is_alpha();  # true
-  
-  $ver = qv("1.2.0");           # v1.2.0
-
-  $perlver = version->new(5.005_03); # must not be quoted!
-  print $perlver;		# 5.005030
+version::Internal - Perl extension for Version Objects
 
 =head1 DESCRIPTION
 
-Overloaded version objects for all modern versions of Perl.  This module
-implements all of the features of version objects which are part
-of Perl 5.10.0.  All previous releases (i.e. before 0.74) are deprecated
-and should not be used due to incompatible API changes.  If you 'use
-version' in your code, you are strongly urged to set a minimum, e.g. 
+Overloaded version objects for all modern versions of Perl.  This documents
+the internal data representation and underlying code for version.pm.  See
+L<version.pod> for daily usage.  This document is only useful for users
+writing a subclass of version.pm or interested in the gory details.
 
-  use version 0.74; # to remain compatible with Perl v5.10.0
+=head1 High level design
 
-=head2 BEST PRACTICES
+=head2 version objects
 
-If you intend for your module to be used by different releases of Perl,
-and/or for your $VERSION scalar to mean what you think it means, there 
-are a few simple rules to follow:
+version.pm provides a robust version object that is designed to both 
+encapsulate the author's intended $VERSION assignment as well as make it
+completely natural to use those objects as if they were numbers (e.g. for
+comparisons).  To do this, a version object contains both the original 
+representation as typed by the author, as well as a parsed representation
+to ease comparisons.  Version objects also employ L<overload> methods to
+simplify code that needs to compare, print, etc the objects.
 
-=over 4
+=head2 History
 
-=item * Be consistent
+Until Perl 5.6.0 was released in March 2000, all $VERSION assignments were
+made as floating point numbers, e.g.
 
-Whichever of the two types of version objects that you choose to employ, 
-you should stick to either L<Numeric Versions> or L<Extended Versions>
-and not mix them together.  While this is I<possible>, it is very 
-confusing to the average user.
+  $VERSION = 1.020;
 
-If you intend to use L<Extended Versions>, you are strongly encouraged 
-to use the L<qv()> operator with a quoted term, e.g.:
+or in the case of an alpha/developer release to CPAN, with a single
+underscore:
 
-  use version; our $VERSION = qv("1.2.3");
+  $VERSION = "1.020_1";
+  $VERSION = eval($VERSION); # looks like 1.0201 now
 
-on a single line as above. 
-
-At the very least, decide on which of the several ways to initialize 
-your version objects you prefer and stick with it.  It is also best to 
-be explicit about what value you intend to assign your version object 
-and to not rely on hidden behavior of the parser. 
-
-=item * Be careful
-
-If you are using Module::Build or ExtUtils::MakeMaker, so that you can
-release your module to CPAN, you have to recognize that neither of those
-programs completely handles version objects natively (yet).  If you use
-version objects with Module::Build, you should add an explicit dependency
-to the release of version.pm in your Build.PL:
-
-  my $builder = Module::Build->new(
-     ...
-     requires => {
-         ... ,
-         'version'    => 0.50,
-	 ...,
-     },
-     ...
-  );
-
-and it should Just Work(TM).  Module::Build will [hopefully soon] 
-include full support for version objects; there are no current plans 
-to patch ExtUtils::MakeMaker to support version objects.
-
-=back
+The C<eval> is required because most code (in the core an in core modules)
+assumed that C<$VERSION> always contained a number.  Packaging code, like
+L<ExtUtils::MakeMaker> and more recently L<Module::Build> would "see" the
+first assignment and retain the underscore, e.g. in the package name.
+Perl itself ignores underscores in bare (unquoted) numbers, which is what
+the C<eval> is equivalent to, so anything that assumed a number would get
+a number.
 
 =head2 Using modules that use version.pm
 
