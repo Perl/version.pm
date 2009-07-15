@@ -8,7 +8,7 @@ use Test::More qw/no_plan/;
 use File::Temp qw/tempfile/;
 
 BEGIN {
-    use_ok("version", 0.76_03); # If we made it this far, we are ok.
+    use_ok("version", 0.76_04); # If we made it this far, we are ok.
 }
 
 my $Verbose;
