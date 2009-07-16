@@ -6,19 +6,19 @@ version - Perl extension for Version Objects
 
   # Parsing version strings (decimal or dotted-decimal)
 
-  use version;
+  use version 0.77; # get latest bug-fixes and API
   $ver = version->parse($string)
 
   # Declaring a dotted-decimal $VERSION (keep on one line!)
 
-  use version; our $VERSION = version->declare("v1.2.3"); # formal
-  use version; our $VERSION = qv("v1.2.3");               # shorthand
-  use version; our $VERSION = qv("v1.2_3");               # alpha
+  use version 0.77; our $VERSION = version->declare("v1.2.3"); # formal
+  use version 0.77; our $VERSION = qv("v1.2.3");               # shorthand
+  use version 0.77; our $VERSION = qv("v1.2_3");               # alpha
 
   # Declaring an old-style decimal $VERSION (use quotes!)
 
-  use version; our $VERSION = version->parse("1.0203");   # formal
-  use version; our $VERSION = version->parse("1.02_03");  # alpha
+  use version 0.77; our $VERSION = version->parse("1.0203");   # formal
+  use version 0.77; our $VERSION = version->parse("1.02_03");  # alpha
 
   # Comparing mixed version styles (decimals, dotted-decimals, objects)
 
@@ -32,50 +32,16 @@ version - Perl extension for Version Objects
 
 =head1 DESCRIPTION
 
-Overloaded version objects for all modern versions of Perl.  This module
-implements all of the features of version objects which are part
-of Perl 5.10.0.  All previous releases (i.e. before 0.74) are deprecated
-and should not be used due to incompatible API changes.  If you 'use
-version' in your code, you are strongly urged to set a minimum, e.g. 
+Version objects were added to Perl in 5.10.  This module implements version
+objects for older version of Perl and provides the version object API for all
+versions of Perl.  All previous releases before 0.74 are deprecated and should
+not be used due to incompatible API changes.  Version 0.77 introduces the new
+'parse' and 'declare' methods to standardize usage.  You are strongly urged to
+set 0.77 as a minimum in your code, e.g. 
 
-  use version 0.74; # to remain compatible with Perl v5.10.0
+  use version 0.77; # even for Perl v.5.10.0
 
-If you use either of the two new methods, C<<version->parse>> or
-C<<version->declare>>, you must use this instead:
-
-  use version 0.77; # requires an update even for Perl v.5.10.0
-
-=head2 For CPAN Authors
-
-If you have a module that uses a decimal $VERSION (floating point), and you
-do not intend to ever change that, this module is not for you.  There is
-nothing that version.pm gains you over a simple $VERSION assignment:
-
-  our $VERSION = 1.02;
-
-and since Perl v5.10.0 includes the version.pm comparison logic anyways, 
-you don't need to do anything at all.
-
-If you have used a decimal $VERSION in the past and wish to switch to a
-dotted-decimal $VERSION, then you need to make a one-time conversion to
-the new format. B<IMPORTANT NOTE>: you must ensure that your new $VERSION
-is numerically greater than your current decimal $VERSION; this is not
-always obvious.  See L<Comparing Different Versions> for details.  The
-PAUSE script will enforce this stricture, but you should understand the 
-reasoning behind the conversion.  Once you convert, you are free to
-increment $VERSION to your heart's content.
-
-If you have always used a dotted-decimal $VERSION for your module releases, 
-then version.pm is the way to ensure that this $VERSION works in any release
-of Perl from 5.005_04 to the present.
-
-No matter which type of $VERSION you use with version.pm, if you quote your
-initializer, then whatever you type B<in> will be exactly what comes B<out>
-when your $VERSION is printed (stringified).  If you do not quote your value,
-Perl's normal numeric handling comes into play and you may not get back what
-you were expecting.  See L<Quoting Rules> for more details.
-
-=head2 Types of version objects
+=head1 TYPES OF VERSION OBJECTS
 
 There are two different types of version objects, corresponding to the two
 different styles of versions in use:
@@ -91,10 +57,141 @@ quotes) into your source file.
 =item Dotted Decimal Versions
 
 The more modern form of version assignment, with 3 (or potentially more)
-integers seperated by decimal points (e.g. 1.2.3).  This is the form that
-Perl itself has used since 5.6.0 was released.
+integers seperated by decimal points (e.g. v1.2.3).  This is the form that
+Perl itself has used since 5.6.0 was released.  A leading "v" is optional, 
+but recommended for clarity.
 
-=head2 Converting between Decimal and Dotted-Decimal Versions
+=back
+
+See L<VERSION OBJECT DETAILS> for further information.
+
+=head1 DECLARING VERSIONS
+
+If you have a module that uses a decimal $VERSION (floating point), and you
+do not intend to ever change that, this module is not for you.  There is
+nothing that version.pm gains you over a simple $VERSION assignment:
+
+  our $VERSION = 1.02;
+
+Since Perl v5.10.0 includes the version.pm comparison logic anyways, 
+you don't need to do anything at all.
+
+=head2 How to convert a module from decimal to dotted-decimal
+
+If you have used a decimal $VERSION in the past and wish to switch to a
+dotted-decimal $VERSION, then you need to make a one-time conversion to
+the new format. 
+
+B<Important Note>: you must ensure that your new $VERSION is numerically
+greater than your current decimal $VERSION; this is not always obvious. First,
+convert your old decimal version (e.g. 1.02) to a normalized dotted-decimal
+form:
+
+  $ perl -Mversion -e 'print version->parse("1.02")->normal'
+  v1.20.0
+
+Then increment any of the dotted-decimal components (v1.20.1 or v1.21.0).
+
+=head2 How to C<declare()> a dotted-decimal version
+
+  use version 0.77; our $VERSION = version->declare("v1.2.3");
+
+The C<declare()> method always creates dotted-decimal version objects.  When
+used in a module, you B<must> put it on the same line as "use version" to
+ensure that $VERSION is read correctly by PAUSE and installer tools.  You
+should also add 'version' to the 'configure_requires' section of your
+module metadata file.  See instructions in L<ExtUtils::MakeMaker> or
+L<Module::Build> for details.
+
+B<Important Note>: Even if you pass in what looks like a decimal number
+("1.2"), a dotted-decimal will be created ("v1.200.0"). To avoid confusion
+or unintentional errors on older Perls, follow these guidelines:
+
+=over 2
+
+=item *
+
+Always use a dotted-decimal with (at least) three components
+
+=item *
+
+Always use a leading-v
+
+=item *
+
+Always quote the version
+
+=back
+
+If you really insist on using version.pm with an ordinary decimal version,
+use C<parse()> instead of declare.  See the L<PARSING AND COMPARING VERSIONS>
+for details.
+
+See also L<VERSION OBJECT DETAILS> for more on version number conversion,
+quoting, calculated version numbers and declaring developer or "alpha" version
+numbers.
+
+=head1 PARSING AND COMPARING VERSIONS
+
+If you need to compare version numbers, but can't be sure whether they are
+expressed as numbers, strings, v-strings or version objects,  then you can
+use version.pm to parse them all into objects for comparison.
+
+=head2 How to C<parse()> a version
+
+The C<parse()> method takes in anything that might be a version and returns
+a corresponding version object, doing any necessary conversion along the way.
+
+=over 2
+
+=item *
+
+Dotted-decimal: v-strings (v1.2.3), strings with with more than one decimal
+point ("1.2.3") and strings with a leading-v ("v1.2")
+
+=item *
+
+Decimal: regular decimal numbers (literal or in a string)
+
+=back
+
+Some examples:
+
+  $variable   version->parse($variable)
+  ---------   -------------------------
+  1.23        v1.230.0
+  "1.23"      v1.230.0
+  v1.23       v1.23.0
+  "v1.23"     v1.23.0
+  "1.2.3"     v1.2.3
+  "v1.2.3"    v1.2.3
+
+See L<VERSION OBJECT DETAILS> for more on version number conversion.
+
+=head2 How to compare version objects
+
+Version objects overload the C<cmp> and C<< E<lt>=E<gt> >> operators.  Perl
+automatically generates all of the other comparison operators based on those
+two so all the normal logical comparisons will work.
+
+  if ( version->parse($v1) == version->parse($v2) ) {
+    # do stuff
+  }
+
+If a version object is compared against a non-version object, the non-object
+term will be converted to a version object using C<parse()>.  This may give
+surprising results:
+
+  $v1 = version->parse("v0.95.0");
+  $bool = $v1 < 0.96; # FALSE since 0.96 is v0.960.0
+
+Always comparing to a version object will help avoid surprises:
+
+  $bool = $v1 < version->parse("v0.96.0"); # TRUE
+
+=head1 VERSION OBJECT DETAILS
+
+=head2 Equivalence between Decimal and Dotted-Decimal Versions
 
 When Perl 5.6.0 was released, the decision was made to provide a
 transformation between the old-style decimal versions and new-style
@@ -108,24 +205,8 @@ place, then each group of three digits to the right of the decimal makes up
 the next digit, and so on until the number of significant digits is exhausted,
 B<plus> enough trailing zeros to reach the next multiple of three.
 
-B<IMPORTANT NOTE:> There is no significance to the underscore in the last
-example above.  Perl has always allowed you to included underscores in bare
-numbers (not quoted) for visual formatting purposes.  So these are all
-equivalent:
-
-  $v1 = 1.000000;
-  $v2 = 1.000_000;
-  $v3 = 1.0_0_0_0_0_0;
-
-What is important is that 5.005_04 == 5.00504 == 5.005040.  And hence
-5.005_04 == 5.5.40.
-
-This was the method that version.pm adopted as well.  The internal 
-representation of a version object is discussed in L<version::Internals>,
-but suffice it to say that for comparison purposes, all version objects are
-compared as an array of digits.
-
-Some examples may be helpful:
+This was the method that version.pm adopted as well.  Some examples may be
+helpful:
 
                             equivalent
   decimal    zero-padded    dotted-decimal
@@ -137,18 +218,7 @@ Some examples may be helpful:
   1.00203    1.002030       v1.2.30
   1.002003   1.002003       v1.2.3
 
-Since many CPAN authors have used a 2 digit decimal $VERSION, they can be
-surprised to discover that the equivalent dotted-decimal version appears
-to be 10 times larger than they expected.  For this reason, if you are 
-converting from a decimal to a dotted-decimal $VERSION, it is best if you
-bump the major release:
-
-  Old $VERSION = 1.13;
-  New $VERSION = 2.0.0;
-
-to prevent any confusion.
-
-=head2 Quoting Rules
+=head2 Quoting rules
 
 Because of the nature of the Perl parsing and tokenizing routines,
 certain initialization values B<must> be quoted in order to correctly
@@ -157,6 +227,11 @@ L<qv> methods.  While you do not have to quote decimal numbers when
 creating version objects, it is always safe to quote B<all> initial values
 when using version.pm methods, as this will ensure that what you type is
 what is used.
+
+Additionally, if you quote your initializer, then the quoted value that goes
+B<in> will be be exactly what comes B<out> when your $VERSION is printed
+(stringified).  If you do not quote your value, Perl's normal numeric handling
+comes into play and you may not get back what you were expecting.
 
 If you use a mathematic formula that resolves to a floating point number,
 you are dependent on Perl's conversion routines to yield the version you
@@ -204,56 +279,70 @@ determine whether the v-string encoding was used.
 form that has a leading 'v' character, for the simple reason that sometimes
 it is impossible to tell whether one was present initially.
 
-=head1 CLASS METHODS
+=head2 Alpha versions
 
-=over 2
+For module authors using CPAN, the convention has been to note unstable
+releases with an underscore in the version string. (See L<CPAN>.)  version.pm
+follows this convention and alpha releases will test as being newer than the
+more recent stable release, and less than the next stable release.  For
+dotted-decimal versions, only the last element may be separated by an
+underscore:
 
-=item parse
+  # Declaring
+  use version 0.77; our $VERSION = version->declare("v1.2_3");
 
-This is the generic way to create version objects, equivalent to using
-L<<version->new()>>.  No special interpretation of the value is done; what
-you type is what you get (as long as you quote the value).  You can use
-this to create version objects using either decimal or dotted-decimal (with
-or without leading 'v').
+  # Parsing
+  $v1 = version->parse("v1.2_3");
+  $v1 = version->parse("1.002_003");
 
-=item declare
+=head1 OBJECT METHODS
 
-This method always creates dotted-decimal version objects and is equivalent
-to the exported L<qv> function.  Even if you pass in what looks like a
-decimal number, a dotted-decimal will be formed, using the rules given in
-the discussion about L<Converting between Decimal and Dotted-Decimal
-Versions> above.  For this reason, you are B<STRONGLY> encouraged to always
-pass a dotted-decimal, e.g. C<<version->declare("1.2.3")>>, so that there
-is no opportunity for confusion.
-
-=item new
-
-Equivalent to L<<version->parse()>>, use of this method is no longer
-encouraged.
-
-=item qv
-
-A class method equivalent to the exported L<qv> function; you are urged
-to use L<<version->declare()>> instead for future development.
-
-=item is_qv
-
-True only if the version object is a dotted-decimal version, e.g.
-
-  version->parse('1.2.0') == qv('1.2') == version->declare('v1.2');
-
-=item is_alpha
+=head2 is_alpha()
 
 True if and only if the version object was created with a underscore, e.g.
 
-  version->parse('1.002_03');
-  version->declare('1.2.3_4');
+  version->parse('1.002_03')->is_alpha;  # TRUE
+  version->declare('1.2.3_4')->is_alpha; # TRUE
 
-=back
+=head2 is_qv()
 
-=head1 EXPORT
+True only if the version object is a dotted-decimal version, e.g.
 
-qv - Dotted Decimal Version initialization operator
+  version->parse('1.2.0')->is_qv;        # TRUE
+  version->declare('v1.2')->is_qv;       # TRUE
+  qv('1.2')->is_qv;                      # TRUE
+  version->parse('1.2')->is_qv;          # FALSE
+
+=head2 normal()
+
+Returns a string with a standard 'normalized' dotted-decimal form with a
+leading-v and at least 3 components.
+
+ version->declare('v1.2')->normal;  # v1.2.0
+ version->parse('1.2')->normal;     # v1.200.0
+
+=head2 numify()
+
+Returns a value representing the object in a pure decimal form without
+trailing zeroes.
+
+ version->declare('v1.2')->numify;  # 1.002
+ version->parse('1.2')->numify;     # 1.2
+
+=head2 stringify()
+
+Returns a string that is as close to the original representation as possible.
+If the original representation was a numeric literal, it will be returned the
+way perl would normally represent it in a string.  This method is used whenever
+a version object is interpolated into a string.
+
+ version->declare('v1.2')->stringify;    # v1.2
+ version->parse('1.200')->stringify;     # 1.200
+ version->parse(1.02_30)->stringify;     # 1.023
+
+=head1 EXPORTED FUNCTIONS
+
+=head2 qv()
 
 This function is no longer recommended for use, but is maintained for
 compatibility with existing code.  If you do not want to have it exported
