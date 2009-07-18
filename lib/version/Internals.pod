@@ -71,7 +71,7 @@ error like:
 
   Example version 1.002003 (v1.2.3) required--this is only version 1.002002 (v1.2.2)...
 
-=item Extended version work sometimes
+=item Dotted-Decimal version work sometimes
 
 With Perl >= 5.6.2, you can also use a line like this:
 
@@ -83,7 +83,7 @@ v-strings> below).  This has to do with that fact that C<use> only checks
 to see if the second term I<looks like a number> and passes that to the
 replacement L<UNIVERSAL::VERSION>.  This is not true in Perl 5.005_04,
 however, so you are B<strongly encouraged> to always use a Decimal version
-in your code, even for those versions of Perl which support the extended
+in your code, even for those versions of Perl which support the Dotted-Decimal
 version.
 
 =back
@@ -107,10 +107,10 @@ Versions>.  This also covers versions with a single decimal point and
 a single embedded underscore, see L<Decimal Alpha Versions>, even though
 these must be quoted to preserve the underscore formatting.
 
-=item * Extended Versions
+=item * Dotted-Decimal Versions
 
 Any initial parameter which contains more than one decimal point
-and an optional embedded underscore, see L<Extended Versions>.  This 
+and an optional embedded underscore, see L<Dotted-Decimal Versions>.  This 
 is what is commonly used in most open source software as the "external"
 version (the one used as part of the tag or tarfile name).  The use
 of the exported L<qv()> function also produces this kind of version
@@ -128,7 +128,7 @@ if required:
 
 In specific, version numbers initialized as L<Decimal Versions> will
 stringify as they were originally created (i.e. the same string that was
-passed to C<new()>.  Version numbers initialized as L<Extended Versions>
+passed to C<new()>.  Version numbers initialized as L<Dotted-Decimal Versions>
 will be stringified as L<Normal Form>.
 
 =head2 Decimal Versions
@@ -161,7 +161,7 @@ each multiple of 3, so 1.0003 is equivalent to v1.0.300, due to the need
 to remain compatible with Perl's own 5.005_03 == 5.5.30 interpretation.  
 Any trailing zeros are ignored for mathematical comparison purposes.
 
-=head2 Extended Versions
+=head2 Dotted-Decimal Versions
 
 These are the newest form of versions, and correspond to Perl's own
 version style beginning with 5.6.0.  Starting with Perl 5.10.0,
@@ -170,7 +170,7 @@ method normally requires that the input parameter be quoted, although
 Perl's after 5.8.1 can use v-strings as a special form of quoting, but
 this is highly discouraged.
 
-Unlike L<Decimal Versions>, Extended Versions have more than
+Unlike L<Decimal Versions>, Dotted-Decimal Versions have more than
 a single decimal point, e.g.:
 
                                    # Prints
@@ -180,12 +180,12 @@ a single decimal point, e.g.:
   $v = qv("1.2.3");                # v1.2.3
   $v = qv("1.20");                 # v1.20.0
 
-In general, Extended Versions permit the greatest amount of freedom
+In general, Dotted-Decimal Versions permit the greatest amount of freedom
 to specify a version, whereas Decimal Versions enforce a certain
 uniformity.  See also L<New Operator> for an additional method of
 initializing version objects.
 
-Just like L<Decimal Versions>, Extended Versions can be used as 
+Just like L<Decimal Versions>, Dotted-Decimal Versions can be used as 
 L<Alpha Versions>.
 
 =head2 Decimal Alpha Versions
@@ -242,7 +242,7 @@ In other words, the version will be automatically parsed out of the
 string, and it will be quoted to preserve the meaning CVS normally
 carries for versions.  The CVS $Revision$ increments differently from
 Decimal versions (i.e. 1.10 follows 1.9), so it must be handled as if
-it were a L<Extended Version>.
+it were a L<Dotted-Decimal Version>.
 
 A new version object can be created as a copy of an existing version
 object, either as a class method:
@@ -433,7 +433,7 @@ first glance.  For example, the following inequalities hold:
   version->new("0.96.1") < version->new(0.95); # 0.096.1 < 0.950.0
 
 For this reason, it is best to use either exclusively L<Decimal Versions> or
-L<Extended Versions> with multiple decimal points.
+L<Dotted-Decimal Versions> with multiple decimal points.
 
 =back
 
@@ -515,7 +515,7 @@ leading 'v' character (also bare).  For example:
 However, the use of bare v-strings to initialize version objects is
 B<strongly> discouraged in all circumstances (especially the leading 
 'v' style), since the meaning will change depending on which Perl you 
-are running.  It is better to directly use L<"Extended Versions"> to 
+are running.  It is better to directly use L<"Dotted-Decimal Versions"> to 
 ensure the proper interpretation.
 
 If you insist on using bare v-strings with Perl > 5.6.0, be aware of the 
@@ -573,7 +573,7 @@ underscore will be output when an alpha version is stringified, in the same
 place as it was when input.
 
 Alpha versions with more than a single decimal point will be treated 
-exactly as if they were L<Extended Versions>, and will display without any
+exactly as if they were L<Dotted-Decimal Versions>, and will display without any
 trailing (or leading) zeros, in the L<Version Normal> form.  For example,
 
   $newver = version->new("12.3.1_1");
@@ -657,7 +657,7 @@ of the subclass.
 
 =head1 EXPORT
 
-qv - Extended Version initialization operator
+qv - Dotted-Decimal Version initialization operator
 
 =head1 AUTHOR
 
