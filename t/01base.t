@@ -26,3 +26,12 @@ local $SIG{__WARN__} = sub { die $_[0] };
 eval 'use version;';
 unlike ($@, qr/^Subroutine main::declare redefined/,
     "Only export declare once per package (to prevent redefined warnings)."); 
+
+# https://rt.cpan.org/Ticket/Display.html?id=47980
+my $v = eval {
+    require IO::Handle;
+    $@ = qq(Can't locate some/completely/fictitious/module.pm); 
+    return IO::Handle->VERSION;
+};
+ok defined($v), 'Fix for RT #47980';
+

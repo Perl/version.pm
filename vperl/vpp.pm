@@ -511,15 +511,17 @@ sub _VERSION {
     my $class = ref($obj) || $obj;
 
     no strict 'refs';
-    eval "require $class" unless %{"$class\::"}; # already existing
-    return undef if $@ =~ /Can't locate/ and not defined $req;
+    unless (%{"$class\::"}) { # class not already loaded 
+    	eval "require $class";
+    	return undef if $@ =~ /Can't locate/ and not defined $req;
+    }
     
     if ( not %{"$class\::"} and $] >= 5.008) { # file but no package
 	require Carp;
 	Carp::croak( "$class defines neither package nor VERSION"
 	    ."--version check failed");
     }
-    
+
     my $version = eval "\$$class\::VERSION";
     if ( defined $version ) {
 	local $^W if $] <= 5.008;
