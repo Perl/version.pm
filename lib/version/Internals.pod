@@ -9,86 +9,7 @@ the internal data representation and underlying code for version.pm.  See
 L<version.pod> for daily usage.  This document is only useful for users
 writing a subclass of version.pm or interested in the gory details.
 
-=head1 High level design
-
-=head2 version objects
-
-version.pm provides a robust version object that is designed to both 
-encapsulate the author's intended $VERSION assignment as well as make it
-completely natural to use those objects as if they were numbers (e.g. for
-comparisons).  To do this, a version object contains both the original 
-representation as typed by the author, as well as a parsed representation
-to ease comparisons.  Version objects also employ L<overload> methods to
-simplify code that needs to compare, print, etc the objects.
-
-=head2 History
-
-Until Perl 5.6.0 was released in March 2000, all $VERSION assignments were
-made as floating point numbers, e.g.
-
-  $VERSION = 1.020;
-
-or in the case of an alpha/developer release to CPAN, with a single
-underscore:
-
-  $VERSION = "1.020_1";
-  $VERSION = eval($VERSION); # looks like 1.0201 now
-
-The C<eval> is required because most code (in the core an in core modules)
-assumed that C<$VERSION> always contained a number.  Packaging code, like
-L<ExtUtils::MakeMaker> and more recently L<Module::Build> would "see" the
-first assignment and retain the underscore, e.g. in the package name.
-Perl itself ignores underscores in bare (unquoted) numbers, which is what
-the C<eval> is equivalent to, so anything that assumed a number would get
-a number.
-
-=head2 Using modules that use version.pm
-
-As much as possible, the version.pm module remains compatible with all
-current code.  However, if your module is using a module that has defined
-C<$VERSION> using the version class, there are a couple of things to be
-aware of.  For purposes of discussion, we will assume that we have the
-following module installed:
-
-  package Example;
-  use version;  $VERSION = qv('1.2.2');
-  ...module code here...
-  1;
-
-=over 4
-
-=item Decimal versions always work
-
-Code of the form:
-
-  use Example 1.002003;
-
-will always work correctly.  The C<use> will perform an automatic
-C<$VERSION> comparison using the floating point number given as the first
-term after the module name (e.g. above 1.002.003).  In this case, the
-installed module is too old for the requested line, so you would see an
-error like:
-
-  Example version 1.002003 (v1.2.3) required--this is only version 1.002002 (v1.2.2)...
-
-=item Dotted-Decimal version work sometimes
-
-With Perl >= 5.6.2, you can also use a line like this:
-
-  use Example 1.2.3;
-
-and it will again work (i.e. give the error message as above), even with
-releases of Perl which do not normally support v-strings (see L<What about
-v-strings> below).  This has to do with that fact that C<use> only checks
-to see if the second term I<looks like a number> and passes that to the
-replacement L<UNIVERSAL::VERSION>.  This is not true in Perl 5.005_04,
-however, so you are B<strongly encouraged> to always use a Decimal version
-in your code, even for those versions of Perl which support the Dotted-Decimal
-version.
-
-=back
-
-=head2 What IS a version
+=head1 What IS a version
 
 For the purposes of this module, a version "number" is a sequence of
 positive integer values separated by one or more decimal points and 
@@ -102,19 +23,18 @@ There are actually two distinct kinds of version objects:
 
 =item * Decimal Versions
 
-Any initial parameter which "looks like a number", see L<Decimal
-Versions>.  This also covers versions with a single decimal point and
-a single embedded underscore, see L<Decimal Alpha Versions>, even though
-these must be quoted to preserve the underscore formatting.
+Any version which "looks like a number", see L<Decimal Versions>.  This
+also includes versions with a single decimal point and a single embedded
+underscore, see L<Decimal Alpha Versions>, even though these must be quoted
+to preserve the underscore formatting.
 
 =item * Dotted-Decimal Versions
 
-Any initial parameter which contains more than one decimal point
-and an optional embedded underscore, see L<Dotted-Decimal Versions>.  This 
-is what is commonly used in most open source software as the "external"
-version (the one used as part of the tag or tarfile name).  The use
-of the exported L<qv()> function also produces this kind of version
-object.
+Also referred to as "Dotted-Integer", these contains more than one decimal
+point and may have an optional embedded underscore, see L<Dotted-Decimal
+Versions>.  This is what is commonly used in most open source software as
+the "external" version (the one used as part of the tag or tarfile name).
+A leading 'v' character is optional, but strongly recommended for clarity.
 
 =back
 
@@ -209,6 +129,143 @@ following sequence of $VERSION's:
 
 The stringified form of Decimal versions will always be the same string
 that was used to initialize the version object.
+
+=head1 High level design
+
+=head2 version objects
+
+version.pm provides a robust version object that is designed to both 
+encapsulate the author's intended $VERSION assignment as well as make it
+completely natural to use those objects as if they were numbers (e.g. for
+comparisons).  To do this, a version object contains both the original 
+representation as typed by the author, as well as a parsed representation
+to ease comparisons.  Version objects also employ L<overload> methods to
+simplify code that needs to compare, print, etc the objects.
+
+The internal structure of version objects is a blessed has with several
+components:
+
+  bless( {
+    'original' => '1.2.3',
+    'qv' => 1,
+    'version' => [
+      1,
+      2,
+     3
+    ]
+  }, 'version' );
+
+=over 4
+
+=item original
+
+A faithful representation of the value used to initialize this version
+object.  The only time this will not be precisely the same characters
+that exist in the source file is if a short dotted-decimal version like
+v1.2 was used (in which case it will contain 'v1.2'.
+
+=item qv
+
+A logical the denotes whether this is a decimal or dotted-decimal version.
+
+=item version
+
+An array 
+
+=head2 Replacement UNIVERSAL::VERSION
+
+In addition to the version objects, this modules also replaces the core
+UNIVERSAL::VERSION function with one that uses version objects for its
+comparisons.  The return from this operator is always the stringified form,
+but the warning message generated includes either the stringified form or
+the normal form, depending on how it was called.
+
+For example:
+
+  package Foo;
+  $VERSION = 1.2;
+
+  package Bar;
+  $VERSION = "1.3.5"; # works with all Perl's (since it is quoted)
+
+  package main;
+  use version;
+
+  print $Foo::VERSION; # prints 1.2
+
+  print $Bar::VERSION; # prints 1.003005
+
+  eval "use foo 10";
+  print $@; # prints "foo version 10 required..."
+  eval "use foo 1.3.5; # work in Perl 5.6.1 or better
+  print $@; # prints "foo version 1.3.5 required..."
+
+  eval "use bar 1.3.6";
+  print $@; # prints "bar version 1.3.6 required..."
+  eval "use bar 1.004"; # note Decimal version
+  print $@; # prints "bar version 1.004 required..."
+
+
+IMPORTANT NOTE: This may mean that code which searches for a specific
+string (to determine whether a given module is available) may need to be
+changed.  It is always better to use the built-in comparison implicit in
+C<use> or C<require>, rather than manually poking at C<class->VERSION>
+and then doing a comparison yourself.
+
+The replacement UNIVERSAL::VERSION, when used as a function, like this:
+
+  print $module->VERSION;
+
+will also exclusively return the stringified form.  See L<Stringification>
+for more details.
+
+=head1 Usage question
+
+=head2 Using modules that use version.pm
+
+As much as possible, the version.pm module remains compatible with all
+current code.  However, if your module is using a module that has defined
+C<$VERSION> using the version class, there are a couple of things to be
+aware of.  For purposes of discussion, we will assume that we have the
+following module installed:
+
+  package Example;
+  use version;  $VERSION = qv('1.2.2');
+  ...module code here...
+  1;
+
+=over 4
+
+=item Decimal versions always work
+
+Code of the form:
+
+  use Example 1.002003;
+
+will always work correctly.  The C<use> will perform an automatic
+C<$VERSION> comparison using the floating point number given as the first
+term after the module name (e.g. above 1.002.003).  In this case, the
+installed module is too old for the requested line, so you would see an
+error like:
+
+  Example version 1.002003 (v1.2.3) required--this is only version 1.002002 (v1.2.2)...
+
+=item Dotted-Decimal version work sometimes
+
+With Perl >= 5.6.2, you can also use a line like this:
+
+  use Example 1.2.3;
+
+and it will again work (i.e. give the error message as above), even with
+releases of Perl which do not normally support v-strings (see L<What about
+v-strings> below).  This has to do with that fact that C<use> only checks
+to see if the second term I<looks like a number> and passes that to the
+replacement L<UNIVERSAL::VERSION>.  This is not true in Perl 5.005_04,
+however, so you are B<strongly encouraged> to always use a Decimal version
+in your code, even for those versions of Perl which support the Dotted-Decimal
+version.
+
+=back
 
 =head2 Object Methods
 
@@ -532,101 +589,6 @@ determine whether the v-string encoding was used.
 3) In all cases, a version created using v-strings will have a stringified
 form that has a leading 'v' character, for the simple reason that sometimes
 it is impossible to tell whether one was present initially.
-
-=head2 Types of Versions Objects
-
-There are two types of Version Objects:
-
-=over 4
-
-=item * Ordinary versions
-
-These are the versions that normal modules will use.  Can contain as
-many subversions as required.  In particular, those using RCS/CVS can
-use the following:
-
-  $VERSION = version->new(qw$Revision: 2.7 $);
-
-and the current RCS Revision for that file will be inserted
-automatically.  If the file has been moved to a branch, the Revision
-will have three or more elements; otherwise, it will have only two.
-This allows you to automatically increment your module version by
-using the Revision number from the primary file in a distribution, see
-L<ExtUtils::MakeMaker/"VERSION_FROM">.
-
-=item * Alpha Versions
-
-For module authors using CPAN, the convention has been to note
-unstable releases with an underscore in the version string, see
-L<CPAN>.  Alpha releases will test as being newer than the more recent
-stable release, and less than the next stable release.  For example:
-
-  $alphaver = version->new("12.03_01"); # must be quoted
-
-obeys the relationship
-
-  12.03 < $alphaver < 12.04
-
-Alpha versions with a single decimal point will be treated exactly as if
-they were L<Decimal Versions>, for parsing and output purposes.  The
-underscore will be output when an alpha version is stringified, in the same
-place as it was when input.
-
-Alpha versions with more than a single decimal point will be treated 
-exactly as if they were L<Dotted-Decimal Versions>, and will display without any
-trailing (or leading) zeros, in the L<Version Normal> form.  For example,
-
-  $newver = version->new("12.3.1_1");
-  print $newver; # v12.3.1_1
-
-=back
-
-=head2 Replacement UNIVERSAL::VERSION
-
-In addition to the version objects, this modules also replaces the core
-UNIVERSAL::VERSION function with one that uses version objects for its
-comparisons.  The return from this operator is always the stringified form,
-but the warning message generated includes either the stringified form or
-the normal form, depending on how it was called.
-
-For example:
-
-  package Foo;
-  $VERSION = 1.2;
-
-  package Bar;
-  $VERSION = "1.3.5"; # works with all Perl's (since it is quoted)
-
-  package main;
-  use version;
-
-  print $Foo::VERSION; # prints 1.2
-
-  print $Bar::VERSION; # prints 1.003005
-
-  eval "use foo 10";
-  print $@; # prints "foo version 10 required..."
-  eval "use foo 1.3.5; # work in Perl 5.6.1 or better
-  print $@; # prints "foo version 1.3.5 required..."
-
-  eval "use bar 1.3.6";
-  print $@; # prints "bar version 1.3.6 required..."
-  eval "use bar 1.004"; # note Decimal version
-  print $@; # prints "bar version 1.004 required..."
-
-
-IMPORTANT NOTE: This may mean that code which searches for a specific
-string (to determine whether a given module is available) may need to be
-changed.  It is always better to use the built-in comparison implicit in
-C<use> or C<require>, rather than manually poking at C<class->VERSION>
-and then doing a comparison yourself.
-
-The replacement UNIVERSAL::VERSION, when used as a function, like this:
-
-  print $module->VERSION;
-
-will also exclusively return the stringified form.  See L<Stringification>
-for more details.
 
 =head1 SUBCLASSING
 
