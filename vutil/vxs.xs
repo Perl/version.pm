@@ -35,11 +35,11 @@ PPCODE:
 {
     SV *vs = ST(1);
     SV *rv;
-    PERL_UNUSED_ARG(ix);
     const char * const classname = 
     	sv_isobject(ST(0)) /* get the class if called as an object method */
 	    ? HvNAME_get(SvSTASH(SvRV(ST(0))))
 	    : (char *)SvPV_nolen(ST(0));
+    PERL_UNUSED_ARG(ix);
 
     if (items > 3)
 	Perl_croak(aTHX_ "Usage: version::new(class, version)");
@@ -153,8 +153,8 @@ PPCODE:
 {
     SV *ver = ST(0);
     SV * rv;
-    PERL_UNUSED_ARG(ix);
     const char * classname = "";
+    PERL_UNUSED_ARG(ix);
     if ( items == 2 && (ST(1)) != &PL_sv_undef ) {
 	/* getting called as object or class method */
 	ver = ST(1);
