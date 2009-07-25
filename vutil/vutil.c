@@ -100,8 +100,12 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     if ( alpha && saw_period && width == 0 )
 	Perl_croak(aTHX_ "Invalid version format (misplaced _ in number)");
 
-    if ( saw_period > 1 )
+    if ( saw_period > 1 && qv == 0) {
 	qv = 1; /* force quoted version processing */
+	if(ckWARN(WARN_SYNTAX))
+	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX), 
+	    "v-string without leading 'v' deprecated for version objects");
+    }
 
     last = pos;
     pos = s;

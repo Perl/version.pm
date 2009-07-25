@@ -58,8 +58,8 @@ quotes) into your source file.
 
 The more modern form of version assignment, with 3 (or potentially more)
 integers seperated by decimal points (e.g. v1.2.3).  This is the form that
-Perl itself has used since 5.6.0 was released.  A leading "v" is optional, 
-but recommended for clarity.
+Perl itself has used since 5.6.0 was released.  The leading "v" is now 
+required for clarity, and will throw a warning if omitted.
 
 =back
 
@@ -146,8 +146,10 @@ a corresponding version object, doing any necessary conversion along the way.
 
 =item *
 
-Dotted-decimal: v-strings (v1.2.3), strings with with more than one decimal
-point ("1.2.3") and strings with a leading-v ("v1.2")
+Dotted-decimal: bare v-strings (v1.2.3) and strings with more than one
+decimal point and a leading 'v' ("v1.2.3"); NOTE you can technically use a
+v-string or strings with a leading-v and only one decimal point (v1.2 or
+"v1.2"), but you will confuse both yourself and others.
 
 =item *
 
@@ -259,10 +261,10 @@ leading 'v' character (also bare).  For example:
   $vs2 = v1.2;  # encoded as \1\2 
 
 However, the use of bare v-strings to initialize version objects is
-B<strongly> discouraged in all circumstances (especially the leading 
-'v' style), since the meaning will change depending on which Perl you 
-are running.  It is better to directly use L<Dotted Decimal Versions> to 
-ensure the proper interpretation.
+B<strongly> discouraged in all circumstances.  In fact, if you leave off
+the leading 'v' style, version.pm will throw a warning.  Also, bare
+v-strings are not completely supported in any version of Perl prior to
+5.8.1.
 
 If you insist on using bare v-strings with Perl > 5.6.0, be aware of the 
 following limitations:
@@ -308,7 +310,7 @@ True if and only if the version object was created with a underscore, e.g.
 
 True only if the version object is a dotted-decimal version, e.g.
 
-  version->parse('1.2.0')->is_qv;        # TRUE
+  version->parse('v1.2.0')->is_qv;        # TRUE
   version->declare('v1.2')->is_qv;       # TRUE
   qv('1.2')->is_qv;                      # TRUE
   version->parse('1.2')->is_qv;          # FALSE

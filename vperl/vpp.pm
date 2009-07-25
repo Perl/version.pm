@@ -4,7 +4,7 @@ use strict;
 use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = '0.76_05';
+$VERSION = '0.76_06';
 $VERSION = eval $VERSION;
 
 push @REGEXS, qr/
@@ -139,7 +139,12 @@ sub new
 		"(misplaced _ in number)");
 	}
 
-	if ( $saw_period > 1 ) {
+	if ( $saw_period > 1 && $qv == 0 ) {
+	    if ( warnings::enabled("syntax") ) {
+		require Carp;
+		Carp::carp("v-string without leading 'v' deprecated "
+		          ."for version objects");
+	    }
 	    $qv = 1; # force quoted version processing
 	}
 

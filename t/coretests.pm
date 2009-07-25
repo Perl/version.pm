@@ -10,6 +10,8 @@ use File::Basename;
 sub BaseTests {
 
     my ($CLASS, $method, $qv_declare) = @_;
+    my $warning;
+    local $SIG{__WARN__} = sub { $warning = $_[0] };
     
     # Insert your test code below, the Test module is use()ed here so read
     # its man page ( perldoc Test ) for help writing this test script.
@@ -34,8 +36,9 @@ sub BaseTests {
     is ( "$version" , "5.005" , '5.005 eq "5.005"' );
     $version = $CLASS->$method("5.006.001");
     is ( "$version" , "5.006.001" , '5.006.001 eq v5.6.1' );
-    $version = $CLASS->$method("1.2.3_4");
-    is ( "$version" , "1.2.3_4" , 'alpha version 1.2.3_4 eq v1.2.3_4' );
+    like ($warning, qr/v-string without leading 'v' deprecated/, 'No leading v');
+    $version = $CLASS->$method("v1.2.3_4");
+    is ( "$version" , "v1.2.3_4" , 'alpha version 1.2.3_4 eq v1.2.3_4' );
     
     # test illegal formats
     diag "test illegal formats" if $Verbose;
@@ -51,7 +54,7 @@ sub BaseTests {
     like($@, qr/alpha without decimal/,
 	"Invalid version format (alpha without decimal)");
     
-    # for this first test, just upgrade the warn() to die()
+    # for this test, upgrade the warn() to die()
     eval {
 	local $SIG{__WARN__} = sub { die $_[0] };
 	$version = $CLASS->$method("1.2b3");
@@ -64,8 +67,6 @@ sub BaseTests {
 
     # from here on out capture the warning and test independently
     {
-    my $warning;
-    local $SIG{__WARN__} = sub { $warning = $_[0] };
     $version = $CLASS->$method("99 and 44/100 pure");
 
     like($warning, qr/$warnregex/,
