@@ -7,3 +7,4 @@
 Makefile$
 version-.+\.tar\.gz
 vutil/Makefile\.PL
+t/test-all
