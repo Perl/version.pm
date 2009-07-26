@@ -59,7 +59,8 @@ quotes) into your source file.
 The more modern form of version assignment, with 3 (or potentially more)
 integers seperated by decimal points (e.g. v1.2.3).  This is the form that
 Perl itself has used since 5.6.0 was released.  The leading "v" is now 
-required for clarity, and will throw a warning if omitted.
+strongly recommended for clarity, and will throw a warning in a future
+release if omitted.
 
 =back
 
@@ -261,8 +262,7 @@ leading 'v' character (also bare).  For example:
   $vs2 = v1.2;  # encoded as \1\2 
 
 However, the use of bare v-strings to initialize version objects is
-B<strongly> discouraged in all circumstances.  In fact, if you leave off
-the leading 'v' style, version.pm will throw a warning.  Also, bare
+B<strongly> discouraged in all circumstances.  Also, bare
 v-strings are not completely supported in any version of Perl prior to
 5.8.1.
 

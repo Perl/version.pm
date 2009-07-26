@@ -36,7 +36,7 @@ sub BaseTests {
     is ( "$version" , "5.005" , '5.005 eq "5.005"' );
     $version = $CLASS->$method("5.006.001");
     is ( "$version" , "5.006.001" , '5.006.001 eq v5.6.1' );
-    like ($warning, qr/v-string without leading 'v' deprecated/, 'No leading v');
+    unlike ($warning, qr/v-string without leading 'v' deprecated/, 'No leading v');
     $version = $CLASS->$method("v1.2.3_4");
     is ( "$version" , "v1.2.3_4" , 'alpha version 1.2.3_4 eq v1.2.3_4' );
     
