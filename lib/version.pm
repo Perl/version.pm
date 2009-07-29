@@ -88,7 +88,8 @@ sub import {
 
     if (exists($args{'UNIVERSAL::VERSION'})) {
 	local $^W;
-	*UNIVERSAL::VERSION = \&version::_VERSION;
+	*UNIVERSAL::VERSION 
+		= \&version::_VERSION;
     }
 
     if (exists($args{'VERSION'})) {
