@@ -1,4 +1,4 @@
-version 0.76
+version 0.77
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -9,26 +9,30 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
-Major Changes in 0.76 - 2008-07-08
-===================================
-Fix segfault with core version stringification of serialized version 
-objects without an 'original' entry.  See
-
-	http://rt.perl.org/rt3/Public/Bug/Display.html?id=56606
-
-for more details.  I cannot make this 100% automatic; some module has to
-call 'use version;' for the fixed code to take effect.
-
-
-Major Changes in 0.7501 - 2008-06-14
+Major Changes in 0.7701 - 2009-07-28
 =====================================
+Special RHEL4.x/Fedora4.x Are Too Stupid to Live Release.  Those distros
+have never updated beyond Perl 5.8.5/5.8.6 respectively.  Consequently,
+they contain a complete broken Test::More::use_ok which doesn't load the
+package into the correct namespace:
 
-Installs correctly on Perl v5.10.0 (only the version.pm and
-version.pod) with both Makefile.PL and Build.PL.  Unify version.pm
-with core copy for future Perl releases.
-Resolves:
+	https://rt.cpan.org/Ticket/Display.html?id=48268
 
-	http://rt.cpan.org/Ticket/Display.html?id=36598
+thus causing mysterious test failures.  No version.pm code was changed at
+all. :(
+
+Major Changes in 0.77 - 2009-07-26
+===================================
+
+Complete POD rewrite to document common usage in version.pod and put all
+of the implementation details into version::Internals.
+
+Resolve a number of RT tickets:
+RT#48135 - Compilation failure using MS VC++ 7.0.
+RT#47980 - Remove need for runtime class loading in pure Perl code
+RT#46921 - locale and eval action at a distance.
+RT#45241 - mistaken regex to convert large exponential numbers
+to non-exponential form before scanning.
 
 
 Please read the POD documentation for usage/details.  See the CHANGES file
@@ -81,5 +85,5 @@ COPYRIGHT AND LICENCE
 
 This module can be distributed under the same terms as Perl.
 
-Copyright (C) 2004-2008 John Peacock
+Copyright (C) 2004-2009 John Peacock
 

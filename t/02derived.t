@@ -8,7 +8,13 @@ use Test::More qw/no_plan/;
 use File::Temp qw/tempfile/;
 
 BEGIN {
-    use_ok("version", 0.76_04); # If we made it this far, we are ok.
+    if ($Test::More::VERSION > 0.47) {
+	use_ok("version", 0.7701);
+    } else {
+	eval "use version 0.7701";
+	is $version::VERSION, 0.7701, 'Had to manually use version';
+    }
+    # If we made it this far, we are ok.
 }
 
 my $Verbose;
