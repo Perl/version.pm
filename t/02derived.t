@@ -9,7 +9,6 @@ use File::Temp qw/tempfile/;
 my $Verbose;
 
 BEGIN {
-    local $^W;
     require "t/coretests.pm";
     use_ok("version", 0.7701);
     # If we made it this far, we are ok.

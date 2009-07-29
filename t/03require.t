@@ -7,7 +7,6 @@
 use Test::More qw/no_plan/;
 my $Verbose;
 BEGIN {
-    local $^W;
     require "t/coretests.pm";
 }
 

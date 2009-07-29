@@ -8,7 +8,6 @@ use Test::More qw/no_plan/;
 my $Verbose;
 
 BEGIN {
-    local $^W;
     require "t/coretests.pm";
     use_ok('version', 0.7701);
 }
