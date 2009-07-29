@@ -6,19 +6,15 @@
 
 use Test::More qw/no_plan/;
 use File::Temp qw/tempfile/;
+my $Verbose;
 
 BEGIN {
-    if ($Test::More::VERSION > 0.47) {
-	use_ok("version", 0.7701);
-    } else {
-	eval "use version 0.7701";
-	is $version::VERSION, 0.7701, 'Had to manually use version';
-    }
+    local $^W;
+    require "t/coretests.pm";
+    use_ok("version", 0.7701);
     # If we made it this far, we are ok.
 }
 
-my $Verbose;
-require "t/coretests.pm";
 use lib qw/./;
 
 package version::Bad;

@@ -7,6 +7,17 @@ use POSIX qw/locale_h/;
 use File::Temp qw/tempfile/;
 use File::Basename;
 
+sub use_ok ($;@) {
+    my ($pkg, $req, @args) = @_;
+    if ($Test::More::VERSION > 0.47) {
+	Test::More::use_ok($pkg, $req, @args);
+    } else {
+	eval "use $pkg $req ".join(' ',@args);
+	is ${"$pkg\::VERSION"}, $req, 'Had to manually use version';
+    }
+    # If we made it this far, we are ok.
+}
+
 sub BaseTests {
 
     my ($CLASS, $method, $qv_declare) = @_;
