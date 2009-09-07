@@ -35,7 +35,7 @@ write_makefile();
 
 sub write_makefile
 {
-    my %prereq = ( 'Test::More' => 0 );
+    my %prereq = ( 'Test::More' => 0.45, 'File::Temp' => 0.13 );
 
     WriteMakefile( VERSION_FROM    => "lib/version.pm",
                    NAME            => "version",

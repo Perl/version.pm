@@ -4,6 +4,7 @@
 .+\.bak
 .+~
 .+\.orig
+.svn
 Makefile$
 version-.+\.tar\.gz
 vutil/Makefile\.PL

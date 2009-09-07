@@ -1,4 +1,4 @@
-version 0.77
+version 0.7702
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -8,6 +8,13 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.7702 - 2009-09-07
+=====================================
+Add additional contraints to the code which tries to guess whether something
+is a v-string or not for Perl 5.6.0 through 5.8.0 (inclusive).  Resolves:
+
+	https://rt.cpan.org/Ticket/Display.html?id=49348
 
 Major Changes in 0.7701 - 2009-07-28
 =====================================

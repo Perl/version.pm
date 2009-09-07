@@ -553,6 +553,16 @@ EOF
 	my $badv2 = bless { qv => 1, version => [1,2,3] }, "version";
 	is $badv2, 'v1.2.3', "Deal with badly serialized versions from YAML ";	
     }
+SKIP: {
+	if ( $] < 5.006_000 ) {
+	    skip 'No v-string support at all < 5.6.0', 2; 
+	}
+	# https://rt.cpan.org/Ticket/Display.html?id=49348
+	my $v = $CLASS->$method("420");
+	is "$v", "420", 'Correctly guesses this is not a v-string';
+	$v = $CLASS->$method(4.2.0);
+	is "$v", 'v4.2.0', 'Correctly guess that this is a v-string';
+    }
 }
 
 1;

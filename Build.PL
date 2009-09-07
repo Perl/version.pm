@@ -34,6 +34,8 @@ my %build_arguments = (
     license         => 'perl',
     requires        => {
 	perl => '> 5.005',
+	'Test::More' =>	'>= 0.45',
+	'File::Temp' => '>= 0.13',
     },
     dynamic_config  => 1,
     installdirs     =>

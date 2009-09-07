@@ -389,7 +389,8 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 #ifndef SvVOK
 #  if PERL_VERSION > 5
 	/* This will only be executed for 5.6.0 - 5.8.0 inclusive */
-	if ( len == 3 && !instr(version,".") && !instr(version,"_") ) {
+	if ( len == 3 && !instr(version,".") && !instr(version,"_")
+	    && (version[0] < '0' || version[0] > '9') ) {
 	    /* may be a v-string */
 	    SV * const nsv = sv_newmortal();
 	    const char *nver;
