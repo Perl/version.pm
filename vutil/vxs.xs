@@ -221,9 +221,7 @@ PPCODE:
     gvp = pkg ? (GV**)hv_fetchs(pkg,"VERSION",FALSE) : Null(GV**);
 
     if (gvp && isGV(gv = *gvp) && (sv = GvSV(gv)) && SvOK(sv)) {
-        SV * const nsv = sv_newmortal();
-        sv_setsv(nsv, sv);
-        sv = nsv;
+        sv = sv_mortalcopy(sv);
 	if ( !sv_derived_from(sv, "version::vxs"))
 	    UPG_VERSION(sv, FALSE);
         undef = NULL;
@@ -264,25 +262,25 @@ PPCODE:
 	    req = sv_2mortal( NEW_VERSION(req) );
 	}
 	
-
 	if ( vcmp( req, sv ) > 0 ) {
 	    if ( hv_exists(MUTABLE_HV(SvRV(req)), "qv", 2 ) ) {
-		Perl_croak(aTHX_ "%s version %"SVf" required--"
-		   "this is only version %"SVf" ", HvNAME_get(pkg),
-		       SVfARG(vnormal(req)),
-		       SVfARG(vnormal(sv)));
+		req = vnormal(req);
+		sv  = vnormal(sv);
 	    }
 	    else {
-		Perl_croak(aTHX_ "%s version %"SVf" required--"
-		   "this is only version %"SVf" ", HvNAME_get(pkg),
-		       SVfARG(VSTRINGIFY(req)),
-		       SVfARG(VSTRINGIFY(sv)));
-	    }
+		req = VSTRINGIFY(req);
+		sv  = VSTRINGIFY(sv);
+ 	    }
+	    Perl_croak(aTHX_ "%s version %"SVf" required--"
+	        "this is only version %"SVf"", HvNAME_get(pkg),
+	        SVfARG(sv_2mortal(req)),
+	        SVfARG(sv_2mortal(sv)));
 	}
     }
 
-    if ( SvOK(sv) && sv_derived_from(sv, "version::vxs") ) {
-	ST(0) = VSTRINGIFY(sv);
+    /* if the package's $VERSION is not undef, it is upgraded to be a version object */
+    if (!undef) {
+	ST(0) = sv_2mortal(VSTRINGIFY(sv));
     } else {
 	ST(0) = sv;
     }
