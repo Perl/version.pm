@@ -9,6 +9,21 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+Major Changes in 0.78 - 2009-10-12
+=====================================
+More changes to improve the non-magic v-string heuristics, this time 
+affecting both the pure Perl and XS backends.  NOTE: these fixes only
+matter if you are running Perl 5.6.x to 5.8.0 (inclusive).  Beginning
+with Perl 5.8.1, v-strings are now magical and version.pm no longer has
+to guess.  Resolves:
+
+	https://rt.cpan.org/Ticket/Display.html?id=50347
+
+Also resolve the issue where attempting to install CPAN releases on top
+of core releases (e.g. 5.10.0 and 5.10.1) would not DTRT.  Resolves:
+
+	https://rt.cpan.org/Ticket/Display.html?id=49667
+
 Major Changes in 0.7702 - 2009-09-07
 =====================================
 Add additional contraints to the code which tries to guess whether something
