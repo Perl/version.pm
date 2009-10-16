@@ -496,10 +496,10 @@ sub _verify {
 sub _un_vstring {
     my $value = shift;
     # may be a v-string
-    if ( $] >= 5.006_000 && length($value) == 3 && $value !~ /[._]/
+    if ( $] >= 5.006_000 && length($value) >= 3 && $value !~ /[._]/
 	&& (ord($value) < ord('0') || ord($value) > ord('9')) ) {
 	my $tvalue = sprintf("v%vd",$value);
-	if ( $tvalue =~ /^v\d+\.\d+\.\d+$/ ) {
+	if ( $tvalue =~ /^v\d+(\.\d+){2,}$/ ) {
 	    # must be a v-string
 	    $value = $tvalue;
 	}

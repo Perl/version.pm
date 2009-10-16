@@ -389,8 +389,9 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 #ifndef SvVOK
 #  if PERL_VERSION > 5
 	/* This will only be executed for 5.6.0 - 5.8.0 inclusive */
-	if ( len == 3 && !instr(version,".") && !instr(version,"_")
-	    && (version[0] < '0' || version[0] > '9') ) {
+	if ( len >= 3 && !instr(version,".") && !instr(version,"_")
+	    && !(*version == 'u' && strEQ(version, "undef"))
+	    && (*version < '0' || *version > '9') ) {
 	    /* may be a v-string */
 	    SV * const nsv = sv_newmortal();
 	    const char *nver;
@@ -408,7 +409,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	    }
 
 	    /* is definitely a v-string */
-	    if ( saw_period == 2 ) {	
+	    if ( saw_period >= 2 ) {	
 		Safefree(version);
 		version = nver;
 	    }

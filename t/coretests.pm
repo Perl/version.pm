@@ -563,6 +563,18 @@ SKIP: {
 	$v = $CLASS->$method(4.2.0);
 	is "$v", 'v4.2.0', 'Correctly guess that this is a v-string';
     }
+SKIP: {
+	if ( $] < 5.006_000 ) {
+	    skip 'No v-string support at all < 5.6.0', 4; 
+	}
+	# https://rt.cpan.org/Ticket/Display.html?id=50347
+	# Check that the qv() implementation does not change
+
+	ok $CLASS->$method(1.2.3) < $CLASS->$method(1.2.3.1), 'Compare 3 and 4 digit v-strings' ;
+	ok $CLASS->$method(v1.2.3) < $CLASS->$method(v1.2.3.1), 'Compare 3 and 4 digit v-strings, leaving v';
+	ok $CLASS->$method("1.2.3") < $CLASS->$method("1.2.3.1"), 'Compare 3 and 4 digit v-strings, quoted';
+	ok $CLASS->$method("v1.2.3") < $CLASS->$method("v1.2.3.1"), 'Compare 3 and 4 digit v-strings, quoted leading v';
+    }
 }
 
 1;
