@@ -69,7 +69,43 @@ dotted_decimal_version:
 	    if (strict && i < 2)	/* requires v1.2.3 */
 		return FALSE;
 	}
+    } 					/* end if dotted-decimal */
+    else
+    {					/* decimal versions */
+
+	if (d[0] == '0' && ! d[1] == '.')
+	{
+	    /* no leading zeros allowed */
+	    return FALSE;
+	}
+
+	while (isDIGIT(*d)) 	/* integer part */
+	    d++;
+
+	if (*d == '.')
+	{
+	    d++; 		/* decimal point */
+	}
+	if (!isDIGIT(*d)) 	/* requires 1.[0-9] */
+	    return FALSE;
+
+	while (isDIGIT(*d)) {
+	    d++;
+	    if (*d == '.' && isDIGIT(d[-1])) {
+		if (strict)
+		    return FALSE;
+		d = (char *)s; 		/* start all over again */
+		goto dotted_decimal_version;
+	    }
+	    if (*d == '_') {
+		if (strict)
+		    return FALSE;
+		else
+		    d++;
+	    }
+	}
     }
+
     return TRUE;
 }
 
