@@ -33,6 +33,8 @@ int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
 
 # endif
 
+#define isVERSION(a,b)		Perl_isVERSION(aTHX_ a,b)
+
 #define PERL_ARGS_ASSERT_SCAN_VERSION	\
 	assert(s); assert(rv)
 #define PERL_ARGS_ASSERT_NEW_VERSION	\

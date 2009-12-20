@@ -9,6 +9,70 @@
 #include "vutil.h"
 
 #define VERSION_MAX 0x7FFFFFFF
+
+bool Perl_isVERSION(pTHX_ const char *s, int strict) {
+    char *d = (char *)s;
+
+    while (isSPACE(*d)) /* leading whitespace */
+	d++;
+
+    if (*d == 'v' && isDIGIT(d[1]) ) /* explicit v-string */
+    {
+	d++;
+
+dotted_decimal_version:
+	if (strict && d[0] == '0' && ! d[1] == '.')
+	{
+	    /* no leading zeros allowed */
+	    return FALSE;
+	}
+
+	while (isDIGIT(*d)) 	/* integer part */
+	    d++;
+
+	if (*d == '.')
+	{
+	    d++; 		/* decimal point */
+	}
+	else
+	{
+	    if (strict) 	/* require v1.2.3 */
+		return FALSE;
+	    else
+		return TRUE;
+	}
+
+	{
+	    int i = 0;
+	    int j = 0;
+	    while (isDIGIT(*d)) {	/* just keep reading */
+		i++;
+		while (isDIGIT(*d)) {
+		    d++; j++;
+		    /* maximum 3 digits between decimal */
+		    if (strict && j == 3)
+			break;
+		}
+		if (*d == '_') {
+		    if (strict)
+			return FALSE;
+		    else
+			d++;
+		}
+		else if (*d == '.')
+		    d++;
+		else if (!isDIGIT(*d))
+		    break;
+		j = 0;
+	    }
+	
+	    if (strict && i < 2)	/* requires v1.2.3 */
+		return FALSE;
+	}
+    }
+    return TRUE;
+}
+
 /*
 =for apidoc scan_version
 
@@ -417,6 +481,13 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 #  endif
 #endif
     }
+
+/*
+    if (! isVERSION(version, TRUE))
+	if(ckWARN(WARN_MISC))
+	    Perl_warner(aTHX_ packWARN(WARN_MISC), 
+		"Version string '%s' does not pass STRICT test", version);
+*/
 
     s = SCAN_VERSION(version, ver, qv);
     if ( *s != '\0' ) 
