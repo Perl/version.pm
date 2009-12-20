@@ -12,7 +12,7 @@
 
 const char *
 Perl_prescan_version(pTHX_ const char *s, int strict,
-		     bool *sqv, int *swidth, bool *salpha) {
+		     bool *sqv, int *ssaw_period, int *swidth, bool *salpha) {
     bool qv = (sqv ? *sqv : FALSE);
     int width = 3;
     int saw_period = 0;
@@ -21,6 +21,9 @@ Perl_prescan_version(pTHX_ const char *s, int strict,
 
     while (isSPACE(*d)) /* leading whitespace */
 	d++;
+
+    if (qv && isDIGIT(*d))
+	goto dotted_decimal_version;
 
     if (*d == 'v' && isDIGIT(d[1]) ) /* explicit v-string */
     {
@@ -97,6 +100,10 @@ dotted_decimal_version:
 	while (isDIGIT(*d)) 	/* integer part */
 	    d++;
 
+	if (d[0] == '_' && isDIGIT(d[1])) {
+	    Perl_croak(aTHX_ "Invalid version format (alpha without decimal)");
+	}
+
 	if (*d == '.')
 	{
 	    saw_period++;
@@ -128,14 +135,14 @@ dotted_decimal_version:
     }
 
 version_prescan_success:
-    if ( alpha && !saw_period )
-	Perl_croak(aTHX_ "Invalid version format (alpha without decimal)");
     if ( alpha && saw_period && width == 0 )
 	Perl_croak(aTHX_ "Invalid version format (misplaced _ in number)");
     if (sqv)
 	*sqv = qv;
     if (swidth)
 	*swidth = width;
+    if (ssaw_period)
+	*ssaw_period = saw_period;
     if (salpha)
 	*salpha = alpha;
     return d;
@@ -191,7 +198,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     while (isSPACE(*s)) /* leading whitespace is OK */
 	s++;
 
-    last = prescan_version(s, FALSE, &qv, &width, &alpha);
+    last = prescan_version(s, FALSE, &qv, &saw_period, &width, &alpha);
     start = s;
     if (*s == 'v')
 	s++;
