@@ -33,7 +33,11 @@ int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
 
 # endif
 
-#define isVERSION(a,b)		Perl_isVERSION(aTHX_ a,b)
+const char *
+Perl_prescan_version(pTHX_ const char *s, int strict,
+		     bool *sqv, int *swidth, bool *salpha);
+#define prescan_version(a,b,c,d,e)	Perl_prescan_version(aTHX_ a,b,c,d,e)
+#define isVERSION(a,b)	(a != Perl_prescan_version(aTHX_ a, b, NULL, NULL, NULL))
 
 #define PERL_ARGS_ASSERT_SCAN_VERSION	\
 	assert(s); assert(rv)

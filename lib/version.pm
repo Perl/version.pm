@@ -19,8 +19,7 @@ my $DECIMAL_VERSION = '
       |			# or
 	[1-9]		# 1-9 followed by
 	[0-9]*		# zero or more digits
-    )			# mantissa required
-			# optionally followed by
+    )
     (?:			# decimal part
 	[.]		# literal decimal point
 	[0-9]+		# one or more digits
@@ -102,8 +101,7 @@ my $LAX_DECIMAL_VERSION = '
 	  |		# or
 	    [1-9]	# 1-9 followed by
 	    [0-9]*	# zero or more digits
-	)		# mantissa required
-			# optionally followed by
+	)
 	(?:		# decimal part
 	    [.]		# literal decimal point
 	    [0-9]+	# one or more digits
