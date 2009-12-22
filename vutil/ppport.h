@@ -7083,7 +7083,11 @@ DPPP_(my_pv_display)(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRL
 #endif
 
 #ifndef SvPVx_nolen_const
-#  define SvPVx_nolen_const(sv) ({SV *_sv = (sv); SvPV_nolen_const(_sv); })
+#  if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+#    define SvPVx_nolen_const(sv) ({SV *_sv = (sv); SvPV_nolen_const(_sv); })
+#  else
+#    define SvPVx_nolen_const(sv) (SvPV_nolen_const(sv))
+#  endif
 #endif
 
 #endif /* _P_P_PORTABILITY_H_ */
