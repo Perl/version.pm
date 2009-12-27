@@ -34,12 +34,15 @@ int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
 # endif
 
 const char *
-Perl_prescan_version(pTHX_ const char *s, int strict,
-		     bool *sqv, int *ssaw_period, int *swidth, bool *salpha);
+Perl_prescan_version(pTHX_ const char *s, bool strict,
+		     bool *sqv, int *ssaw_decimal, int *swidth, bool *salpha);
 #define prescan_version(a,b,c,d,e,f)	Perl_prescan_version(aTHX_ a,b,c,d,e,f)
 #define isVERSION(a,b) \
 	(a != Perl_prescan_version(aTHX_ a, b, NULL, NULL, NULL, NULL))
 
+#define PERL_ARGS_ASSERT_PRESCAN_VERSION	\
+	assert(s); assert(strict); assert(sqv); assert(ssaw_period);\
+	assert(swidth); assert(salpha);
 #define PERL_ARGS_ASSERT_SCAN_VERSION	\
 	assert(s); assert(rv)
 #define PERL_ARGS_ASSERT_NEW_VERSION	\

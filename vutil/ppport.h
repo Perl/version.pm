@@ -7090,6 +7090,25 @@ DPPP_(my_pv_display)(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRL
 #  endif
 #endif
 
+#ifndef Perl_ck_warner
+static void Perl_ck_warner(pTHX_ U32 err, const char* pat, ...);
+
+static
+void
+Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
+{
+  va_list args;
+
+  PERL_UNUSED_ARG(err);
+  if (ckWARN(err)) {
+    va_list args;
+    va_start(args, pat);
+    vwarner(err, pat, &args);
+    va_end(args);
+  }
+}
+#endif
+
 #endif /* _P_P_PORTABILITY_H_ */
 
 /* End of File ppport.h */
