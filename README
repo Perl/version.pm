@@ -1,4 +1,4 @@
-version 0.78
+version 0.79
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -8,6 +8,13 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.79 - 2010-01-03
+=====================================
+No outwardly visible changes.  This release is to match the code that 
+will part of Perl 5.12.0, but which doesn't affect the external API of
+the CPAN release.
+
 
 Major Changes in 0.78 - 2009-10-12
 =====================================

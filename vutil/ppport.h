@@ -7093,6 +7093,7 @@ DPPP_(my_pv_display)(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRL
 #ifndef Perl_ck_warner
 static void Perl_ck_warner(pTHX_ U32 err, const char* pat, ...);
 
+#  ifdef vwarner
 static
 void
 Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
@@ -7107,6 +7108,24 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
     va_end(args);
   }
 }
+#  else
+/* yes this replicates my_warner */
+static
+void
+Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
+{
+  SV *sv;
+  va_list args;
+
+  PERL_UNUSED_ARG(err);
+
+  va_start(args, pat);
+  sv = vnewSVpvf(pat, &args);
+  va_end(args);
+  sv_2mortal(sv);
+  warn("%s", SvPV_nolen(sv));
+}
+#  endif
 #endif
 
 #endif /* _P_P_PORTABILITY_H_ */

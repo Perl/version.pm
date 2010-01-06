@@ -9,7 +9,7 @@ my $class = Module::Build->subclass
     code => q{
 	sub ACTION_dist{
 	    my $self = shift;
-	    $self->do_system('svk log -x | gnuify-changelog.pl > Changes');
+	    $self->do_system('hg log --style changelog > Changes');
 	    $self->SUPER::ACTION_dist();
 	};
 	sub have_c_compiler{
