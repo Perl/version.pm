@@ -1,6 +1,6 @@
 #include "ppport.h"
 
-# if PERL_VERSION == 10 && PERL_SUBVERSION == 0
+# if PERL_VERSION == 10 && (PERL_SUBVERSION == 0 || PERL_SUBVERSION == 1) 
 
 const char * Perl_scan_version2(pTHX_ const char *s, SV *rv, bool qv);
 SV * Perl_new_version2(pTHX_ SV *ver);
