@@ -38,6 +38,7 @@ my %build_arguments = (
 	'File::Temp' => '>= 0.13',
     },
     dynamic_config  => 1,
+    dist_version_from => 'lib/version.pm',
     installdirs     =>
 	($] > 5.009001) ? 'core' : 'site',
 );
