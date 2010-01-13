@@ -11,118 +11,96 @@ $VERSION = 0.79;
 $CLASS = 'version';
 
 # Define STRICT version parsing
+use re 'debug';
 
-my $DECIMAL_VERSION = '
+my $INTEGER_PART = qr/
 (?:
-    (?: 		# integer part
-	0(?=[.])	# 0 but only if followed by a period
-      |			# or
-	[1-9]		# 1-9 followed by
-	[0-9]*		# zero or more digits
-    )
-    (?:			# decimal part
-	[.]		# literal decimal point
-	[0-9]+		# one or more digits
-    )?			# optional
-)';
+    0				# 0
+  |				# or
+    [1-9]			# 1-9 followed by
+    [0-9]{0,}			# zero or more digits
+)
+/x;
 
-my $DOTTED_DECIMAL_VERSION = '
+my $DECIMAL_PART = qr/
+(?:				# decimal part
+    [.]				# literal decimal point
+    [0-9]{1,}			# one or more digits
+)
+/x;
+
+my $DECIMAL_VERSION = qr/
 (?:
-    v			# leading v required
-    (?:			# integer part
-	0(?=[.])	# 0 but only if followed by a period
-      |			# or
-	[1-9]		# 1-9 followed by
-	[0-9]*		# zero or more digits
+    ${INTEGER_PART}		# mandatory
+    ${DECIMAL_PART}{0,1}	# optional
+)
+/x;
+
+my $STRICT_DECIMAL_PART = qr/
+(?:				# repeated part
+    [.]				# literal decimal point
+    [0-9]{1,3}			# followed by one to three digits
+)
+/x;
+
+my $DOTTED_DECIMAL_VERSION = qr/
+(?:
+    v				# leading v required
+    (?:
+    ${INTEGER_PART}		# mandatory decimal
+    ${STRICT_DECIMAL_PART}{2,}	# repeating 2 or more times
     )
-    (?:			# repeated part
-	[.]		# literal decimal point
-	[0-9]{1,3}	# followed by one to three digits
-    ){2,}		# repeating 2 or more times
-)';
+)
+/x;
 
 $STRICT = qr/(?:${DECIMAL_VERSION}|${DOTTED_DECIMAL_VERSION})/x;
 
 # Define LAX version parsing
 
-my $ALPHA = '
+my $ALPHA = qr/
 (?:
-    [_]			# literal underscore
-    [0-9]{1,}		# followed by one or more digits
-)';
+    [_]				# literal underscore
+    [0-9]{1,}			# followed by one or more digits
+)
+/x;
 
-my $LAX_DOTTED_DECIMAL_VERSION = '
+my $LAX_DOTTED_DECIMAL_VERSION = qr/
 (?:
     (?:
-	v		# leading v required
-	(?:		# integer part
-	    [0-9]+	# zero or more digits
-	)
-	(?:		# repeated part
-	    [.]		# literal decimal point
-	    [0-9]{1,}	# followed by one or more digits
-	){0,}		# repeating zero or more times
+	v			# leading v required
+	${INTEGER_PART}
     )
-  |	# or
+  |				# or
     (?:
-	v		# leading v required
-	(?:		# integer part
-	    [0-9]+	# zero or more digits
-	)
-	(?:		# repeated part
-	    [.]		# literal decimal point
-	    [0-9]{1,}	# followed by one or more digits
-	){1,}		# repeating one or more times
-	${ALPHA}*	# with trailing optional alpha stanza(s)
+	v			# leading v required
+	${INTEGER_PART}
+	${DECIMAL_PART}{1,}	# one or more times
+	${ALPHA}{0,1}		# with trailing optional alpha stanza
     )
-  |	# or
+  |				# or
     (?:
-	(?!v)		# no leading v
-	(?:		# integer part
-	    0(?=[.])	# 0 but only if followed by a period
-	  |		# or
-	    [1-9]	# 1-9 followed by
-	    [0-9]*	# zero or more digits
-	)
-	(?:		# repeated part
-	    [.]		# literal decimal point
-	    [0-9]{1,}	# followed by one or more digits
-	){2,}		# repeating two or more times
-	${ALPHA}*	# with trailing optional alpha stanza(s)
+	(?!v)			# no leading v allowed
+	${INTEGER_PART}
+	${DECIMAL_PART}{2,}	# repeating two or more times
+	${ALPHA}{0,1}		# with trailing optional alpha stanza
     )
 )
-';
+/x;
 
-my $LAX_DECIMAL_VERSION = '
+my $LAX_DECIMAL_VERSION = qr/
 (?:
     (?:
-	(?: 		# integer part
-	    0(?=[.])	# 0 but only if followed by a period
-	  |		# or
-	    [1-9]	# 1-9 followed by
-	    [0-9]*	# zero or more digits
-	)
-	(?:		# decimal part
-	    [.]		# literal decimal point
-	    [0-9]+	# one or more digits
-	)?		# optional
+	${INTEGER_PART}
+	${DECIMAL_PART}{0,1}	# optional
     )
-  |	# or
+  |				# or
     (?:
-	(?: 		# integer part
-	    0(?=[.])	# 0 but only if followed by a period
-	  |		# or
-	    [1-9]	# 1-9 followed by
-	    [0-9]*	# zero or more digits
-	)		# mantissa required
-	(?:		# decimal part
-	    [.]		# literal decimal point
-	    [0-9]+	# one or more digits
-	)		# required
-	${ALPHA}*	# with trailing optional alpha stanza(s)
+	${INTEGER_PART}
+	${DECIMAL_PART}
+	${ALPHA}{0,1}		# with trailing optional alpha stanza
     )
 )
-';
+/x;
 
 $LAX= qr/(?:${LAX_DECIMAL_VERSION}|${LAX_DOTTED_DECIMAL_VERSION})/x;
 
