@@ -50,13 +50,7 @@ my $DOTTED_DECIMAL_VERSION = qr/
 )
 /x;
 
-$STRICT = qr/
-(?:
-    \A${DECIMAL_VERSION}\Z
-  |
-    \A${DOTTED_DECIMAL_VERSION}\Z
-)
-/x;
+$STRICT = qr/\A(?:${DECIMAL_VERSION}|${DOTTED_DECIMAL_VERSION}\z)/x;
 
 # Define LAX version parsing
 
@@ -105,13 +99,7 @@ my $LAX_DECIMAL_VERSION = qr/
 )
 /x;
 
-$LAX= qr/
-(?:
-    \A${LAX_DECIMAL_VERSION}\Z
-  |
-    \A${LAX_DOTTED_DECIMAL_VERSION}\Z
-)
-/x;
+$LAX= qr/\A(?:${LAX_DECIMAL_VERSION}|${LAX_DOTTED_DECIMAL_VERSION}\z)/x;
 
 eval "use version::vxs $VERSION";
 if ( $@ ) { # don't have the XS version installed
