@@ -6,12 +6,11 @@ use strict;
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 
-$VERSION = 0.79;
+$VERSION = 0.81;
 
 $CLASS = 'version';
 
 # Define STRICT version parsing
-use re 'debug';
 
 my $INTEGER_PART = qr/
 (?:
@@ -46,14 +45,18 @@ my $STRICT_DECIMAL_PART = qr/
 my $DOTTED_DECIMAL_VERSION = qr/
 (?:
     v				# leading v required
-    (?:
     ${INTEGER_PART}		# mandatory decimal
     ${STRICT_DECIMAL_PART}{2,}	# repeating 2 or more times
-    )
 )
 /x;
 
-$STRICT = qr/(?:${DECIMAL_VERSION}|${DOTTED_DECIMAL_VERSION})/x;
+$STRICT = qr/
+(?:
+    \A${DECIMAL_VERSION}\Z
+  |
+    \A${DOTTED_DECIMAL_VERSION}\Z
+)
+/x;
 
 # Define LAX version parsing
 
@@ -102,7 +105,13 @@ my $LAX_DECIMAL_VERSION = qr/
 )
 /x;
 
-$LAX= qr/(?:${LAX_DECIMAL_VERSION}|${LAX_DOTTED_DECIMAL_VERSION})/x;
+$LAX= qr/
+(?:
+    \A${LAX_DECIMAL_VERSION}\Z
+  |
+    \A${LAX_DOTTED_DECIMAL_VERSION}\Z
+)
+/x;
 
 eval "use version::vxs $VERSION";
 if ( $@ ) { # don't have the XS version installed
