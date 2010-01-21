@@ -1,0 +1,12 @@
+\.lwpcookies
+\.releaserc
+.+\.diff
+.+\.bak
+.+~
+.+\.orig
+.hg
+.shipit
+Makefile$
+version-.+\.tar\.gz
+vutil/Makefile\.PL
+t/test-all
