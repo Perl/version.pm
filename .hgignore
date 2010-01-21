@@ -1,6 +1,6 @@
 .*~
 .*\.bak
 .*\.orig
-version-*.tar.gz
+version-.*\.tar\.gz
 Changes
-META.yml
+META\.yml
