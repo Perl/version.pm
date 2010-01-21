@@ -41,7 +41,7 @@ Perl_prescan_version(pTHX_ const char *s, bool strict,
 	(a != Perl_prescan_version(aTHX_ a, b, NULL, NULL, NULL, NULL))
 
 #define PERL_ARGS_ASSERT_PRESCAN_VERSION	\
-	assert(s); assert(strict); assert(sqv); assert(ssaw_period);\
+	assert(s); assert(sqv); assert(ssaw_decimal);\
 	assert(swidth); assert(salpha);
 #define PERL_ARGS_ASSERT_SCAN_VERSION	\
 	assert(s); assert(rv)
