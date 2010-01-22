@@ -35,10 +35,21 @@ int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
 
 const char *
 Perl_prescan_version(pTHX_ const char *s, bool strict,
+		     const char** errstr,
 		     bool *sqv, int *ssaw_decimal, int *swidth, bool *salpha);
-#define prescan_version(a,b,c,d,e,f)	Perl_prescan_version(aTHX_ a,b,c,d,e,f)
-#define isVERSION(a,b) \
-	(a != Perl_prescan_version(aTHX_ a, b, NULL, NULL, NULL, NULL))
+#define prescan_version(a,b,c,d,e,f,g)	Perl_prescan_version(aTHX_ a,b,c,d,e,f,g)
+
+#define is_LAX_VERSION(a,b) \
+	(a != Perl_prescan_version(aTHX_ a, FALSE, b, NULL, NULL, NULL, NULL))
+
+#define is_STRICT_VERSION(a,b) \
+	(a != Perl_prescan_version(aTHX_ a, TRUE, b, NULL, NULL, NULL, NULL))
+
+#define BADVERSION(a,b,c) \
+	if (b) { \
+	    *b = c; \
+	} \
+	return a;
 
 #define PERL_ARGS_ASSERT_PRESCAN_VERSION	\
 	assert(s); assert(sqv); assert(ssaw_decimal);\

@@ -44,10 +44,10 @@ PPCODE:
     if (items > 3)
 	Perl_croak(aTHX_ "Usage: version::new(class, version)");
 
-    if ( items == 1 || vs == &PL_sv_undef ) { /* no param or explicit undef */
+    if ( items == 1 || ! SvOK(vs) ) { /* no param or explicit undef */
 	/* create empty object */
 	vs = sv_newmortal();
-	sv_setpvs(vs,"");
+	sv_setpvs(vs,"undef");
     }
     else if (items == 3 ) {
 	vs = sv_newmortal();
@@ -101,7 +101,7 @@ PPCODE:
 
     if ( ! sv_derived_from(robj, "version::vxs") )
     {
-	robj = NEW_VERSION(robj);
+	robj = NEW_VERSION(SvOK(robj) ? robj : newSVpvs("undef"));
     }
     rvs = SvRV(robj);
 
@@ -155,7 +155,7 @@ PPCODE:
     SV * rv;
     const char * classname = "";
     PERL_UNUSED_ARG(ix);
-    if ( items == 2 && (ST(1)) != &PL_sv_undef ) {
+    if ( items == 2 && SvOK(ST(1)) ) {
 	/* getting called as object or class method */
 	ver = ST(1);
 	classname = 
