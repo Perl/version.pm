@@ -175,15 +175,15 @@ sub import {
     my $callpkg = caller();
     
     if (exists($args{declare})) {
-	*{$callpkg."::declare"} = 
+	*{$callpkg.'::declare'} = 
 	    sub {return $class->declare(shift) }
 	  unless defined(&{$callpkg.'::declare'});
     }
 
     if (exists($args{qv})) {
-	*{$callpkg."::qv"} =
+	*{$callpkg.'::qv'} =
 	    sub {return $class->qv(shift) }
-	  unless defined(&{"$callpkg\::qv"});
+	  unless defined(&{$callpkg.'::qv'});
     }
 
     if (exists($args{'UNIVERSAL::VERSION'})) {
@@ -193,7 +193,19 @@ sub import {
     }
 
     if (exists($args{'VERSION'})) {
-	*{$callpkg."::VERSION"} = \&version::_VERSION;
+	*{$callpkg.'::VERSION'} = \&version::_VERSION;
+    }
+
+    if (exists($args{'is_strict'})) {
+	*{$callpkg.'::is_strict'} = 
+	    sub {return $class->is_strict(shift)}
+	  unless defined(&{$callpkg.'::is_strict'});
+    }
+
+    if (exists($args{'is_lax'})) {
+	*{$callpkg.'::is_lax'} = 
+	    sub {return $class->is_lax(shift)}
+	  unless defined(&{$callpkg.'::is_lax'});
     }
 }
 
