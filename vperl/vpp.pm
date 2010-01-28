@@ -1,3 +1,64 @@
+package version::_string;
+# a little helper class to emulate C char* semantics in Perl
+# so that prescan_version can use the same code as in C
+
+use overload (
+    '""'	=> \&thischar,
+    '++'	=> \&increment,
+    '+'		=> \&plus,
+    '<=>'	=> \&compare,
+    'bool'	=> \&bool,
+    '='		=> \&clone,
+);
+
+sub new {
+    my ($self, $string) = @_;
+    my $class = ref($self) || $self;
+
+    my $obj = {
+	string  => [split(//,$string)],
+	current => 0,
+    };
+    return bless $obj, $class;
+}
+
+sub thischar {
+    my ($self) = @_;
+    return $self->{string}->[$self->{current}];
+}
+
+sub increment {
+    my ($self) = @_;
+    $self->{current}++;
+}
+
+sub plus {
+    my ($self, $offset) = @_;
+    return $self->{string}->[$self->{current} + $offset];
+}
+
+sub compare {
+    my ($left, $right, $swapped) = @_;
+    unless (ref($right)) { # not an object already
+	$right = $left->new($right);
+    }
+    return $left->thischar cmp $right->thischar;
+}
+
+sub bool {
+    my ($self) = @_;
+    return ($self->{string}->[$self->{current}]);
+}
+
+sub clone {
+    my ($left, $right, $swapped) = @_;
+    $right = {
+	string  => [@{$left->{string}}],
+	current => $left->{current},
+    };
+    return bless $right, ref($left);
+}
+
 package version::vpp;
 use strict;
 
@@ -5,13 +66,6 @@ use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
 $VERSION = 0.81;
-
-push @REGEXS, qr/
-	^v?	# optional leading 'v'
-	(\d*)	# major revision not required
-	\.	# requires at least one decimal
-	(?:(\d+)\.?){1,}
-	/x;
 
 use overload (
     '""'       => \&stringify,
@@ -22,8 +76,6 @@ use overload (
     'nomethod' => \&vnoop,
 );
 
-my $VERSION_MAX = 0x7FFFFFFF;
-
 eval "use warnings";
 if ($@) {
     eval '
@@ -31,6 +83,403 @@ if ($@) {
 	sub enabled {return $^W;}
 	1;
     ';
+}
+
+my $VERSION_MAX = 0x7FFFFFFF;
+
+# implement prescan_version as closely to the C version as possible
+use constant {
+    TRUE	=> 1,
+    FALSE	=> 0,
+};
+
+sub isDIGIT {
+    my ($char) = $_[0]->thischar();
+    return ($char =~ /\w/);
+}
+
+sub isSPACE {
+    my ($char) = $_[0]->thischar();
+    return ($char =~ /\s/);
+}
+
+sub BADVERSION {
+    my ($s, $errstr, $error) = @_;
+    if ($errstr) {
+	$$errstr = $error;
+    }
+    return $s;
+}
+
+sub prescan_version {
+    my ($s, $strict, $errstr, $sqv, $ssaw_decimal, $swidth, $salpha) = @_;
+    my $qv = (defined $sqv ? $$sqv : FALSE);
+    my $width = 3;
+    my $saw_decimal = 0;
+    my $alpha = FALSE;
+    my $d = $s;
+
+    if ($qv && isDIGIT($d)) {
+	goto dotted_decimal_version;
+    }
+
+    if ($d == 'v') { # explicit v-string
+	$d++;
+	if (isDIGIT($d)) {
+	    $qv = TRUE;
+	}
+	else { # degenerate v-string
+	    # requires v1.2.3
+	    return BADVERSION($s,$errstr,"Invalid version format (dotted-decimal versions require at least three parts)");
+	}
+
+dotted_decimal_version:
+	if ($strict && $d == '0' && isDIGIT($d+1)) {
+	    # no leading zeros allowed
+	    return BADVERSION($s,$errstr,"Invalid version format (no leading zeros)");
+	}
+
+	while (isDIGIT($d)) { 	# integer part
+	    $d++;
+	}
+
+	if ($d == '.')
+	{
+	    $saw_decimal++;
+	    $d++; 		# decimal point
+	}
+	else
+	{
+	    if ($strict) {
+		# require v1.2.3
+		return BADVERSION($s,$errstr,"Invalid version format (dotted-decimal versions require at least three parts)");
+	    }
+	    else {
+		goto version_prescan_finish;
+	    }
+	}
+
+	{
+	    my $i = 0;
+	    my $j = 0;
+	    while (isDIGIT($d)) {	# just keep reading
+		$i++;
+		while (isDIGIT($d)) {
+		    $d++; $j++;
+		    # maximum 3 digits between decimal
+		    if ($strict && $j > 3) {
+			return BADVERSION($s,$errstr,"Invalid version format (maximum 3 digits between decimals)");
+		    }
+		}
+		if ($d == '_') {
+		    if ($strict) {
+			return BADVERSION($s,$errstr,"Invalid version format (no underscores)");
+		    }
+		    if ( $alpha ) {
+			return BADVERSION($s,$errstr,"Invalid version format (multiple underscores)");
+		    }
+		    $d++;
+		    $alpha = TRUE;
+		}
+		elsif ($d == '.') {
+		    if ($alpha) {
+			return BADVERSION($s,$errstr,"Invalid version format (underscores before decimal)");
+		    }
+		    $saw_decimal++;
+		    $d++;
+		}
+		elsif (!isDIGIT($d)) {
+		    last;
+		}
+		$j = 0;
+	    }
+	
+	    if ($strict && $i < 2) {
+		# requires v1.2.3
+		return BADVERSION($s,$errstr,"Invalid version format (dotted-decimal versions require at least three parts)");
+	    }
+	}
+    } 					# end if dotted-decimal
+    else
+    {					# decimal versions
+	# special $strict case for leading '.' or '0'
+	if ($strict) {
+	    if ($d == '.') {
+		return BADVERSION($s,$errstr,"Invalid version format (0 before decimal required)");
+	    }
+	    if ($d == '0' && isDIGIT($d+1)) {
+		return BADVERSION($s,$errstr,"Invalid version format (no leading zeros)");
+	    }
+	}
+
+	# consume all of the integer part
+	while (isDIGIT($d)) {
+	    $d++;
+	}
+
+	# look for a fractional part
+	if ($d == '.') {
+	    # we found it, so consume it
+	    $saw_decimal++;
+	    $d++;
+	}
+	elsif (!$d || $d == ';' || isSPACE($d) || $d == '}') {
+	    if ( $d == $s ) {
+		# found nothing
+		return BADVERSION($s,$errstr,"Invalid version format (version required)");
+	    }
+	    # found just an integer
+	    goto version_prescan_finish;
+	}
+	elsif ( $d == $s ) {
+	    # didn't find either integer or period
+	    return BADVERSION($s,$errstr,"Invalid version format (non-numeric data)");
+	}
+	elsif ($d == '_') {
+	    # underscore can't come after integer part
+	    if ($strict) {
+		return BADVERSION($s,$errstr,"Invalid version format (no underscores)");
+	    }
+	    elsif (isDIGIT($d+1)) {
+		return BADVERSION($s,$errstr,"Invalid version format ($alpha without decimal)");
+	    }
+	    else {
+		return BADVERSION($s,$errstr,"Invalid version format (misplaced underscore)");
+	    }
+	}
+	else {
+	    # anything else after integer part is just invalid data
+	    return BADVERSION($s,$errstr,"Invalid version format (non-numeric data)");
+	}
+
+	# scan the fractional part after the decimal point
+	if (!isDIGIT($d) && ($strict || ! (!$d || $d == ';' || isSPACE($d) || $d == '}') )) {
+		# $strict or lax-but-not-the-end
+		return BADVERSION($s,$errstr,"Invalid version format (fractional part required)");
+	}
+
+	while (isDIGIT($d)) {
+	    $d++;
+	    if ($d == '.' && isDIGIT($d-1)) {
+		if ($alpha) {
+		    return BADVERSION($s,$errstr,"Invalid version format (underscores before decimal)");
+		}
+		if ($strict) {
+		    return BADVERSION($s,$errstr,"Invalid version format (dotted-decimal versions must begin with 'v')");
+		}
+		$d = version::_string->new($s); # start all over again
+		$qv = TRUE;
+		goto dotted_decimal_version;
+	    }
+	    if ($d == '_') {
+		if ($strict) {
+		    return BADVERSION($s,$errstr,"Invalid version format (no underscores)");
+		}
+		if ( $alpha ) {
+		    return BADVERSION($s,$errstr,"Invalid version format (multiple underscores)");
+		}
+		if ( ! isDIGIT($d+1) ) {
+		    return BADVERSION($s,$errstr,"Invalid version format (misplaced underscore)");
+		}
+		$d++;
+		$alpha = TRUE;
+	    }
+	}
+    }
+
+version_prescan_finish:
+    while (isSPACE($d)) {
+	$d++;
+    }
+
+    if (!isDIGIT($d) && (! (!$d || $d == ';' || $d == '}') )) {
+	# trailing non-numeric data
+	return BADVERSION($s,$errstr,"Invalid version format (non-numeric data)");
+    }
+
+    if (defined $sqv) {
+	$$sqv = $qv;
+    }
+    if (defined $swidth) {
+	$$swidth = $width;
+    }
+    if (defined $ssaw_decimal) {
+	$ssaw_decimal = $saw_decimal;
+    }
+    if (defined $salpha) {
+	$$salpha = $alpha;
+    }
+    return $d;
+}
+
+sub scan_version {
+    my ($s, $rv, $qv) = @_;
+    my $start;
+    my $pos;
+    my $last;
+    my $errstr;
+    my $saw_decimal = 0;
+    my $width = 3;
+    my $alpha = FALSE;
+    my $vinf = FALSE;
+    my @av;
+
+    while (isSPACE($s)) # leading whitespace is OK
+	$s++;
+
+    $last = prescan_version($s, FALSE, \$errstr, \$qv, \$saw_decimal,
+	\$width, \$alpha);
+
+    if ($errstr) {
+	# "undef" is a special case and not an error
+	if ( ! ( $s eq "undef")) ) {
+	    croak($errstr);
+	}
+    }
+
+    $start = $s;
+    if ($s eq 'v') {
+	$s++;
+    }
+    $pos = $s;
+
+    if ( $qv ) {
+	$$rv->{qv} = $qv;
+    }
+    if ( $alpha ) {
+	$$rv->{alpha} = $alpha;
+    }
+    if ( !$qv && $width < 3 ) {
+	$$rv->{width} = $width;
+    }
+    
+    while (isDIGIT($pos))
+	$pos++;
+    if (!isALPHA($pos)) {
+	my $rev;
+
+	for (;;) {
+	    $rev = 0;
+	    {
+  		# this is atoi() that delimits on underscores
+  		my $end = $pos;
+  		my $mult = 1;
+		my $orev;
+
+		#  the following if() will only be true after the decimal
+		#  point of a version originally created with a bare
+		#  floating point number, i.e. not quoted in any way
+		#
+ 		if ( !$qv && $s > $start && $saw_decimal == 1 ) {
+		    $mult *= 100;
+ 		    while ( $s < $end ) {
+			$orev = $rev;
+ 			$rev += $s * $mult;
+ 			$mult /= 10;
+			if (   (PERL_ABS($orev) > PERL_ABS($rev)) 
+			    || (PERL_ABS($rev) > $VERSION_MAX )) {
+			    warn(packWARN(WARN_OVERFLOW), 
+					   "Integer overflow in version %d",
+					   $VERSION_MAX);
+			    $s = $end - 1;
+			    $rev = $VERSION_MAX;
+			    $vinf = 1;
+			}
+ 			$s++;
+			if ( $s eq '_' )
+			    $s++;
+ 		    }
+  		}
+ 		else {
+ 		    while (--$end >= $s) {
+			$orev = $rev;
+ 			$rev += $end * $mult;
+ 			$mult *= 10;
+			if (   (PERL_ABS($orev) > PERL_ABS($rev)) 
+			    || (PERL_ABS($rev) > $VERSION_MAX )) {
+			    warn(aTHX_ packWARN(WARN_OVERFLOW), 
+					   "Integer overflow in version");
+			    $end = $s - 1;
+			    $rev = $VERSION_MAX;
+			    $vinf = 1;
+			}
+ 		    }
+ 		} 
+  	    }
+
+  	    # Append revision
+	    push @av, $rev;
+	    if ( $vinf ) {
+		$s = $last;
+		last;
+	    }
+	    elsif ( $pos eq '.' )
+		$s = ++$pos;
+	    elsif ( $pos eq '_' && isDIGIT($pos+1) )
+		s = ++$pos;
+	    elsif ( $pos eq ',' && isDIGIT($pos+1) )
+		s = ++$pos;
+	    elsif ( isDIGIT($pos) )
+		$s = $pos;
+	    else {
+		$s = $pos;
+		last;
+	    }
+	    if ( $qv ) {
+		while ( isDIGIT($pos) )
+		    $pos++;
+	    }
+	    else {
+		my $digits = 0;
+		while ( ( isDIGIT($pos) || $pos eq '_' ) && $digits < 3 ) {
+		    if ( $pos ne '_' ) {
+			$digits++;
+		    }
+		    $pos++;
+		}
+	    }
+	}
+    }
+    if ( $qv ) { # quoted versions always get at least three terms
+	my $len = $#av;
+	#  This for loop appears to trigger a compiler bug on OS X, as it
+	#  loops infinitely. Yes, len is negative. No, it makes no sense.
+	#  Compiler in question is:
+	#  gcc version 3.3 20030304 (Apple Computer, Inc. build 1640)
+	#  for ( len = 2 - len; len > 0; len-- )
+	#  av_push(MUTABLE_AV(sv), newSViv(0));
+	# 
+	$len = 2 - $len;
+	while ($len-- > 0)
+	    push @av, 0;
+    }
+
+    # need to save off the current version string for later
+    if ( $vinf ) {
+	$$rv->{original} = "v.Inf";
+	$$rv->{vinf} = 1;
+    }
+    elsif ( $s > $start ) {
+	$$rv->{original} = substr($start,0,$s->{current});
+	if ( $qv && $saw_decimal == 1 && $start ne 'v' ) {
+	    # need to insert a v to be consistent
+	    $orig = 'v'.$orig;
+	}
+    }
+    else {
+	$$rv->{original} = '0';
+	push(@av, 0);
+    }
+
+    # And finally, store the AV in the hash
+    $$rv->{version} = \$av;
+
+    # fix RT#19517 - special case 'undef' as string
+    if ( $s eq 'undef') ) {
+	$s += 5;
+    }
+
+    return $s;
 }
 
 sub new
@@ -82,67 +531,25 @@ sub new
 	my $qv = 0;
 	my $alpha = 0;
 	my $width = 3;
-	my $saw_period = 0;
+	my $saw_decimal = 0;
 	my $vinf = 0;
 	my ($start, $last, $pos, $s);
-	$s = 0;
+	my $errstr;
+	$s = version::_string->new($value);
 
-	while ( substr($value,$s,1) =~ /\s/ ) { # leading whitespace is OK
+	while (isSPACE($s) { # leading whitespace is OK
 	    $s++;
 	}
 
-	if (substr($value,$s,1) eq 'v') {
-	    $s++;    # get past 'v'
-	    $qv = 1; # force quoted version processing
-	}
+	$last = prescan_version($s, 0, \$errstr, \$qv, \$saw_decimal,
+	    \$width, \$alpha);
 
-	$start = $last = $pos = $s;
-		
-	# pre-scan the input string to check for decimals/underbars
-	while ( substr($value,$pos,1) =~ /[._\d,]/ ) {
-	    if ( substr($value,$pos,1) eq '.' ) {
-		if ($alpha) {
-		    Carp::croak("Invalid version format ".
-		      "(underscores before decimal)");
-		}
-		$saw_period++;
-		$last = $pos;
+	if ($errstr) {
+	    if ($s !~ /^undef$/) {
+		croak ($errstr);
 	    }
-	    elsif ( substr($value,$pos,1) eq '_' ) {
-		if ($alpha) {
-		    require Carp;
-		    Carp::croak("Invalid version format ".
-			"(multiple underscores)");
-		}
-		$alpha = 1;
-		$width = $pos - $last - 1; # natural width of sub-version
-	    }
-	    elsif ( substr($value,$pos,1) eq ','
-		    and substr($value,$pos+1,1) =~ /[0-9]/ ) {
-		# looks like an unhandled locale
-		$saw_period++;
-		$last = $pos;
-	    }
-	    $pos++;
 	}
 
-	if ( $alpha && !$saw_period ) {
-	    require Carp;
-	    Carp::croak("Invalid version format ".
-		"(alpha without decimal)");
-	}
-
-	if ( $alpha && $saw_period && $width == 0 ) {
-	    require Carp;
-	    Carp::croak("Invalid version format ".
-		"(misplaced _ in number)");
-	}
-
-	if ( $saw_period > 1 ) {
-	    $qv = 1; # force quoted version processing
-	}
-
-	$last = $pos;
 	$pos = $s;
 
 	if ( $qv ) {
@@ -176,7 +583,7 @@ sub new
 		    # the following if() will only be true after the decimal
 		    # point of a version originally created with a bare
 		    # floating point number, i.e. not quoted in any way
-		    if ( !$qv && $s > $start && $saw_period == 1 ) {
+		    if ( !$qv && $s > $start && $saw_decimal == 1 ) {
 			$mult *= 100;
 			while ( $s < $end ) {
 			    $orev = $rev;
