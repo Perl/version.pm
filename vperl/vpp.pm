@@ -1,11 +1,13 @@
-package charstar
+package charstar;
 # a little helper class to emulate C char* semantics in Perl
 # so that prescan_version can use the same code as in C
 
 use overload (
     '""'	=> \&thischar,
     '++'	=> \&increment,
+    '--'	=> \&decrement,
     '+'		=> \&plus,
+    '*'		=> \&multiply,
     '<=>'	=> \&compare,
     'bool'	=> \&bool,
     '='		=> \&clone,
@@ -24,7 +26,14 @@ sub new {
 
 sub thischar {
     my ($self) = @_;
-    return $self->{string}->[$self->{current}];
+    my $last = $#{$self->{string}};
+    my $curr = $self->{current};
+    if ($curr >= 0 && $curr <= $last) {
+	return $self->{string}->[$curr];
+    }
+    else {
+	return '';
+    }
 }
 
 sub increment {
@@ -32,9 +41,20 @@ sub increment {
     $self->{current}++;
 }
 
+sub decrement {
+    my ($self) = @_;
+    $self->{current}--;
+}
+
 sub plus {
     my ($self, $offset) = @_;
     return $self->{string}->[$self->{current} + $offset];
+}
+
+sub multiply {
+    my ($left, $right, $swapped) = @_;
+    my $char = $left->thischar();
+    return $char * $right;
 }
 
 sub compare {
@@ -94,12 +114,17 @@ use constant {
 };
 
 sub isDIGIT {
-    my ($char) = $_[0]->thischar();
-    return ($char =~ /\w/);
+    my ($char) = shift->thischar();
+    return ($char =~ /\d/);
+}
+
+sub isALPHA {
+    my ($char) = shift->thischar();
+    return ($char =~ /[a-zA-Z]/);
 }
 
 sub isSPACE {
-    my ($char) = $_[0]->thischar();
+    my ($char) = shift->thischar();
     return ($char =~ /\s/);
 }
 
@@ -119,7 +144,7 @@ sub prescan_version {
     my $width       = defined $swidth       ? $$swidth       : 3;
     my $alpha       = defined $salpha       ? $$salpha       : FALSE;
 
-    my $d = new charstar $s;
+    my $d = $s;
 
     if ($qv && isDIGIT($d)) {
 	goto dotted_decimal_version;
@@ -328,21 +353,22 @@ sub scan_version {
 
     $s = new charstar $s;
 
-    while (isSPACE($s)) # leading whitespace is OK
+    while (isSPACE($s)) { # leading whitespace is OK
 	$s++;
+    }
 
     $last = prescan_version($s, FALSE, \$errstr, \$qv, \$saw_decimal,
 	\$width, \$alpha);
 
     if ($errstr) {
-	# "undef" is a special case and not an error
-	if ( ! ( $s eq "undef")) ) {
+	# 'undef' is a special case and not an error
+	if ( $s != 'undef') {
 	    croak($errstr);
 	}
     }
 
     $start = $s;
-    if ($s eq 'v') {
+    if ($s == 'v') {
 	$s++;
     }
     $pos = $s;
@@ -357,8 +383,9 @@ sub scan_version {
 	$$rv->{width} = $width;
     }
     
-    while (isDIGIT($pos))
+    while (isDIGIT($pos)) {
 	$pos++;
+    }
     if (!isALPHA($pos)) {
 	my $rev;
 
@@ -389,8 +416,9 @@ sub scan_version {
 			    $vinf = 1;
 			}
  			$s++;
-			if ( $s eq '_' )
+			if ( $s == '_' ) {
 			    $s++;
+			}
  		    }
   		}
  		else {
@@ -400,8 +428,7 @@ sub scan_version {
  			$mult *= 10;
 			if (   (abs($orev) > abs($rev)) 
 			    || (abs($rev) > $VERSION_MAX )) {
-			    warn(aTHX_ packWARN(WARN_OVERFLOW), 
-					   "Integer overflow in version");
+			    warn("Integer overflow in version");
 			    $end = $s - 1;
 			    $rev = $VERSION_MAX;
 			    $vinf = 1;
@@ -416,26 +443,31 @@ sub scan_version {
 		$s = $last;
 		last;
 	    }
-	    elsif ( $pos eq '.' )
+	    elsif ( $pos == '.' ) {
 		$s = ++$pos;
-	    elsif ( $pos eq '_' && isDIGIT($pos+1) )
-		s = ++$pos;
-	    elsif ( $pos eq ',' && isDIGIT($pos+1) )
-		s = ++$pos;
-	    elsif ( isDIGIT($pos) )
+	    }
+	    elsif ( $pos == '_' && isDIGIT($pos+1) ) {
+		$s = ++$pos;
+	    }
+	    elsif ( $pos == ',' && isDIGIT($pos+1) ) {
+		$s = ++$pos;
+	    }
+	    elsif ( isDIGIT($pos) ) {
 		$s = $pos;
+	    }
 	    else {
 		$s = $pos;
 		last;
 	    }
 	    if ( $qv ) {
-		while ( isDIGIT($pos) )
+		while ( isDIGIT($pos) ) {
 		    $pos++;
+		}
 	    }
 	    else {
 		my $digits = 0;
-		while ( ( isDIGIT($pos) || $pos eq '_' ) && $digits < 3 ) {
-		    if ( $pos ne '_' ) {
+		while ( ( isDIGIT($pos) || $pos == '_' ) && $digits < 3 ) {
+		    if ( $pos != '_' ) {
 			$digits++;
 		    }
 		    $pos++;
@@ -453,8 +485,9 @@ sub scan_version {
 	#  av_push(MUTABLE_AV(sv), newSViv(0));
 	# 
 	$len = 2 - $len;
-	while ($len-- > 0)
+	while ($len-- > 0) {
 	    push @av, 0;
+	}
     }
 
     # need to save off the current version string for later
@@ -464,9 +497,9 @@ sub scan_version {
     }
     elsif ( $s > $start ) {
 	$$rv->{original} = substr($start,0,$s->{current});
-	if ( $qv && $saw_decimal == 1 && $start ne 'v' ) {
+	if ( $qv && $saw_decimal == 1 && $start != 'v' ) {
 	    # need to insert a v to be consistent
-	    $orig = 'v'.$orig;
+	    $$rv->{original} = 'v' . $$rv->{original};
 	}
     }
     else {
@@ -475,10 +508,10 @@ sub scan_version {
     }
 
     # And finally, store the AV in the hash
-    $$rv->{version} = \$av;
+    $$rv->{version} = \@av;
 
     # fix RT#19517 - special case 'undef' as string
-    if ( $s eq 'undef') ) {
+    if ($s == 'undef') {
 	$s += 5;
     }
 
@@ -489,6 +522,7 @@ sub new
 {
 	my ($class, $value) = @_;
 	my $self = bless ({}, ref ($class) || $class);
+	my $qv = FALSE;
 	
 	if ( ref($value) && eval('$value->isa("version")') ) {
 	    # Can copy the elements directly
@@ -517,7 +551,8 @@ sub new
 	}
 
 	if ( $#_ == 2 ) { # must be CVS-style
-	    $value = 'v'.$_[2];
+	    $value = $_[2];
+	    $qv = TRUE;
 	}
 
 	$value = _un_vstring($value);
@@ -532,7 +567,8 @@ sub new
 
 	if ($s) { # must be something left over
 	    warn("Version string '%s' contains invalid data; "
-                       "ignoring: '%s'", $version, $s);
+                       ."ignoring: '%s'", $value, $s);
+	}
 
 	return ($self);
 }
