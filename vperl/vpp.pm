@@ -1,4 +1,4 @@
-package version::_string;
+package charstar
 # a little helper class to emulate C char* semantics in Perl
 # so that prescan_version can use the same code as in C
 
@@ -112,12 +112,14 @@ sub BADVERSION {
 }
 
 sub prescan_version {
-    my ($s, $strict, $errstr, $sqv, $ssaw_decimal, $swidth, $salpha) = @_;
-    my $qv = (defined $sqv ? $$sqv : FALSE);
-    my $width = 3;
-    my $saw_decimal = 0;
-    my $alpha = FALSE;
-    my $d = $s;
+    my ($s, $strict, $serrstr, $sqv, $ssaw_decimal, $swidth, $salpha) = @_;
+    my $errstr      = defined $serrstr      ? $$serrstr      : '';
+    my $qv          = defined $sqv          ? $$sqv          : FALSE;
+    my $saw_decimal = defined $ssaw_decimal ? $$ssaw_decimal : 0;
+    my $width       = defined $swidth       ? $$swidth       : 3;
+    my $alpha       = defined $salpha       ? $$salpha       : FALSE;
+
+    my $d = new charstar $s;
 
     if ($qv && isDIGIT($d)) {
 	goto dotted_decimal_version;
@@ -267,7 +269,7 @@ dotted_decimal_version:
 		if ($strict) {
 		    return BADVERSION($s,$errstr,"Invalid version format (dotted-decimal versions must begin with 'v')");
 		}
-		$d = version::_string->new($s); # start all over again
+		$d = $s; # start all over again
 		$qv = TRUE;
 		goto dotted_decimal_version;
 	    }
@@ -324,6 +326,8 @@ sub scan_version {
     my $vinf = FALSE;
     my @av;
 
+    $s = new charstar $s;
+
     while (isSPACE($s)) # leading whitespace is OK
 	$s++;
 
@@ -376,10 +380,9 @@ sub scan_version {
 			$orev = $rev;
  			$rev += $s * $mult;
  			$mult /= 10;
-			if (   (PERL_ABS($orev) > PERL_ABS($rev)) 
-			    || (PERL_ABS($rev) > $VERSION_MAX )) {
-			    warn(packWARN(WARN_OVERFLOW), 
-					   "Integer overflow in version %d",
+			if (   (abs($orev) > abs($rev)) 
+			    || (abs($rev) > $VERSION_MAX )) {
+			    warn("Integer overflow in version %d",
 					   $VERSION_MAX);
 			    $s = $end - 1;
 			    $rev = $VERSION_MAX;
@@ -395,8 +398,8 @@ sub scan_version {
 			$orev = $rev;
  			$rev += $end * $mult;
  			$mult *= 10;
-			if (   (PERL_ABS($orev) > PERL_ABS($rev)) 
-			    || (PERL_ABS($rev) > $VERSION_MAX )) {
+			if (   (abs($orev) > abs($rev)) 
+			    || (abs($rev) > $VERSION_MAX )) {
 			    warn(aTHX_ packWARN(WARN_OVERFLOW), 
 					   "Integer overflow in version");
 			    $end = $s - 1;
@@ -525,164 +528,11 @@ sub new
 	    $value =~ s/(0+)$//; # trim trailing zeros
 	}
 	
-	# This is not very efficient, but it is morally equivalent
-	# to the XS code (as that is the reference implementation).
-	# See vutil/vutil.c for details
-	my $qv = 0;
-	my $alpha = 0;
-	my $width = 3;
-	my $saw_decimal = 0;
-	my $vinf = 0;
-	my ($start, $last, $pos, $s);
-	my $errstr;
-	$s = version::_string->new($value);
+	my $s = scan_version($value, \$self, $qv);
 
-	while (isSPACE($s) { # leading whitespace is OK
-	    $s++;
-	}
-
-	$last = prescan_version($s, 0, \$errstr, \$qv, \$saw_decimal,
-	    \$width, \$alpha);
-
-	if ($errstr) {
-	    if ($s !~ /^undef$/) {
-		croak ($errstr);
-	    }
-	}
-
-	$pos = $s;
-
-	if ( $qv ) {
-	    $self->{qv} = 1;
-	}
-
-	if ( $alpha ) {
-	    $self->{alpha} = 1;
-	}
-
-	if ( !$qv && $width < 3 ) {
-	    $self->{width} = $width;
-	}
-
-	while ( substr($value,$pos,1) =~ /\d/ ) {
-	    $pos++;
-	}
-
-	if ( substr($value,$pos,1) !~ /[a-z]/ ) { ### FIX THIS ###
-	    my $rev;
-
-	    while (1) {
-		$rev = 0;
-		{
-
-		    # this is atoi() that delimits on underscores
-		    my $end = $pos;
-		    my $mult = 1;
-		    my $orev;
-
-		    # the following if() will only be true after the decimal
-		    # point of a version originally created with a bare
-		    # floating point number, i.e. not quoted in any way
-		    if ( !$qv && $s > $start && $saw_decimal == 1 ) {
-			$mult *= 100;
-			while ( $s < $end ) {
-			    $orev = $rev;
-			    $rev += substr($value,$s,1) * $mult;
-			    $mult /= 10;
-			    if (   abs($orev) > abs($rev) 
-				|| abs($rev) > abs($VERSION_MAX) ) {
-				if ( warnings::enabled("overflow") ) {
-				    require Carp;
-				    Carp::carp("Integer overflow in version");
-				}
-				$s = $end - 1;
-				$rev = $VERSION_MAX;
-			    }
-			    $s++;
-			    if ( substr($value,$s,1) eq '_' ) {
-				$s++;
-			    }
-			}
-		    }
-		    else {
-			while (--$end >= $s) {
-			    $orev = $rev;
-			    $rev += substr($value,$end,1) * $mult;
-			    $mult *= 10;
-			    if (   abs($orev) > abs($rev) 
-				|| abs($rev) > abs($VERSION_MAX) ) {
-				if ( warnings::enabled("overflow") ) {
-				    require Carp;
-				    Carp::carp("Integer overflow in version");
-				}
-				$end = $s - 1;
-				$rev = $VERSION_MAX;
-			    }
-			}
-		    }
-		}
-
-		# Append revision
-		push @{$self->{version}}, $rev;
-		if ( substr($value,$pos,1) eq '.' 
-		    && substr($value,$pos+1,1) =~ /\d/ ) {
-		    $s = ++$pos;
-		}
-		elsif ( substr($value,$pos,1) eq '_' 
-		    && substr($value,$pos+1,1) =~ /\d/ ) {
-		    $s = ++$pos;
-		}
-		elsif ( substr($value,$pos,1) eq ',' 
-		    && substr($value,$pos+1,1) =~ /\d/ ) {
-		    $s = ++$pos;
-		}
-		elsif ( substr($value,$pos,1) =~ /\d/ ) {
-		    $s = $pos;
-		}
-		else {
-		    $s = $pos;
-		    last;
-		}
-		if ( $qv ) {
-		    while ( substr($value,$pos,1) =~ /\d/ ) {
-			$pos++;
-		    }
-		}
-		else {
-		    my $digits = 0;
-		    while (substr($value,$pos,1) =~ /[\d_]/ && $digits < 3) {
-			if ( substr($value,$pos,1) ne '_' ) {
-			    $digits++;
-			}
-			$pos++;
-		    }
-		}
-	    }
-	}
-	if ( $qv ) { # quoted versions always get at least three terms
-	    my $len = scalar @{$self->{version}};
-	    $len = 3 - $len;
-	    while ($len-- > 0) {
-		push @{$self->{version}}, 0;
-	    }
-	}
-
-	if ( substr($value,$pos) ) { # any remaining text
-	    if ( warnings::enabled("misc") ) {
-		require Carp;
-		Carp::carp("Version string '$value' contains invalid data; ".
-		     "ignoring: '".substr($value,$pos)."'");
-	    }
-	}
-
-	# cache the original value for use when stringification
-	if ( $vinf ) {
-	    $self->{vinf} = 1;
-	    $self->{original} = 'v.Inf';
-	}
-	else {
-	    $self->{original} = substr($value,0,$pos);
-	}
+	if ($s) { # must be something left over
+	    warn("Version string '%s' contains invalid data; "
+                       "ignoring: '%s'", $version, $s);
 
 	return ($self);
 }
