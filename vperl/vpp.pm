@@ -4,11 +4,14 @@ package charstar;
 
 use overload (
     '""'	=> \&thischar,
+    '0+'	=> \&thischar,
     '++'	=> \&increment,
     '--'	=> \&decrement,
     '+'		=> \&plus,
-    '*'		=> \&multiply,
-    '<=>'	=> \&compare,
+    '-'		=> \&minus,
+#    '*'		=> \&multiply,
+    'cmp'	=> \&cmp,
+    '<=>'	=> \&spaceship,
     'bool'	=> \&bool,
     '='		=> \&clone,
 );
@@ -48,7 +51,16 @@ sub decrement {
 
 sub plus {
     my ($self, $offset) = @_;
-    return $self->{string}->[$self->{current} + $offset];
+    my $rself = $self->clone;
+    $rself->{current} += $offset;
+    return $rself;
+}
+
+sub minus {
+    my ($self, $offset) = @_;
+    my $rself = $self->clone;
+    $rself->{current} -= $offset;
+    return $rself;
 }
 
 sub multiply {
@@ -57,12 +69,20 @@ sub multiply {
     return $char * $right;
 }
 
-sub compare {
+sub spaceship {
     my ($left, $right, $swapped) = @_;
     unless (ref($right)) { # not an object already
 	$right = $left->new($right);
     }
-    return $left->thischar cmp $right->thischar;
+    return $left->{current} <=> $right->{current};
+}
+
+sub cmp {
+    my ($left, $right, $swapped) = @_;
+    unless (ref($right)) { # not an object already
+	$right = $left->new($right);
+    }
+    return $left->currstr cmp $right->currstr;
 }
 
 sub bool {
@@ -77,6 +97,18 @@ sub clone {
 	current => $left->{current},
     };
     return bless $right, ref($left);
+}
+
+sub currstr {
+    my ($self, $s) = @_;
+    my $curr = $self->{current};
+    my $last = $#{$self->{string}};
+    if ($s->{current} < $last) {
+	$last = $s->{current};
+    }
+
+    my $string = join('', @{$self->{string}}[$curr..$last]);
+    return $string;
 }
 
 package version::vpp;
@@ -137,8 +169,7 @@ sub BADVERSION {
 }
 
 sub prescan_version {
-    my ($s, $strict, $serrstr, $sqv, $ssaw_decimal, $swidth, $salpha) = @_;
-    my $errstr      = defined $serrstr      ? $$serrstr      : '';
+    my ($s, $strict, $errstr, $sqv, $ssaw_decimal, $swidth, $salpha) = @_;
     my $qv          = defined $sqv          ? $$sqv          : FALSE;
     my $saw_decimal = defined $ssaw_decimal ? $$ssaw_decimal : 0;
     my $width       = defined $swidth       ? $$swidth       : 3;
@@ -150,7 +181,7 @@ sub prescan_version {
 	goto dotted_decimal_version;
     }
 
-    if ($d == 'v') { # explicit v-string
+    if ($d eq 'v') { # explicit v-string
 	$d++;
 	if (isDIGIT($d)) {
 	    $qv = TRUE;
@@ -161,7 +192,7 @@ sub prescan_version {
 	}
 
 dotted_decimal_version:
-	if ($strict && $d == '0' && isDIGIT($d+1)) {
+	if ($strict && $d eq '0' && isDIGIT($d+1)) {
 	    # no leading zeros allowed
 	    return BADVERSION($s,$errstr,"Invalid version format (no leading zeros)");
 	}
@@ -170,7 +201,7 @@ dotted_decimal_version:
 	    $d++;
 	}
 
-	if ($d == '.')
+	if ($d eq '.')
 	{
 	    $saw_decimal++;
 	    $d++; 		# decimal point
@@ -198,7 +229,7 @@ dotted_decimal_version:
 			return BADVERSION($s,$errstr,"Invalid version format (maximum 3 digits between decimals)");
 		    }
 		}
-		if ($d == '_') {
+		if ($d eq '_') {
 		    if ($strict) {
 			return BADVERSION($s,$errstr,"Invalid version format (no underscores)");
 		    }
@@ -208,7 +239,7 @@ dotted_decimal_version:
 		    $d++;
 		    $alpha = TRUE;
 		}
-		elsif ($d == '.') {
+		elsif ($d eq '.') {
 		    if ($alpha) {
 			return BADVERSION($s,$errstr,"Invalid version format (underscores before decimal)");
 		    }
@@ -231,10 +262,10 @@ dotted_decimal_version:
     {					# decimal versions
 	# special $strict case for leading '.' or '0'
 	if ($strict) {
-	    if ($d == '.') {
+	    if ($d eq '.') {
 		return BADVERSION($s,$errstr,"Invalid version format (0 before decimal required)");
 	    }
-	    if ($d == '0' && isDIGIT($d+1)) {
+	    if ($d eq '0' && isDIGIT($d+1)) {
 		return BADVERSION($s,$errstr,"Invalid version format (no leading zeros)");
 	    }
 	}
@@ -245,12 +276,12 @@ dotted_decimal_version:
 	}
 
 	# look for a fractional part
-	if ($d == '.') {
+	if ($d eq '.') {
 	    # we found it, so consume it
 	    $saw_decimal++;
 	    $d++;
 	}
-	elsif (!$d || $d == ';' || isSPACE($d) || $d == '}') {
+	elsif (!$d || $d eq ';' || isSPACE($d) || $d eq '}') {
 	    if ( $d == $s ) {
 		# found nothing
 		return BADVERSION($s,$errstr,"Invalid version format (version required)");
@@ -262,7 +293,7 @@ dotted_decimal_version:
 	    # didn't find either integer or period
 	    return BADVERSION($s,$errstr,"Invalid version format (non-numeric data)");
 	}
-	elsif ($d == '_') {
+	elsif ($d eq '_') {
 	    # underscore can't come after integer part
 	    if ($strict) {
 		return BADVERSION($s,$errstr,"Invalid version format (no underscores)");
@@ -280,14 +311,14 @@ dotted_decimal_version:
 	}
 
 	# scan the fractional part after the decimal point
-	if (!isDIGIT($d) && ($strict || ! (!$d || $d == ';' || isSPACE($d) || $d == '}') )) {
+	if (!isDIGIT($d) && ($strict || ! (!$d || $d eq ';' || isSPACE($d) || $d eq '}') )) {
 		# $strict or lax-but-not-the-end
 		return BADVERSION($s,$errstr,"Invalid version format (fractional part required)");
 	}
 
 	while (isDIGIT($d)) {
 	    $d++;
-	    if ($d == '.' && isDIGIT($d-1)) {
+	    if ($d eq '.' && isDIGIT($d-1)) {
 		if ($alpha) {
 		    return BADVERSION($s,$errstr,"Invalid version format (underscores before decimal)");
 		}
@@ -298,7 +329,7 @@ dotted_decimal_version:
 		$qv = TRUE;
 		goto dotted_decimal_version;
 	    }
-	    if ($d == '_') {
+	    if ($d eq '_') {
 		if ($strict) {
 		    return BADVERSION($s,$errstr,"Invalid version format (no underscores)");
 		}
@@ -319,7 +350,7 @@ version_prescan_finish:
 	$d++;
     }
 
-    if (!isDIGIT($d) && (! (!$d || $d == ';' || $d == '}') )) {
+    if (!isDIGIT($d) && (! (!$d || $d eq ';' || $d eq '}') )) {
 	# trailing non-numeric data
 	return BADVERSION($s,$errstr,"Invalid version format (non-numeric data)");
     }
@@ -362,13 +393,14 @@ sub scan_version {
 
     if ($errstr) {
 	# 'undef' is a special case and not an error
-	if ( $s != 'undef') {
-	    croak($errstr);
+	if ( $s ne 'undef') {
+	    use Carp;
+	    Carp::croak($errstr);
 	}
     }
 
     $start = $s;
-    if ($s == 'v') {
+    if ($s eq 'v') {
 	$s++;
     }
     $pos = $s;
@@ -416,7 +448,7 @@ sub scan_version {
 			    $vinf = 1;
 			}
  			$s++;
-			if ( $s == '_' ) {
+			if ( $s eq '_' ) {
 			    $s++;
 			}
  		    }
@@ -443,13 +475,13 @@ sub scan_version {
 		$s = $last;
 		last;
 	    }
-	    elsif ( $pos == '.' ) {
+	    elsif ( $pos eq '.' ) {
 		$s = ++$pos;
 	    }
-	    elsif ( $pos == '_' && isDIGIT($pos+1) ) {
+	    elsif ( $pos eq '_' && isDIGIT($pos+1) ) {
 		$s = ++$pos;
 	    }
-	    elsif ( $pos == ',' && isDIGIT($pos+1) ) {
+	    elsif ( $pos eq ',' && isDIGIT($pos+1) ) {
 		$s = ++$pos;
 	    }
 	    elsif ( isDIGIT($pos) ) {
@@ -466,8 +498,8 @@ sub scan_version {
 	    }
 	    else {
 		my $digits = 0;
-		while ( ( isDIGIT($pos) || $pos == '_' ) && $digits < 3 ) {
-		    if ( $pos != '_' ) {
+		while ( ( isDIGIT($pos) || $pos eq '_' ) && $digits < 3 ) {
+		    if ( $pos ne '_' ) {
 			$digits++;
 		    }
 		    $pos++;
@@ -496,8 +528,8 @@ sub scan_version {
 	$$rv->{vinf} = 1;
     }
     elsif ( $s > $start ) {
-	$$rv->{original} = substr($start,0,$s->{current});
-	if ( $qv && $saw_decimal == 1 && $start != 'v' ) {
+	$$rv->{original} = $start->currstr($s);
+	if ( $qv && $saw_decimal == 1 && $start ne 'v' ) {
 	    # need to insert a v to be consistent
 	    $$rv->{original} = 'v' . $$rv->{original};
 	}
@@ -511,7 +543,7 @@ sub scan_version {
     $$rv->{version} = \@av;
 
     # fix RT#19517 - special case 'undef' as string
-    if ($s == 'undef') {
+    if ($s eq 'undef') {
 	$s += 5;
     }
 
