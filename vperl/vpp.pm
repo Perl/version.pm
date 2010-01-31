@@ -822,8 +822,8 @@ sub _un_vstring {
     my $value = shift;
     # may be a v-string
     if ( $] >= 5.006_000 && length($value) >= 3 && $value !~ /[._]/) {
-	# might be a v-string, check each character
 	foreach my $char (split(//,$value)) {
+	    # if one of the characters is non-text assume v-string
 	    if (ord($char) < ord(" ")) {
 		my $tvalue = sprintf("v%vd",$value);
 		if ( $tvalue =~ /^v\d+(\.\d+){2,}$/ ) {
