@@ -9,7 +9,7 @@ use overload (
     '--'	=> \&decrement,
     '+'		=> \&plus,
     '-'		=> \&minus,
-#    '*'		=> \&multiply,
+    '*'		=> \&multiply,
     'cmp'	=> \&cmp,
     '<=>'	=> \&spaceship,
     'bool'	=> \&bool,
@@ -80,6 +80,9 @@ sub spaceship {
 sub cmp {
     my ($left, $right, $swapped) = @_;
     unless (ref($right)) { # not an object already
+	if (length($right) == 1) { # comparing single character only
+	    return $left->thischar cmp $right;
+	}
 	$right = $left->new($right);
     }
     return $left->currstr cmp $right->currstr;
@@ -103,7 +106,7 @@ sub currstr {
     my ($self, $s) = @_;
     my $curr = $self->{current};
     my $last = $#{$self->{string}};
-    if ($s->{current} < $last) {
+    if (defined($s) && $s->{current} < $last) {
 	$last = $s->{current};
     }
 
@@ -299,7 +302,7 @@ dotted_decimal_version:
 		return BADVERSION($s,$errstr,"Invalid version format (no underscores)");
 	    }
 	    elsif (isDIGIT($d+1)) {
-		return BADVERSION($s,$errstr,"Invalid version format ($alpha without decimal)");
+		return BADVERSION($s,$errstr,"Invalid version format (alpha without decimal)");
 	    }
 	    else {
 		return BADVERSION($s,$errstr,"Invalid version format (misplaced underscore)");
@@ -362,7 +365,7 @@ version_prescan_finish:
 	$$swidth = $width;
     }
     if (defined $ssaw_decimal) {
-	$ssaw_decimal = $saw_decimal;
+	$$ssaw_decimal = $saw_decimal;
     }
     if (defined $salpha) {
 	$$salpha = $alpha;
@@ -820,12 +823,17 @@ sub _verify {
 sub _un_vstring {
     my $value = shift;
     # may be a v-string
-    if ( $] >= 5.006_000 && length($value) >= 3 && $value !~ /[._]/
-	&& (ord($value) < ord('0') || ord($value) > ord('9')) ) {
-	my $tvalue = sprintf("v%vd",$value);
-	if ( $tvalue =~ /^v\d+(\.\d+){2,}$/ ) {
-	    # must be a v-string
-	    $value = $tvalue;
+    if ( $] >= 5.006_000 && length($value) >= 3 && $value !~ /[._]/) {
+	# might be a v-string, check each character
+	foreach my $char (split(//,$value)) {
+	    if (ord($char) < ord(" ")) {
+		my $tvalue = sprintf("v%vd",$value);
+		if ( $tvalue =~ /^v\d+(\.\d+){2,}$/ ) {
+		    # must be a v-string
+		    $value = $tvalue;
+		}
+		last;
+	    }
 	}
     }
     return $value;
