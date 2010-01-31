@@ -143,10 +143,8 @@ if ($@) {
 my $VERSION_MAX = 0x7FFFFFFF;
 
 # implement prescan_version as closely to the C version as possible
-use constant {
-    TRUE	=> 1,
-    FALSE	=> 0,
-};
+use constant TRUE  => 1;
+use constant FALSE => 0;
 
 sub isDIGIT {
     my ($char) = shift->thischar();
