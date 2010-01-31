@@ -12,7 +12,7 @@ use overload (
     '*'		=> \&multiply,
     'cmp'	=> \&cmp,
     '<=>'	=> \&spaceship,
-    'bool'	=> \&bool,
+    'bool'	=> \&thischar,
     '='		=> \&clone,
 );
 
