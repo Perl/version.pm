@@ -192,7 +192,7 @@ version_prescan_finish:
     while (isSPACE(*d)) 
 	d++;
 
-    if (!isDIGIT(*d) && (! (!*d || *d == ';' || *d == '}') )) {
+    if (*d && !isDIGIT(*d) && (! (*d == ';' || *d == '}') )) {
 	/* trailing non-numeric data */
 	BADVERSION(s,errstr,"Invalid version format (non-numeric data)");
     }
