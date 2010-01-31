@@ -90,7 +90,8 @@ sub cmp {
 
 sub bool {
     my ($self) = @_;
-    return ($self->{string}->[$self->{current}]);
+    my $char = $self->thischar;
+    return ($char ne '');
 }
 
 sub clone {
@@ -306,13 +307,13 @@ dotted_decimal_version:
 		return BADVERSION($s,$errstr,"Invalid version format (misplaced underscore)");
 	    }
 	}
-	else {
+	elsif ($d) {
 	    # anything else after integer part is just invalid data
 	    return BADVERSION($s,$errstr,"Invalid version format (non-numeric data)");
 	}
 
 	# scan the fractional part after the decimal point
-	if (!isDIGIT($d) && ($strict || ! (!$d || $d eq ';' || isSPACE($d) || $d eq '}') )) {
+	if ($d && !isDIGIT($d) && ($strict || ! ($d eq ';' || isSPACE($d) || $d eq '}') )) {
 		# $strict or lax-but-not-the-end
 		return BADVERSION($s,$errstr,"Invalid version format (fractional part required)");
 	}
@@ -351,7 +352,7 @@ version_prescan_finish:
 	$d++;
     }
 
-    if (!isDIGIT($d) && (! (!$d || $d eq ';' || $d eq '}') )) {
+    if ($d && !isDIGIT($d) && (! ($d eq ';' || $d eq '}') )) {
 	# trailing non-numeric data
 	return BADVERSION($s,$errstr,"Invalid version format (non-numeric data)");
     }
