@@ -138,7 +138,7 @@ else { # use XS module
 	*{'version::stringify'} = \*version::vxs::stringify;
 	*{'version::(""'} = \*version::vxs::stringify;
     }
-    elsif ($] == 5.010000) {
+    elsif ($] == 5.010000 || $] == 5.010001) {
 	no strict 'refs';
 	*{'version::stringify'} = \*version::vxs::stringify;
 	*{'version::(""'} = \*version::vxs::stringify;
