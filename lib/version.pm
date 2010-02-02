@@ -28,8 +28,8 @@ my $STRICT_INTEGER_PART = qr/0|[1-9][0-9]*/;
 # First part of either decimal or dotted-decimal lax version number.
 # Unsigned integer, but allowing leading zeros.  Always interpreted
 # as decimal.  However, some forms of the resulting syntax give odd
-# results if used as ordinary Perl expressions, due to how perl treats 
-# octals.  E.g. 
+# results if used as ordinary Perl expressions, due to how perl treats
+# octals.  E.g.
 #   version->new("010" ) == 10
 #   version->new( 010  ) == 8
 #   version->new( 010.2) == 82  # "8" . "2"
@@ -61,13 +61,13 @@ my $LAX_ALPHA_PART = qr/_[0-9]+/;
 
 # Strict decimal version number.
 
-my $STRICT_DECIMAL_VERSION = 
+my $STRICT_DECIMAL_VERSION =
     qr/ $STRICT_INTEGER_PART $FRACTION_PART? /x;
 
 # Strict dotted-decimal version number.  Must have both leading "v" and
 # at least three parts, to avoid confusion with decimal syntax.
 
-my $STRICT_DOTTED_DECIMAL_VERSION = 
+my $STRICT_DOTTED_DECIMAL_VERSION =
     qr/ v $STRICT_INTEGER_PART $STRICT_DOTTED_DECIMAL_PART{2,} /x;
 
 # Complete strict version number syntax -- should generally be used
@@ -82,7 +82,7 @@ $STRICT =
 
 # Lax decimal version number.  Just like the strict one except for
 # allowing an alpha suffix or allowing a leading or trailing
-# decimal-point 
+# decimal-point
 
 my $LAX_DECIMAL_VERSION =
     qr/ $LAX_INTEGER_PART (?: \. | $FRACTION_PART $LAX_ALPHA_PART? )?
@@ -96,7 +96,7 @@ my $LAX_DECIMAL_VERSION =
 # enough, without the leading "v", Perl takes .1.2 to mean v0.1.2,
 # so when there is no "v", the leading part is optional
 
-my $LAX_DOTTED_DECIMAL_VERSION = 
+my $LAX_DOTTED_DECIMAL_VERSION =
     qr/
 	v $LAX_INTEGER_PART (?: $LAX_DOTTED_DECIMAL_PART+ $LAX_ALPHA_PART? )?
 	|
@@ -105,9 +105,12 @@ my $LAX_DOTTED_DECIMAL_VERSION =
 
 # Complete lax version number syntax -- should generally be used
 # anchored: qr/ \A $LAX \z /x
+#
+# The string 'undef' is a special case to make for easier handling
+# of return values from ExtUtils::MM->parse_version
 
-$LAX = 
-    qr/ $LAX_DECIMAL_VERSION | $LAX_DOTTED_DECIMAL_VERSION /x;
+$LAX =
+    qr/ undef | $LAX_DECIMAL_VERSION | $LAX_DOTTED_DECIMAL_VERSION /x;
 
 #--------------------------------------------------------------------------#
 
