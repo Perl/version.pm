@@ -120,11 +120,18 @@ if ( $@ ) { # don't have the XS version installed
     *version::qv = \&version::vpp::qv;
     *version::declare = \&version::vpp::declare;
     *version::_VERSION = \&version::vpp::_VERSION;
-    if ($] > 5.009001 && $] <= 5.010000) {
+    if ($] > 5.009001 && $] < 5.010000) {
 	no strict 'refs';
-	*{'version::stringify'} = \*version::vpp::stringify;
-	*{'version::(""'} = \*version::vpp::stringify;
-	*{'version::new'} = \*version::vpp::new;
+	*version::stringify = \&version::vpp::stringify;
+	*{'version::(""'} = \&version::vpp::stringify;
+	*version::new = \&version::vpp::new;
+    }
+    elsif ($] == 5.010000 || $] == 5.010001) {
+	no strict 'refs';
+	*version::stringify = \&version::vpp::stringify;
+	*{'version::(""'} = \&version::vpp::stringify;
+	*version::new = \&version::vpp::new;
+	*version::parse = \&version::vpp::parse;
     }
 }
 else { # use XS module
@@ -135,13 +142,13 @@ else { # use XS module
     *version::_VERSION = \&version::vxs::_VERSION;
     if ($] > 5.009001 && $] < 5.010000) {
 	no strict 'refs';
-	*{'version::stringify'} = \*version::vxs::stringify;
-	*{'version::(""'} = \*version::vxs::stringify;
+	*version::stringify = \&version::vxs::stringify;
+	*{'version::(""'} = \&version::vxs::stringify;
     }
     elsif ($] == 5.010000 || $] == 5.010001) {
 	no strict 'refs';
-	*{'version::stringify'} = \*version::vxs::stringify;
-	*{'version::(""'} = \*version::vxs::stringify;
+	*version::stringify = \&version::vxs::stringify;
+	*{'version::(""'} = \&version::vxs::stringify;
 	*version::new = \&version::vxs::new;
 	*version::parse = \&version::vxs::parse;
     }
