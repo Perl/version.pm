@@ -10,6 +10,16 @@
 
 #define VERSION_MAX 0x7FFFFFFF
 
+/*
+=for apidoc prescan_version
+
+Validate that a given string can be parsed as a version object, but doesn't
+actually perform the parsing.  Can use either strict or lax validation rules.
+Can optionally set a number of hint variables to save the parsing code
+some time when tokenizing.
+
+=cut
+*/
 const char *
 Perl_prescan_version(pTHX_ const char *s, bool strict,
 		     const char **errstr,
@@ -94,7 +104,7 @@ dotted_decimal_version:
 		}
 		j = 0;
 	    }
-	
+
 	    if (strict && i < 2) {
 		/* requires v1.2.3 */
 		BADVERSION(s,errstr,"Invalid version format (dotted-decimal versions require at least three parts)");
@@ -189,7 +199,7 @@ dotted_decimal_version:
     }
 
 version_prescan_finish:
-    while (isSPACE(*d)) 
+    while (isSPACE(*d))
 	d++;
 
     if (*d && !isDIGIT(*d) && (! (*d == ';' || *d == '}') )) {
@@ -296,7 +306,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 		 * point of a version originally created with a bare
 		 * floating point number, i.e. not quoted in any way
 		 */
- 		if ( !qv && s > start && saw_decimal == 1 ) {
+		if ( !qv && s > start && saw_decimal == 1 ) {
 		    mult *= 100;
  		    while ( s < end ) {
 			orev = rev;
@@ -484,7 +494,7 @@ Perl_new_version(pTHX_ SV *ver)
 	    char * const version = savepvn( (const char*)mg->mg_ptr, len);
 	    sv_setpvn(rv,version,len);
 	    /* this is for consistency with the pure Perl class */
-	    if ( isDIGIT(*version) ) 
+	    if ( isDIGIT(*version) )
 		sv_insert(rv, 0, 0, "v", 1);
 	    Safefree(version);
 	}
@@ -660,7 +670,7 @@ Perl_vnumify(pTHX_ SV *vs)
     I32 i, len, digit;
     int width;
     bool alpha = FALSE;
-    SV * const sv = newSV(0);
+    SV *sv;
     AV *av;
 
     PERL_ARGS_ASSERT_VNUMIFY;
@@ -682,19 +692,17 @@ Perl_vnumify(pTHX_ SV *vs)
 
     /* attempt to retrieve the version array */
     if ( !(av = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE))) ) ) {
-	sv_catpvs(sv,"0");
-	return sv;
+	return newSVpvs("0");
     }
 
     len = av_len(av);
     if ( len == -1 )
     {
-	sv_catpvs(sv,"0");
-	return sv;
+	return newSVpvs("0");
     }
 
     digit = SvIV(*av_fetch(av, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv, "%d.", (int)PERL_ABS(digit));
+    sv = Perl_newSVpvf(aTHX_ "%d.", (int)PERL_ABS(digit));
     for ( i = 1 ; i < len ; i++ )
     {
 	digit = SvIV(*av_fetch(av, i, 0));
@@ -741,7 +749,7 @@ Perl_vnormal(pTHX_ SV *vs)
 {
     I32 i, len, digit;
     bool alpha = FALSE;
-    SV * const sv = newSV(0);
+    SV *sv;
     AV *av;
 
     PERL_ARGS_ASSERT_VNORMAL;
@@ -759,11 +767,10 @@ Perl_vnormal(pTHX_ SV *vs)
     len = av_len(av);
     if ( len == -1 )
     {
-	sv_catpvs(sv,"");
-	return sv;
+	return newSVpvs("");
     }
     digit = SvIV(*av_fetch(av, 0, 0));
-    Perl_sv_setpvf(aTHX_ sv, "v%"IVdf, (IV)digit);
+    sv = Perl_newSVpvf(aTHX_ "v%"IVdf, (IV)digit);
     for ( i = 1 ; i < len ; i++ ) {
 	digit = SvIV(*av_fetch(av, i, 0));
 	Perl_sv_catpvf(aTHX_ sv, ".%"IVdf, (IV)digit);

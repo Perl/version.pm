@@ -1,6 +1,84 @@
 #include "ppport.h"
 
-# if PERL_VERSION == 10 && (PERL_SUBVERSION == 0 || PERL_SUBVERSION == 1) 
+/* The MUTABLE_*() macros cast pointers to the types shown, in such a way
+ * (compiler permitting) that casting away const-ness will give a warning;
+ * e.g.:
+ *
+ * const SV *sv = ...;
+ * AV *av1 = (AV*)sv;        <== BAD:  the const has been silently cast away
+ * AV *av2 = MUTABLE_AV(sv); <== GOOD: it may warn
+ */
+
+#ifndef MUTABLE_PTR
+#  if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+#    define MUTABLE_PTR(p) ({ void *_p = (p); _p; })
+#  else
+#    define MUTABLE_PTR(p) ((void *) (p))
+#  endif
+
+#  define MUTABLE_AV(p)	((AV *)MUTABLE_PTR(p))
+#  define MUTABLE_CV(p)	((CV *)MUTABLE_PTR(p))
+#  define MUTABLE_GV(p)	((GV *)MUTABLE_PTR(p))
+#  define MUTABLE_HV(p)	((HV *)MUTABLE_PTR(p))
+#  define MUTABLE_IO(p)	((IO *)MUTABLE_PTR(p))
+#  define MUTABLE_SV(p)	((SV *)MUTABLE_PTR(p))
+#endif
+
+#ifndef SvPVx_nolen_const
+#  if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+#    define SvPVx_nolen_const(sv) ({SV *_sv = (sv); SvPV_nolen_const(_sv); })
+#  else
+#    define SvPVx_nolen_const(sv) (SvPV_nolen_const(sv))
+#  endif
+#endif
+
+#ifndef PERL_ARGS_ASSERT_CK_WARNER
+static void Perl_ck_warner(pTHX_ U32 err, const char* pat, ...);
+
+#  ifdef vwarner
+static
+void
+Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
+{
+  va_list args;
+
+  PERL_UNUSED_ARG(err);
+  if (ckWARN(err)) {
+    va_list args;
+    va_start(args, pat);
+    vwarner(err, pat, &args);
+    va_end(args);
+  }
+}
+#  else
+/* yes this replicates my_warner */
+static
+void
+Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
+{
+  SV *sv;
+  va_list args;
+
+  PERL_UNUSED_ARG(err);
+
+  va_start(args, pat);
+  sv = vnewSVpvf(pat, &args);
+  va_end(args);
+  sv_2mortal(sv);
+  warn("%s", SvPV_nolen(sv));
+}
+#  endif
+#endif
+
+# if PERL_VERSION == 12
+
+#   define SCAN_VERSION(a,b,c)	Perl_scan_version(aTHX_ a,b,c)
+#   define NEW_VERSION(a)	Perl_new_version(aTHX_ a)
+#   define UPG_VERSION(a,b)	Perl_upg_version(aTHX_ a, b)
+#   define VSTRINGIFY(a)	Perl_vstringify(aTHX_ a)
+
+# else 
+#   if(PERL_VERSION == 10 && (PERL_SUBVERSION == 0 || PERL_SUBVERSION == 1))
 
 const char * Perl_scan_version2(pTHX_ const char *s, SV *rv, bool qv);
 SV * Perl_new_version2(pTHX_ SV *ver);
@@ -11,7 +89,7 @@ SV * Perl_vstringify2(pTHX_ SV *vs);
 #define UPG_VERSION(a,b)	Perl_upg_version2(aTHX_ a, b)
 #define VSTRINGIFY(a)		Perl_vstringify2(aTHX_ a)
 
-# else
+#   else
 
 const char * Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv);
 SV * Perl_new_version(pTHX_ SV *ver);
@@ -31,7 +109,7 @@ int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
 #define voriginal(a)		Perl_voriginal(aTHX_ a)
 #define vcmp(a,b)		Perl_vcmp(aTHX_ a,b)
 
-# endif
+#   endif
 
 const char *
 Perl_prescan_version(pTHX_ const char *s, bool strict,
@@ -70,3 +148,7 @@ Perl_prescan_version(pTHX_ const char *s, bool strict,
 	assert(vs)
 #define PERL_ARGS_ASSERT_VCMP	\
 	assert(lhv); assert(rhv)
+#define PERL_ARGS_ASSERT_CK_WARNER      \
+	assert(pat)
+
+# endif
