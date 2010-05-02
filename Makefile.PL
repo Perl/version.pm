@@ -46,7 +46,7 @@ sub write_makefile
                        AUTHOR      => 'John Peacock <jpeacock@cpan.org>') :
                      ()
                    ), 
-		   ( $] >= 5.009001 ?
+		   ( $] >= 5.009001 && $] < 5.011000 ?
 		     ( INSTALLDIRS => 'perl' ) :
 		     ()
 		   ),
