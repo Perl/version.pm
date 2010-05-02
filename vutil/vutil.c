@@ -241,7 +241,7 @@ it doesn't.
 */
 
 const char *
-#if PERL_VERSION == 10 && (PERL_SUBVERSION == 0 || PERL_SUBVERSION == 1) 
+#if VUTIL_USE_TWO_SUFFIX
 Perl_scan_version2(pTHX_ const char *s, SV *rv, bool qv)
 #else
 Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
@@ -432,7 +432,7 @@ want to upgrade the SV.
 */
 
 SV *
-#if PERL_VERSION == 10 && (PERL_SUBVERSION == 0 || PERL_SUBVERSION == 1) 
+#if VUTIL_USE_TWO_SUFFIX
 Perl_new_version2(pTHX_ SV *ver)
 #else
 Perl_new_version(pTHX_ SV *ver)
@@ -522,7 +522,7 @@ to force this SV to be interpreted as an "extended" version.
 */
 
 SV *
-#if PERL_VERSION == 10 && (PERL_SUBVERSION == 0 || PERL_SUBVERSION == 1) 
+#if VUTIL_USE_TWO_SUFFIX
 Perl_upg_version2(pTHX_ SV *ver, bool qv)
 #else
 Perl_upg_version(pTHX_ SV *ver, bool qv)
@@ -805,7 +805,7 @@ the original version contained 1 or more dots, respectively
 */
 
 SV *
-#if PERL_VERSION == 10 && (PERL_SUBVERSION == 0 || PERL_SUBVERSION == 1) 
+#if VUTIL_USE_TWO_SUFFIX
 Perl_vstringify2(pTHX_ SV *vs)
 #else
 Perl_vstringify(pTHX_ SV *vs)

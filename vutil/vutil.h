@@ -70,7 +70,13 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
 #  endif
 #endif
 
-# if PERL_VERSION == 12
+#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#define PERL_DECIMAL_VERSION \
+	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define PERL_VERSION_GE(r,v,s) \
+	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+
+# if PERL_VERSION_GE(5,11,4)
 
 #   define SCAN_VERSION(a,b,c)	Perl_scan_version(aTHX_ a,b,c)
 #   define NEW_VERSION(a)	Perl_new_version(aTHX_ a)
@@ -78,7 +84,9 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
 #   define VSTRINGIFY(a)	Perl_vstringify(aTHX_ a)
 
 # else 
-#   if(PERL_VERSION == 10 && (PERL_SUBVERSION == 0 || PERL_SUBVERSION == 1))
+#   if PERL_VERSION_GE(5,9,0)
+
+#     define VUTIL_USE_TWO_SUFFIX 1
 
 const char * Perl_scan_version2(pTHX_ const char *s, SV *rv, bool qv);
 SV * Perl_new_version2(pTHX_ SV *ver);
