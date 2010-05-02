@@ -40,7 +40,7 @@ my %build_arguments = (
     dynamic_config  => 1,
     dist_version_from => 'lib/version.pm',
     installdirs     =>
-	($] > 5.009001) ? 'core' : 'site',
+	($] >= 5.009001 && $] < 5.011000) ? 'core' : 'site',
 );
 
 mkdir($t->config_dir(),0777);
