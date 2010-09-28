@@ -22,8 +22,8 @@ BOOT:
 	newXS("version::vxs::()", XS_version__vxs_noop, file);
 	newXS("version::vxs::(\"\"", XS_version__vxs_stringify, file);
 	newXS("version::vxs::(0+", XS_version__vxs_numify, file);
-	newXS("version::vxs::(cmp", XS_version__vxs_vcmp, file);
-	newXS("version::vxs::(<=>", XS_version__vxs_vcmp, file);
+	newXS("version::vxs::(cmp", XS_version__vxs_VCMP, file);
+	newXS("version::vxs::(<=>", XS_version__vxs_VCMP, file);
 	newXS("version::vxs::(bool", XS_version__vxs_boolean, file);
 	newXS("version::vxs::(nomethod", XS_version__vxs_noop, file);
 
@@ -90,7 +90,7 @@ PPCODE:
 }
 
 void
-vcmp (lobj,...)
+VCMP (lobj,...)
     version_vxs	lobj
 PPCODE:
 {
@@ -101,7 +101,8 @@ PPCODE:
 
     if ( ! sv_derived_from(robj, "version::vxs") )
     {
-	robj = NEW_VERSION(SvOK(robj) ? robj : newSVpvs("undef"));
+	robj = NEW_VERSION(SvOK(robj) ? robj : newSVpvs_flags("undef", SVs_TEMP));
+	sv_2mortal(robj);
     }
     rvs = SvRV(robj);
 
@@ -279,7 +280,7 @@ PPCODE:
     }
 
     /* if the package's $VERSION is not undef, it is upgraded to be a version object */
-    if (!undef) {
+    if (SvOK(sv) && sv_derived_from(sv, "version")) {
 	ST(0) = sv_2mortal(VSTRINGIFY(sv));
     } else {
 	ST(0) = sv;
