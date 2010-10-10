@@ -822,20 +822,42 @@ sub _verify {
 sub _un_vstring {
     my $value = shift;
     # may be a v-string
-    if ( $] >= 5.006_000 && length($value) >= 3 && $value !~ /[._]/) {
-	foreach my $char (split(//,$value)) {
-	    # if one of the characters is non-text assume v-string
-	    if (ord($char) < ord(" ")) {
-		my $tvalue = sprintf("v%vd",$value);
-		if ( $tvalue =~ /^v\d+(\.\d+){2,}$/ ) {
-		    # must be a v-string
-		    $value = $tvalue;
-		}
-		last;
+    if ( length($value) >= 3 && $value !~ /[._]/
+	 && (ord($value) < ord('0') || ord($value) > ord('9'))
+       ) {
+	my $tvalue;
+	if ( $] ge 5.008_001 ) {
+	    $tvalue = _find_magic_vstring($value);
+	    $value = $tvalue if length $tvalue;
+	}
+	elsif ( $] ge 5.006_000 ) {
+	    $tvalue = sprintf("v%vd",$value);
+	    if ( $tvalue =~ /^v\d+(\.\d+){2,}$/ ) {
+		# must be a v-string
+		$value = $tvalue;
 	    }
 	}
     }
     return $value;
+}
+
+sub _find_magic_vstring {
+    my $value = shift;
+    my $tvalue = '';
+    require B;
+    my $sv = B::svref_2object(\$value);
+    my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
+    while ( $magic ) {
+	if ( $magic->TYPE eq 'V' ) {
+	    $tvalue = $magic->PTR;
+	    $tvalue =~ s/^v?(.+)$/v$1/;
+	    last;
+	}
+	else {
+	    $magic = $magic->MOREMAGIC;
+	}
+    }
+    return $tvalue;
 }
 
 sub _VERSION {

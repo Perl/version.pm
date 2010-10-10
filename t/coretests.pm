@@ -331,14 +331,24 @@ SKIP: 	{
 		if $] < 5.006_000; 
 	diag "Tests with v-strings" if $Verbose;
 	$version = $CLASS->$method(1.2.3);
-	ok("$version" == "v1.2.3", '"$version" == 1.2.3');
+	ok("$version" eq "v1.2.3", '"$version" eq 1.2.3');
 	$version = $CLASS->$method(1.0.0);
 	$new_version = $CLASS->$method(1);
 	ok($version == $new_version, '$version == $new_version');
 	skip "version require'd instead of use'd, cannot test declare", 1
 	    unless defined $qv_declare;
 	$version = &$qv_declare(1.2.3);
-	ok("$version" == "v1.2.3", 'v-string initialized $qv_declare()');
+	ok("$version" eq "v1.2.3", 'v-string initialized $qv_declare()');
+    }
+
+SKIP: 	{
+	skip 'Cannot test bare alpha v-strings with Perl < 5.8.1', 2
+		if $] lt 5.008_001; 
+	diag "Tests with bare alpha v-strings" if $Verbose;
+	$version = $CLASS->$method(v1.2.3_4);
+	is($version, "v1.2.3_4", '"$version" eq "v1.2.3_4"');
+	$version = $CLASS->$method(eval "v1.2.3_4");
+	is($version, "v1.2.3_4", '"$version" eq "v1.2.3_4" (from eval)');
     }
 
     diag "Tests with real-world (malformed) data" if $Verbose;
