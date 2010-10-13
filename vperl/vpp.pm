@@ -121,7 +121,7 @@ use strict;
 use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.82;
+$VERSION = 0.83;
 
 use overload (
     '""'       => \&stringify,
@@ -819,12 +819,22 @@ sub _verify {
     }
 }
 
+sub _is_non_alphanumeric {
+    my $s = shift;
+    $s = new charstar $s;
+    while ($s) {
+	return 0 if isSPACE($s); # early out
+	return 1 unless (isALPHA($s) || isDIGIT($s) || $s =~ /[.-]/);
+	$s++;
+    }
+    return 0;
+}
+
 sub _un_vstring {
     my $value = shift;
     # may be a v-string
-    if ( length($value) >= 3 && $value !~ /[._]/
-	 && (ord($value) < ord('0') || ord($value) > ord('9'))
-       ) {
+    if ( length($value) >= 3 && $value !~ /[._]/ 
+	&& _is_non_alphanumeric($value)) {
 	my $tvalue;
 	if ( $] ge 5.008_001 ) {
 	    $tvalue = _find_magic_vstring($value);
