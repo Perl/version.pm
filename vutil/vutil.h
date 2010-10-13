@@ -73,34 +73,27 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
 #define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
 #define PERL_DECIMAL_VERSION \
 	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define PERL_VERSION_LT(r,v,s) \
+	(PERL_DECIMAL_VERSION < PERL_VERSION_DECIMAL(r,v,s))
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
-# if PERL_VERSION_GE(5,11,4)
+#if PERL_VERSION_GE(5,9,0)
 
-#   define SCAN_VERSION(a,b,c)	Perl_scan_version(aTHX_ a,b,c)
-#   define NEW_VERSION(a)	Perl_new_version(aTHX_ a)
-#   define UPG_VERSION(a,b)	Perl_upg_version(aTHX_ a, b)
-#   define VSTRINGIFY(a)	Perl_vstringify(aTHX_ a)
-#   define VVERIFY(a)		Perv_vverify(aTHX_ a)
-
-# else 
-#   if PERL_VERSION_GE(5,9,0)
-
-#     define VUTIL_USE_TWO_SUFFIX 1
+#  define VUTIL_USE_TWO_SUFFIX 1
 
 const char * Perl_scan_version2(pTHX_ const char *s, SV *rv, bool qv);
 SV * Perl_new_version2(pTHX_ SV *ver);
 SV * Perl_upg_version2(pTHX_ SV *sv, bool qv);
 SV * Perl_vstringify2(pTHX_ SV *vs);
 SV * Perl_vverify2(pTHX_ SV *vs);
-#define SCAN_VERSION(a,b,c)	Perl_scan_version2(aTHX_ a,b,c)
-#define NEW_VERSION(a)		Perl_new_version2(aTHX_ a)
-#define UPG_VERSION(a,b)	Perl_upg_version2(aTHX_ a, b)
-#define VSTRINGIFY(a)		Perl_vstringify2(aTHX_ a)
-#define VVERIFY(a)		Perl_vverify2(aTHX_ a)
+#  define SCAN_VERSION(a,b,c)	Perl_scan_version2(aTHX_ a,b,c)
+#  define NEW_VERSION(a)		Perl_new_version2(aTHX_ a)
+#  define UPG_VERSION(a,b)	Perl_upg_version2(aTHX_ a, b)
+#  define VSTRINGIFY(a)		Perl_vstringify2(aTHX_ a)
+#  define VVERIFY(a)		Perl_vverify2(aTHX_ a)
 
-#   else
+#else
 
 const char * Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv);
 SV * Perl_new_version(pTHX_ SV *ver);
@@ -110,56 +103,58 @@ SV * Perl_vnumify(pTHX_ SV *vs);
 SV * Perl_vnormal(pTHX_ SV *vs);
 SV * Perl_vstringify(pTHX_ SV *vs);
 int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
-#define SCAN_VERSION(a,b,c)	Perl_scan_version(aTHX_ a,b,c)
-#define NEW_VERSION(a)		Perl_new_version(aTHX_ a)
-#define UPG_VERSION(a,b)	Perl_upg_version(aTHX_ a, b)
-#define VSTRINGIFY(a)		Perl_vstringify(aTHX_ a)
-#define VVERIFY(a)		Perl_vverify(aTHX_ a)
-#define vnumify(a)		Perl_vnumify(aTHX_ a)
-#define vnormal(a)		Perl_vnormal(aTHX_ a)
-#define voriginal(a)		Perl_voriginal(aTHX_ a)
-#define vcmp(a,b)		Perl_vcmp(aTHX_ a,b)
+#  define SCAN_VERSION(a,b,c)	Perl_scan_version(aTHX_ a,b,c)
+#  define NEW_VERSION(a)		Perl_new_version(aTHX_ a)
+#  define UPG_VERSION(a,b)	Perl_upg_version(aTHX_ a, b)
+#  define VSTRINGIFY(a)		Perl_vstringify(aTHX_ a)
+#  define VVERIFY(a)		Perl_vverify(aTHX_ a)
+#  define vnumify(a)		Perl_vnumify(aTHX_ a)
+#  define vnormal(a)		Perl_vnormal(aTHX_ a)
+#  define voriginal(a)		Perl_voriginal(aTHX_ a)
+#  define vcmp(a,b)		Perl_vcmp(aTHX_ a,b)
 
-#   endif
+#endif
 
+#if PERL_VERSION_LT(5,11,4)
 const char *
 Perl_prescan_version(pTHX_ const char *s, bool strict,
 		     const char** errstr,
 		     bool *sqv, int *ssaw_decimal, int *swidth, bool *salpha);
-#define prescan_version(a,b,c,d,e,f,g)	Perl_prescan_version(aTHX_ a,b,c,d,e,f,g)
+#  define prescan_version(a,b,c,d,e,f,g)	Perl_prescan_version(aTHX_ a,b,c,d,e,f,g)
 
-#define is_LAX_VERSION(a,b) \
+#  define is_LAX_VERSION(a,b) \
 	(a != Perl_prescan_version(aTHX_ a, FALSE, b, NULL, NULL, NULL, NULL))
 
-#define is_STRICT_VERSION(a,b) \
+#  define is_STRICT_VERSION(a,b) \
 	(a != Perl_prescan_version(aTHX_ a, TRUE, b, NULL, NULL, NULL, NULL))
 
-#define BADVERSION(a,b,c) \
+#  define BADVERSION(a,b,c) \
 	if (b) { \
 	    *b = c; \
 	} \
 	return a;
 
-#define PERL_ARGS_ASSERT_PRESCAN_VERSION	\
+#  define PERL_ARGS_ASSERT_PRESCAN_VERSION	\
 	assert(s); assert(sqv); assert(ssaw_decimal);\
 	assert(swidth); assert(salpha);
-#define PERL_ARGS_ASSERT_SCAN_VERSION	\
+
+#  define PERL_ARGS_ASSERT_SCAN_VERSION	\
 	assert(s); assert(rv)
-#define PERL_ARGS_ASSERT_NEW_VERSION	\
+#  define PERL_ARGS_ASSERT_NEW_VERSION	\
 	assert(ver)
-#define PERL_ARGS_ASSERT_UPG_VERSION	\
+#  define PERL_ARGS_ASSERT_UPG_VERSION	\
 	assert(ver)
-#define PERL_ARGS_ASSERT_VVERIFY	\
+#  define PERL_ARGS_ASSERT_VVERIFY	\
 	assert(vs)
-#define PERL_ARGS_ASSERT_VNUMIFY	\
+#  define PERL_ARGS_ASSERT_VNUMIFY	\
 	assert(vs)
-#define PERL_ARGS_ASSERT_VNORMAL	\
+#  define PERL_ARGS_ASSERT_VNORMAL	\
 	assert(vs)
-#define PERL_ARGS_ASSERT_VSTRINGIFY	\
+#  define PERL_ARGS_ASSERT_VSTRINGIFY	\
 	assert(vs)
-#define PERL_ARGS_ASSERT_VCMP	\
+#  define PERL_ARGS_ASSERT_VCMP	\
 	assert(lhv); assert(rhv)
-#define PERL_ARGS_ASSERT_CK_WARNER      \
+#  define PERL_ARGS_ASSERT_CK_WARNER      \
 	assert(pat)
 
-# endif
+#endif
