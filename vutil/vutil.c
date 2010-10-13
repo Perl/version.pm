@@ -4,6 +4,7 @@
 #define NEED_my_snprintf
 #define NEED_newRV_noinc
 #define NEED_vnewSVpvf
+#define NEED_newSVpvn_flags_GLOBAL
 #define NEED_warner
 #include "ppport.h"
 #include "vutil.h"
