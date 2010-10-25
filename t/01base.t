@@ -9,7 +9,7 @@ my $Verbose;
 
 BEGIN {
     require "t/coretests.pm";
-    use_ok('version', 0.83);
+    use_ok('version', 0.84);
 }
 
 diag "Tests with base class" if $Verbose;
