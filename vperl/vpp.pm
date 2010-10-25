@@ -121,7 +121,7 @@ use strict;
 use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.83;
+$VERSION = 0.84;
 
 use overload (
     '""'       => \&stringify,
