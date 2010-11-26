@@ -6,7 +6,7 @@ use strict;
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 
-$VERSION = 0.85;
+$VERSION = 0.86;
 
 $CLASS = 'version';
 
@@ -197,14 +197,12 @@ sub import {
     }
 
     if (exists($args{'is_strict'})) {
-	*{$callpkg.'::is_strict'} = 
-	    sub {return $class->is_strict(shift)}
+	*{$callpkg.'::is_strict'} = \&version::is_strict
 	  unless defined(&{$callpkg.'::is_strict'});
     }
 
     if (exists($args{'is_lax'})) {
-	*{$callpkg.'::is_lax'} = 
-	    sub {return $class->is_lax(shift)}
+	*{$callpkg.'::is_lax'} = \&version::is_lax
 	  unless defined(&{$callpkg.'::is_lax'});
     }
 }

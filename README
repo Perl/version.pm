@@ -1,4 +1,4 @@
-version 0.85
+version 0.86
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -9,10 +9,14 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+Major Changes in 0.86 - 2010-11-26
+=====================================
+is_strict/is_lax were not exported correctly (which no one noticed).  Also
+pull in strict/lax tests from core.
+
 Major Changes in 0.85 - 2010-10-25
 =====================================
-Don't include MYMETA.yml file in distro (Module::Build should warn about
-this I think).
+Don't include MYMETA.yml file in distro
 
 Major Changes in 0.84 - 2010-10-24
 =====================================
