@@ -1,4 +1,4 @@
-version 0.86
+version 0.87
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -8,6 +8,12 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.87 - 2010-12-09
+=====================================
+Remove Build.PL since there are modules in the Module::Build tool chain
+that require version.pm, leading to circular dependencies.  This also allows
+Module::Build itself to depend on version.pm.
 
 Major Changes in 0.86 - 2010-11-26
 =====================================

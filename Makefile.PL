@@ -62,7 +62,7 @@ sub write_makefile
                        COMPRESS => 'gzip -9f', 
                        SUFFIX => 'gz',
                        PREOP  => (
-                          'svk log -x | gnuify-changelog.pl > Changes'
+                          'hg log --style changelog > Changes'
                        ),
                    },
 
