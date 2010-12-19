@@ -56,7 +56,7 @@ sub write_makefile
                         'lib/version/Internals.pod' =>
 			    '$(INST_LIBDIR)/version/Internals.pod'},
                    PL_FILES        => {},
-
+                   C               => [],
                    clean           => { FILES => 'vutil/Makefile.PL' },
                    dist            => {
                        COMPRESS => 'gzip -9f', 
