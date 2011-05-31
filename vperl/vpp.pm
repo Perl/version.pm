@@ -794,8 +794,8 @@ sub qv {
 
     $value = _un_vstring($value);
     $value = 'v'.$value unless $value =~ /(^v|\d+\.\d+\.\d)/;
-    my $version = $class->new($value);
-    return $version;
+    my $obj = version->new($value);
+    return bless $obj, $class;
 }
 
 *declare = \&qv;
