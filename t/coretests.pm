@@ -475,7 +475,6 @@ SKIP: {
 	my $warning;
 	local $SIG{__WARN__} = sub { $warning = $_[0] };
 
-$DB::single = 1;
 	my $v = eval { $CLASS->$method('1,7') };
 #	is( $@, "", 'Directly test comma as decimal compliance');
 

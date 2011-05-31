@@ -20,6 +20,21 @@ package version::Bad;
 use base 'version';
 sub new { my($self,$n)=@_;  bless \$n, $self }
 
+# Bad subclass for SemVer failures seen with pure Perl version.pm only
+package version::Bad2;
+use base 'version';
+sub new {
+    my ($class, $val) = @_;
+    die 'Invalid version string format' unless version::is_strict($val);
+    my $self = $class->SUPER::new($val);
+    return $self;
+}
+sub declare {
+    my ($class, $val) = @_;
+    my $self = $class->SUPER::declare($val);
+    return $self;
+}
+
 package main;
 
 my $warning;
@@ -80,3 +95,12 @@ like($@, qr/Invalid version object/,
 eval { my $test = ($testobj > 1.0) };
 like($@, qr/Invalid version object/,
     "Bad subclass vcmp");
+
+# Bad subclassing for SemVer with pure Perl version.pm only
+eval { my $test = version::Bad2->new("01.1.2") };
+like($@, qr/Invalid version string format/,
+    "Correctly found invalid version");
+
+eval { my $test = version::Bad2->declare("01.1.2") };
+unlike($@, qr/Invalid version string format/,
+    "Correctly ignored invalid version");
