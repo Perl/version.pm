@@ -1,4 +1,4 @@
-version 0.88
+version 0.90
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -9,11 +9,25 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+Major Changes in 0.90 - 2011-06-01
+=====================================
+Make all tests pass even with older Test::More releases.  Resolves
+
+  https://rt.cpan.org/Ticket/Display.html?id=68588
+
+Major Changes in 0.89 - 2011-05-31
+=====================================
+Change behavior of pure Perl qv/declare to match the core/XS behavior; do 
+not use parent's new() class for derived classes.  This breaks
+encapsulation but I can justify it because qv/declare is a very specific
+thing that shouldn't be casually overridden (unless you do it directly in the
+subclass).
+
 Major Changes in 0.88 - 2010-12-19
 =====================================
 Fix Makefile.PL to make Strawberry Perl happy.  Resolves:
 
-  https://rt.cpan.org/Public/Bug/Display.html?id=63991
+	https://rt.cpan.org/Public/Bug/Display.html?id=63991
 
 Major Changes in 0.87 - 2010-12-09
 =====================================
