@@ -1,4 +1,4 @@
-version 0.90
+version 0.91
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -8,6 +8,12 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.91 - 2011-06-05
+=====================================
+Fix compilation/linking on Strawberry Perl, resolves
+
+  https://rt.cpan.org/Ticket/Display.html?id=68611
 
 Major Changes in 0.90 - 2011-06-01
 =====================================

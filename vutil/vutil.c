@@ -21,6 +21,7 @@ some time when tokenizing.
 
 =cut
 */
+#if PERL_VERSION_LT(5,11,4)
 const char *
 Perl_prescan_version(pTHX_ const char *s, bool strict,
 		     const char **errstr,
@@ -218,6 +219,7 @@ version_prescan_finish:
 	*salpha = alpha;
     return d;
 }
+#endif
 
 /*
 =for apidoc scan_version
@@ -672,6 +674,7 @@ contained within the RV.
 =cut
 */
 
+#if PERL_VERSION_LT(5,11,4)
 SV *
 Perl_vnumify(pTHX_ SV *vs)
 {
@@ -736,6 +739,7 @@ Perl_vnumify(pTHX_ SV *vs)
     }
     return sv;
 }
+#endif
 
 /*
 =for apidoc vnormal
@@ -751,6 +755,7 @@ contained within the RV.
 =cut
 */
 
+#if PERL_VERSION_LT(5,11,4)
 SV *
 Perl_vnormal(pTHX_ SV *vs)
 {
@@ -798,6 +803,7 @@ Perl_vnormal(pTHX_ SV *vs)
     }
     return sv;
 }
+#endif
 
 /*
 =for apidoc vstringify
@@ -849,6 +855,7 @@ converted into version objects.
 =cut
 */
 
+#if PERL_VERSION_LT(5,11,4)
 int
 Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
 {
@@ -929,4 +936,4 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
     }
     return retval;
 }
-
+#endif
