@@ -121,7 +121,7 @@ use strict;
 use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.90;
+$VERSION = 0.91;
 
 use overload (
     '""'       => \&stringify,
@@ -135,7 +135,8 @@ use overload (
 eval "use warnings";
 if ($@) {
     eval '
-	package warnings;
+	package 
+	warnings;
 	sub enabled {return $^W;}
 	1;
     ';
