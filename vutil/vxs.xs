@@ -78,7 +78,7 @@ numify (lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    mPUSHs(vnumify(lobj));
+    mPUSHs(VNUMIFY(lobj));
 }
 
 void
@@ -86,7 +86,7 @@ normal(ver)
     SV *ver
 PPCODE:
 {
-    mPUSHs(vnormal(ver));
+    mPUSHs(VNORMAL(ver));
 }
 
 void
@@ -108,11 +108,11 @@ PPCODE:
 
     if ( swap )
     {
-        rs = newSViv(vcmp(rvs,lobj));
+        rs = newSViv(VCMP(rvs,lobj));
     }
     else
     {
-        rs = newSViv(vcmp(lobj,rvs));
+        rs = newSViv(VCMP(lobj,rvs));
     }
 
     mPUSHs(rs);
@@ -123,7 +123,7 @@ boolean(lobj,...)
     version_vxs	lobj
 PPCODE:
 {
-    SV	* const rs = newSViv( vcmp(lobj,NEW_VERSION(newSVpvs("0"))) );
+    SV	* const rs = newSViv( VCMP(lobj,NEW_VERSION(newSVpvs("0"))) );
     mPUSHs(rs);
 }
 
@@ -263,10 +263,10 @@ PPCODE:
 	    req = sv_2mortal( NEW_VERSION(req) );
 	}
 	
-	if ( vcmp( req, sv ) > 0 ) {
+	if ( VCMP( req, sv ) > 0 ) {
 	    if ( hv_exists(MUTABLE_HV(SvRV(req)), "qv", 2 ) ) {
-		req = vnormal(req);
-		sv  = vnormal(sv);
+		req = VNORMAL(req);
+		sv  = VNORMAL(sv);
 	    }
 	    else {
 		req = VSTRINGIFY(req);
