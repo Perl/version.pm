@@ -222,13 +222,12 @@ PPCODE:
     gvp = pkg ? (GV**)hv_fetchs(pkg,"VERSION",FALSE) : Null(GV**);
 
     if (gvp && isGV(gv = *gvp) && (sv = GvSV(gv)) && SvOK(sv)) {
-        sv = sv_mortalcopy(sv);
-	if ( !sv_derived_from(sv, "version::vxs"))
-	    UPG_VERSION(sv, FALSE);
+        ST(0) = sv_newmortal();
+        sv_setsv(ST(0), sv);
         undef = NULL;
     }
     else {
-        sv = (SV*)&PL_sv_undef;
+        sv = ST(0) = &PL_sv_undef;
         undef = "(undef)";
     }
 
@@ -258,6 +257,9 @@ PPCODE:
              }
         }
 
+        if ( !sv_derived_from(sv, "version"))
+            UPG_VERSION(sv, FALSE);
+
         if ( !sv_derived_from(req, "version")) {
             /* req may very well be R/O, so create a new object */
             req = sv_2mortal( NEW_VERSION(req) );
@@ -277,13 +279,6 @@ PPCODE:
                 SVfARG(sv_2mortal(req)),
                 SVfARG(sv_2mortal(sv)));
         }
-    }
-
-    /* if the package's $VERSION is not undef, it is upgraded to be a version object */
-    if (SvOK(sv) && sv_derived_from(sv, "version")) {
-	ST(0) = sv_2mortal(VSTRINGIFY(sv));
-    } else {
-	ST(0) = sv;
     }
 
     XSRETURN(1);
