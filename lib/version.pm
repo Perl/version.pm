@@ -6,7 +6,7 @@ use strict;
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 
-$VERSION = 0.91;
+$VERSION = 0.92;
 
 $CLASS = 'version';
 
@@ -138,7 +138,7 @@ else { # use XS module
     *version::qv = \&version::vxs::qv;
     *version::_VERSION = \&version::vxs::_VERSION;
     *version::vcmp = \&version::vxs::VCMP;
-    if ($] >= 5.009000 && $] < 5.011004) {
+    if ($] >= 5.009000) {
 	no strict 'refs';
 	*version::stringify = \&version::vxs::stringify;
 	*{'version::(""'} = \&version::vxs::stringify;
