@@ -207,6 +207,7 @@ PPCODE:
     HV *pkg;
     GV **gvp;
     GV *gv;
+    SV *ret;
     const char *undef;
 
     if (SvROK(sv)) {
@@ -222,12 +223,12 @@ PPCODE:
     gvp = pkg ? (GV**)hv_fetchs(pkg,"VERSION",FALSE) : Null(GV**);
 
     if (gvp && isGV(gv = *gvp) && (sv = GvSV(gv)) && SvOK(sv)) {
-        ST(0) = sv_newmortal();
-        sv_setsv(ST(0), sv);
+        ret = sv_newmortal();
+        sv_setsv(ret, sv);
         undef = NULL;
     }
     else {
-        sv = ST(0) = &PL_sv_undef;
+        sv = ret = &PL_sv_undef;
         undef = "(undef)";
     }
 
@@ -280,6 +281,7 @@ PPCODE:
                 SVfARG(sv_2mortal(sv)));
         }
     }
+    ST(0) = ret;
 
     XSRETURN(1);
 }

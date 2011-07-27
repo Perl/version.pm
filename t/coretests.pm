@@ -337,7 +337,7 @@ SKIP:    { # https://rt.perl.org/rt3/Ticket/Display.html?id=95544
 	print $fh "package $package;\n\$VERSION = '3alpha';\n1;\n";
 	close $fh;
 	eval "use lib '.'; use $package;";
-	unlike ($@, qr/Invalid version format (non-numeric data)/,
+	unlike ($@, qr/Invalid version format \(non-numeric data\)/,
 	    'Do not warn about bad $VERSION unless asked');
 	eval "use lib '.'; use $package; warn $package->VERSION";
 	ok ($warning =~ /3alpha/, 'Even a bad $VERSION is returned:
