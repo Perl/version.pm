@@ -1,4 +1,4 @@
-version 0.91
+version 0.92
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -8,6 +8,16 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.92 - 2011-07-26
+=====================================
+Forbid negative versions.  Make replacement UNIVERSAL::VERSION return the
+original $VERSION scalar if called without a requested version.  Resolves
+
+  https://rt.perl.org/rt3/Ticket/Display.html?id=95544
+
+Rewrite code so that we just override all subs for Perl >= 5.9.0 (when
+version.pm was added to the core).
 
 Major Changes in 0.91 - 2011-06-05
 =====================================
