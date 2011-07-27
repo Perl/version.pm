@@ -123,7 +123,7 @@ if ( $@ ) { # don't have the XS version installed
     *version::qv = \&version::vpp::qv;
     *version::declare = \&version::vpp::declare;
     *version::_VERSION = \&version::vpp::_VERSION;
-    if ($] >= 5.009000 && $] < 5.011004) {
+    if ($] >= 5.009000) {
 	no strict 'refs';
 	*version::stringify = \&version::vpp::stringify;
 	*{'version::(""'} = \&version::vpp::stringify;
