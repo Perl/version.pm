@@ -10,7 +10,7 @@ my $Verbose;
 
 BEGIN {
     require "t/coretests.pm";
-    use_ok("version", 0.93);
+    use_ok("version", 0.94);
     # If we made it this far, we are ok.
 }
 
