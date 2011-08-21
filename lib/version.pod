@@ -60,9 +60,10 @@ source file.  Quoting is recommended, as it ensures that trailing zeroes
 
 The more modern form of version assignment, with 3 (or potentially more)
 integers separated by decimal points (e.g. v1.2.3).  This is the form that
-Perl itself has used since 5.6.0 was released.  The leading "v" is now
+Perl itself has used since 5.6.0 was released.  The leading 'v' is now
 strongly recommended for clarity, and will throw a warning in a future
-release if omitted.
+release if omitted.  A leading 'v' character is required to pass the
+L<is_strict()> test.
 
 =back
 
@@ -194,7 +195,7 @@ for dotted-decimal formats strings:
 
 =item C<is_strict()>
 
-If you want to limit youself to a much more narrow definition of what
+If you want to limit yourself to a much more narrow definition of what
 a version string constitutes, C<is_strict()> is limited to version
 strings like the following list:
 

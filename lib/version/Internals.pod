@@ -34,7 +34,7 @@ Also referred to as "Dotted-Integer", these contains more than one decimal
 point and may have an optional embedded underscore, see L<Dotted-Decimal
 Versions>.  This is what is commonly used in most open source software as
 the "external" version (the one used as part of the tag or tarfile name).
-A leading 'v' character is now required and will warn if it missing.
+A leading "v" character is now required to pass the L<is_strict()> test.
 
 =back
 
