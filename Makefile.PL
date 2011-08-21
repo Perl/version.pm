@@ -37,8 +37,9 @@ sub write_makefile
 {
     my %prereq = ( 'Test::More' => 0.45, 'File::Temp' => 0.13 );
 
-    WriteMakefile( VERSION_FROM    => "lib/version.pm",
-                   NAME            => "version",
+    WriteMakefile( VERSION_FROM    => 'lib/version.pm',
+                   NAME            => 'version',
+                   LICENSE         => 'perl',
                    PREREQ_PM       => \%prereq,
                    CONFIGURE       => \&init,
                    ( $] >= 5.005 ?
