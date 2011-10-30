@@ -121,7 +121,7 @@ use strict;
 use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.94;
+$VERSION = 0.95;
 
 use overload (
     '""'       => \&stringify,
@@ -129,6 +129,11 @@ use overload (
     'cmp'      => \&vcmp,
     '<=>'      => \&vcmp,
     'bool'     => \&vbool,
+    '+'        => \&vnoop,
+    '-'        => \&vnoop,
+    '*'        => \&vnoop,
+    '/'        => \&vnoop,
+    'abs'      => \&vnoop,
     'nomethod' => \&vnoop,
 );
 
