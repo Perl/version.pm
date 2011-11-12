@@ -1,4 +1,4 @@
-version 0.93
+version 0.95
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -8,6 +8,35 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.95 - 2011-11-12
+=====================================
+Restore compatibility in replacement UNIVERSAL::VERSION with the behavior
+of Perl 5.14.x, essentially by reverting the changes in 
+
+    https://rt.perl.org/rt3/Ticket/Display.html?id=95544
+
+Fix segfault error with strings that begin with 'v', especially the string
+'version'.  Resolves:
+
+    https://rt.cpan.org/Ticket/Display.html?id=72365
+
+Forbid all math operations on version objects in base class (this was
+already the case for XS code but the pure Perl was lacking).  Resolves:
+
+    https://rt.cpan.org/Public/Bug/Display.html?id=70950
+
+Major Changes in 0.94 - 2011-08-21
+=====================================
+Clarify documentation on advisability of using leading 'v' (it isn't
+mandatory, but it is much more likely to DTRT).  Resolves:
+
+    https://rt.cpan.org/Public/Bug/Display.html?id=70120
+
+Use a localized DIE handler when attempting to load the XS code, in case
+the caller has its own DIE handler.  Resolves:
+
+    https://rt.cpan.org/Public/Bug/Display.html?id=70260
 
 Major Changes in 0.93 - 2011-07-27
 =====================================
