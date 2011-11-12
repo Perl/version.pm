@@ -25,6 +25,11 @@ BOOT:
         newXS("version::vxs::(cmp", XS_version__vxs_VCMP, file);
         newXS("version::vxs::(<=>", XS_version__vxs_VCMP, file);
         newXS("version::vxs::(bool", XS_version__vxs_boolean, file);
+        newXS("version::vxs::(+", XS_version__vxs_noop, file);
+        newXS("version::vxs::(-", XS_version__vxs_noop, file);
+        newXS("version::vxs::(*", XS_version__vxs_noop, file);
+        newXS("version::vxs::(/", XS_version__vxs_noop, file);
+        newXS("version::vxs::(abs", XS_version__vxs_noop, file);
         newXS("version::vxs::(nomethod", XS_version__vxs_noop, file);
 
 void

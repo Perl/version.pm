@@ -570,6 +570,20 @@ EOF
     }
 
     {
+	# https://rt.cpan.org/Public/Bug/Display.html?id=70950
+	# test indirect usage of version objects
+	my $sum = 0;
+	eval '$sum += $CLASS->$method("v2.0.0")';
+	like $@, qr/operation not supported with version object/,
+	    'No math operations with version objects';
+	# test direct usage of version objects
+	my $v = $CLASS->$method("v2.0.0");
+	eval '$v += 1';
+	like $@, qr/operation not supported with version object/,
+	    'No math operations with version objects';
+    }
+
+    {
 	# https://rt.cpan.org/Ticket/Display.html?id=72365
 	# https://rt.perl.org/rt3/Ticket/Display.html?id=102586
 	eval 'my $v = $CLASS->$method("version")';
