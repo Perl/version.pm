@@ -894,14 +894,13 @@ sub _VERSION {
     }
 
     my $version = eval "\$$class\::VERSION";
+    if ( defined $version ) {
+	local $^W if $] <= 5.008;
+	$version = version::vpp->new($version);
+    }
 
     if ( defined $req ) {
-	my $ver;
-	if ( defined $version ) {
-	    local $^W if $] <= 5.008;
-	    $ver = version::vpp->new($version);
-	}
-	else {
+	unless ( defined $version ) {
 	    require Carp;
 	    my $msg =  $] < 5.006
 	    ? "$class version $req required--this is only version "
@@ -918,26 +917,26 @@ sub _VERSION {
 
 	$req = version::vpp->new($req);
 
-	if ( $req > $ver ) {
+	if ( $req > $version ) {
 	    require Carp;
 	    if ( $req->is_qv ) {
 		Carp::croak(
 		    sprintf ("%s version %s required--".
 			"this is only version %s", $class,
-			$req->normal, $ver->normal)
+			$req->normal, $version->normal)
 		);
 	    }
 	    else {
 		Carp::croak(
 		    sprintf ("%s version %s required--".
 			"this is only version %s", $class,
-			$req->stringify, $ver->stringify)
+			$req->stringify, $version->stringify)
 		);
 	    }
 	}
     }
 
-    return $version;
+    return defined $version ? $version->stringify : undef;
 }
 
 1; #this line is important and will help the module return a true value
