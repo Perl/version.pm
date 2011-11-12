@@ -568,6 +568,18 @@ EOF
 	my $badv2 = bless { qv => 1, version => [1,2,3] }, "version";
 	is $badv2, 'v1.2.3', "Deal with badly serialized versions from YAML ";	
     }
+
+    {
+	# https://rt.cpan.org/Ticket/Display.html?id=72365
+	# https://rt.perl.org/rt3/Ticket/Display.html?id=102586
+	eval 'my $v = $CLASS->$method("version")';
+	like $@, qr/Invalid version format/,
+	    'The string "version" is not a version';
+	eval 'my $v = $CLASS->$method("ver510n")';
+	like $@, qr/Invalid version format/,
+	    'All strings starting with "v" are not versions';
+    }
+
 SKIP: {
 	if ( $] < 5.006_000 ) {
 	    skip 'No v-string support at all < 5.6.0', 2; 

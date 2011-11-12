@@ -99,7 +99,7 @@ PPCODE:
     SV *robj = ST(1);
     const IV  swap = (IV)SvIV(ST(2));
 
-    if ( ! sv_derived_from(robj, "version::vxs") )
+    if ( ! ISA_VERSION_OBJ(robj, "version::vxs") )
     {
         robj = NEW_VERSION(SvOK(robj) ? robj : newSVpvs_flags("undef", SVs_TEMP));
         sv_2mortal(robj);
@@ -224,7 +224,7 @@ PPCODE:
 
     if (gvp && isGV(gv = *gvp) && (sv = GvSV(gv)) && SvOK(sv)) {
         sv = sv_mortalcopy(sv);
-	if ( !sv_derived_from(sv, "version::vxs"))
+	if ( ! ISA_VERSION_OBJ(sv, "version::vxs"))
 	    UPG_VERSION(sv, FALSE);
         undef = NULL;
     }
@@ -259,7 +259,7 @@ PPCODE:
              }
         }
 
-        if ( !sv_derived_from(req, "version")) {
+        if ( ! ISA_VERSION_OBJ(req, "version")) {
             /* req may very well be R/O, so create a new object */
             req = sv_2mortal( NEW_VERSION(req) );
         }
@@ -282,7 +282,7 @@ PPCODE:
     ST(0) = ret;
 
     /* if the package's $VERSION is not undef, it is upgraded to be a version object */
-    if (SvOK(sv) && sv_derived_from(sv, "version")) {
+    if (ISA_VERSION_OBJ(sv, "version")) {
 	ST(0) = sv_2mortal(VSTRINGIFY(sv));
     } else {
 	ST(0) = sv;
