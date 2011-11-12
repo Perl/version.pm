@@ -78,6 +78,8 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#define ISA_VERSION_OBJ(v,c) (SvROK(v) && sv_derived_from(v,c))
+
 #if PERL_VERSION_GE(5,9,0)
 
 #  define VUTIL_REPLACE_CORE 1
