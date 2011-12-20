@@ -15,7 +15,7 @@ BEGIN {
 
 
 BEGIN {
-    use version 0.95;
+    use version 0.96;
 }
 
 pass "Didn't get caught by the wrong DIE handler, which is a good thing";

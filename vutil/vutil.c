@@ -451,7 +451,7 @@ Perl_new_version(pTHX_ SV *ver)
     dVAR;
     SV * const rv = newSV(0);
     PERL_ARGS_ASSERT_NEW_VERSION;
-    if ( ISA_VERSION_OBJ(ver,"version") ) /* can just copy directly */
+    if ( ISA_CLASS_OBJ(ver,"version") ) /* can just copy directly */
     {
 	I32 key;
 	AV * const av = newAV();
@@ -550,11 +550,13 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	/* may get too much accuracy */ 
 	char tbuf[64];
 #ifdef USE_LOCALE_NUMERIC
-	char *loc = setlocale(LC_NUMERIC, "C");
+	char *loc = savepv(setlocale(LC_NUMERIC, NULL));
+	setlocale(LC_NUMERIC, "C");
 #endif
 	STRLEN len = my_snprintf(tbuf, sizeof(tbuf), "%.9"NVff, SvNVX(ver));
 #ifdef USE_LOCALE_NUMERIC
 	setlocale(LC_NUMERIC, loc);
+	Safefree(loc);
 #endif
 	while (tbuf[len-1] == '0' && len > 0) len--;
 	if ( tbuf[len-1] == '.' ) len--; /* eat the trailing decimal */
