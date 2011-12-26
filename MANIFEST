@@ -15,7 +15,6 @@ t/04strict_lax.t
 t/05sigdie.t
 t/06noop.t
 t/07locale.t
-t/08locale-105784.t
 t/comma_locale.pl
 t/coretests.pm
 t/survey_locales
