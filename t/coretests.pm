@@ -185,8 +185,7 @@ sub BaseTests {
     diag "test with version class names" if $Verbose;
     $version = $CLASS->$method("v1.2.3");
     eval { () = $version < 'version' };
-    diag $@;
-    like $@, qr/^Invalid version object/, "error with \$version < 'version'";
+    like $@, qr/^Invalid version format/, "error with ${CLASS}->${method}(\$version) < 'version'";
     
     # that which is not expressly permitted is forbidden
     diag "forbidden operations" if $Verbose;

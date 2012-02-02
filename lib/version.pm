@@ -144,6 +144,7 @@ $LAX =
 	    no strict 'refs';
 	    *version::stringify = \&version::vxs::stringify;
 	    *{'version::(""'} = \&version::vxs::stringify;
+	    *{'version::(<=>'} = \&version::vxs::VCMP;
 	    *version::new = \&version::vxs::new;
 	    *version::parse = \&version::vxs::parse;
 	}

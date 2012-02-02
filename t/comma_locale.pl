@@ -6,6 +6,7 @@
 
 use POSIX qw/locale_h/;
 
+exit if $] < 5.006;
 my $ver = 1.23;  # has to be floating point number
 my $orig_loc = setlocale( LC_ALL );
 my $loc;
