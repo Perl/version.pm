@@ -547,13 +547,14 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 
     if ( SvNOK(ver) && !( SvPOK(ver) && sv_len(ver) == 3 ) )
     {
+	STRLEN len;
 	/* may get too much accuracy */ 
 	char tbuf[64];
 #ifdef USE_LOCALE_NUMERIC
 	char *loc = savepv(setlocale(LC_NUMERIC, NULL));
 	setlocale(LC_NUMERIC, "C");
 #endif
-	STRLEN len = my_snprintf(tbuf, sizeof(tbuf), "%.9"NVff, SvNVX(ver));
+	len = my_snprintf(tbuf, sizeof(tbuf), "%.9"NVff, SvNVX(ver));
 #ifdef USE_LOCALE_NUMERIC
 	setlocale(LC_NUMERIC, loc);
 	Safefree(loc);
@@ -680,6 +681,8 @@ point representation.  Call like:
 NOTE: you can pass either the object directly or the SV
 contained within the RV.
 
+The SV returned has a refcount of 1.
+
 =cut
 */
 
@@ -763,6 +766,8 @@ representation.  Call like:
 NOTE: you can pass either the object directly or the SV
 contained within the RV.
 
+The SV returned has a refcount of 1.
+
 =cut
 */
 
@@ -824,7 +829,9 @@ Perl_vnormal(pTHX_ SV *vs)
 In order to maintain maximum compatibility with earlier versions
 of Perl, this function will return either the floating point
 notation or the multiple dotted notation, depending on whether
-the original version contained 1 or more dots, respectively
+the original version contained 1 or more dots, respectively.
+
+The SV returned has a refcount of 1.
 
 =cut
 */

@@ -132,7 +132,13 @@ boolean(lobj,...)
     version_vxs lobj
 PPCODE:
 {
-    SV * const rs = newSViv( VCMP(lobj,NEW_VERSION(newSVpvs("0"))) );
+    SV * const rs =
+    	newSViv( VCMP(lobj,
+		      sv_2mortal(NEW_VERSION(
+		      		 sv_2mortal(newSVpvs("0"))
+				))
+		     )
+	       );
     mPUSHs(rs);
 }
 
