@@ -22,7 +22,7 @@ version_vxs T_PTROBJ_SPECIAL
 INPUT
 
 T_PTROBJ_SPECIAL
-        if (sv_derived_from($arg, \"version\")) {
+        if (ISA_CLASS_OBJ($arg, \"version\")) {
 	    $var = SvRV($arg);
         }
         else
