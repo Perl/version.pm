@@ -125,10 +125,12 @@ $LAX =
 	*version::qv = \&version::vpp::qv;
 	*version::declare = \&version::vpp::declare;
 	*version::_VERSION = \&version::vpp::_VERSION;
+	*version::vcmp = \&version::vpp::vcmp;
 	if ($] >= 5.009000) {
 	    no strict 'refs';
 	    *version::stringify = \&version::vpp::stringify;
 	    *{'version::(""'} = \&version::vpp::stringify;
+	    *{'version::(<=>'} = \&version::vpp::vcmp;
 	    *version::new = \&version::vpp::new;
 	    *version::parse = \&version::vpp::parse;
 	}

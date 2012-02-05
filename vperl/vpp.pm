@@ -732,7 +732,7 @@ sub vcmp
     }
     unless (_verify($right)) {
 	require Carp;
-	Carp::croak("Invalid version object");
+	Carp::croak("Invalid version format");
     }
     my $l = $#{$left->{version}};
     my $r = $#{$right->{version}};
