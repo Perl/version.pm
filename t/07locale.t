@@ -28,7 +28,7 @@ SKIP: {
 	    $loc = setlocale( LC_ALL, $_);
 	    last if localeconv()->{decimal_point} eq ',';
 	}
-	skip 'Cannot test locale handling without a comma locale', 4
+	skip 'Cannot test locale handling without a comma locale', 5
 	    unless $loc;
 
 	diag ("Testing locale handling with $loc") unless $ENV{PERL_CORE};
@@ -65,7 +65,6 @@ EOF
 	unlike($warning, qr"Version string '1,7' contains invalid data",
 	    'Handle locale action-at-a-distance');
     }
-
 
 __DATA__
 af_ZA
@@ -236,4 +235,3 @@ vi_VN.tcvn
 wa_BE
 wa_BE@euro
 wa_BE.utf8
-
