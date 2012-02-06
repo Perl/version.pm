@@ -63,7 +63,7 @@ integers separated by decimal points (e.g. v1.2.3).  This is the form that
 Perl itself has used since 5.6.0 was released.  The leading 'v' is now
 strongly recommended for clarity, and will throw a warning in a future
 release if omitted.  A leading 'v' character is required to pass the
-L<is_strict()> test.
+L</is_strict()> test.
 
 =back
 
