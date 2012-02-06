@@ -298,7 +298,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 	(void)hv_stores(MUTABLE_HV(hv), "alpha", newSViv(alpha));
     if ( !qv && width < 3 )
 	(void)hv_stores(MUTABLE_HV(hv), "width", newSViv(width));
-    
+
     while (isDIGIT(*pos))
 	pos++;
     if (!isALPHA(*pos)) {
@@ -472,7 +472,7 @@ Perl_new_version(pTHX_ SV *ver)
 
 	if ( hv_exists(MUTABLE_HV(ver), "alpha", 5) )
 	    (void)hv_stores(MUTABLE_HV(hv), "alpha", newSViv(1));
-	
+
 	if ( hv_exists(MUTABLE_HV(ver), "width", 5 ) )
 	{
 	    const I32 width = SvIV(*hv_fetchs(MUTABLE_HV(ver), "width", FALSE));
@@ -599,7 +599,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 		    }
 
 		    /* is definitely a v-string */
-		    if ( saw_decimal >= 2 ) {	
+		    if ( saw_decimal >= 2 ) {
 			Safefree(version);
 			version = nver;
 		    }
