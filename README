@@ -1,4 +1,4 @@
-version 0.95
+version 0.97
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -8,6 +8,14 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.97 - 2012-02-28
+=====================================
+Minor tweak to locale test to skip if no locales are installed at all.
+
+Major Changes in 0.96 - 2012-02-06
+=====================================
+Merge in upstream changes from bleadperl.  Improved locale tests.
 
 Major Changes in 0.95 - 2011-11-12
 =====================================
