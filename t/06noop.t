@@ -8,7 +8,7 @@ use Test::More qw/no_plan/;
 my $Verbose;
 
 BEGIN {
-    use_ok('version', 0.97);
+    use_ok('version', 0.98);
 }
 
 my $v1 = version->new('1.2');
