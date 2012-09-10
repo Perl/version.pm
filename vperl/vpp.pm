@@ -121,7 +121,7 @@ use strict;
 use POSIX qw/locale_h/;
 use locale;
 use vars qw ($VERSION @ISA @REGEXS);
-$VERSION = 0.99;
+$VERSION = 0.9901;
 
 use overload (
     '""'       => \&stringify,
@@ -271,6 +271,7 @@ dotted_decimal_version:
     } 					# end if dotted-decimal
     else
     {					# decimal versions
+	my $j = 0;
 	# special $strict case for leading '.' or '0'
 	if ($strict) {
 	    if ($d eq '.') {
@@ -333,7 +334,7 @@ dotted_decimal_version:
 	}
 
 	while (isDIGIT($d)) {
-	    $d++;
+	    $d++; $j++;
 	    if ($d eq '.' && isDIGIT($d-1)) {
 		if ($alpha) {
 		    return BADVERSION($s,$errstr,"Invalid version format (underscores before decimal)");
@@ -355,6 +356,7 @@ dotted_decimal_version:
 		if ( ! isDIGIT($d+1) ) {
 		    return BADVERSION($s,$errstr,"Invalid version format (misplaced underscore)");
 		}
+		$width = $j;
 		$d++;
 		$alpha = TRUE;
 	    }

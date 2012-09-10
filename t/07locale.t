@@ -10,7 +10,7 @@ use POSIX qw/locale_h/;
 use Test::More tests => 7;
 
 BEGIN {
-    use_ok('version', 0.99);
+    use_ok('version', 0.9901);
 }
 
 SKIP: {
