@@ -50,7 +50,7 @@ PPCODE:
             : (char *)SvPV_nolen(ST(0));
     PERL_UNUSED_ARG(ix);
 
-    if (items > 3)
+    if (items > 3 || items == 0)
         Perl_croak(aTHX_ "Usage: version::new(class, version)");
 
     if ( items == 1 || ! SvOK(vs) ) { /* no param or explicit undef */
