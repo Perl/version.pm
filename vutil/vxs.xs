@@ -44,10 +44,7 @@ PPCODE:
 {
     SV *vs = ST(1);
     SV *rv;
-    const char * const classname = 
-        sv_isobject(ST(0)) /* get the class if called as an object method */
-            ? HvNAME_get(SvSTASH(SvRV(ST(0))))
-            : (char *)SvPV_nolen(ST(0));
+    const char * classname = "";
     PERL_UNUSED_ARG(ix);
 
     if (items > 3 || items == 0)
@@ -58,10 +55,18 @@ PPCODE:
         vs = sv_newmortal();
         sv_setpvs(vs,"undef");
     }
+    else if ( items == 2 && SvOK(ST(1)) ) {
+        /* getting called as object or class method */
+        vs = ST(1);
+    }
     else if (items == 3 ) {
         vs = sv_newmortal();
         sv_setpvf(vs,"v%s",SvPV_nolen_const(ST(2)));
     }
+    classname =
+	sv_isobject(ST(0)) /* get the class if called as an object method */
+	    ? HvNAME_get(SvSTASH(SvRV(ST(0))))
+	    : (char *)SvPV_nolen(ST(0));
 
     rv = NEW_VERSION(vs);
     if ( strcmp(classname,"version::vxs") != 0 ) /* inherited new() */
@@ -174,10 +179,6 @@ PPCODE:
     if ( items == 2 && SvOK(ST(1)) ) {
         /* getting called as object or class method */
         ver = ST(1);
-        classname = 
-            sv_isobject(ST(0)) /* get the class if called as an object method */
-                ? HvNAME_get(SvSTASH(SvRV(ST(0))))
-                : (char *)SvPV_nolen(ST(0));
     }
 #ifdef SvVOK
     if ( !SvVOK(ver) ) { /* not already a v-string */
@@ -192,6 +193,11 @@ PPCODE:
         rv = sv_2mortal(NEW_VERSION(ver));
     }
 #endif
+    classname =
+	sv_isobject(ST(0)) /* get the class if called as an object method */
+	    ? HvNAME_get(SvSTASH(SvRV(ST(0))))
+	    : (char *)SvPV_nolen(ST(0));
+
     if ( items == 2 && strcmp(classname,"version") ) {
         /* inherited new() */
 #if PERL_VERSION == 5
