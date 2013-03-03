@@ -259,7 +259,7 @@ Perl_scan_version2(pTHX_ const char *s, SV *rv, bool qv)
 Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 #endif
 {
-    const char *start;
+    const char *start = s;
     const char *pos;
     const char *last;
     const char *errstr = NULL;
@@ -267,16 +267,10 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     int width = 3;
     bool alpha = FALSE;
     bool vinf = FALSE;
-    AV * const av = newAV();
-    SV * const hv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
+    AV * av;
+    SV * hv;
 
     PERL_ARGS_ASSERT_SCAN_VERSION;
-
-    (void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
-
-#ifndef NODEFAULT_SHAREKEYS
-    HvSHAREKEYS_on(hv);         /* key-sharing on by default */
-#endif
 
     while (isSPACE(*s)) /* leading whitespace is OK */
 	s++;
@@ -285,6 +279,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     if (errstr) {
 	/* "undef" is a special case and not an error */
 	if ( ! ( *s == 'u' && strEQ(s,"undef")) ) {
+	    Safefree(start);
 	    Perl_croak(aTHX_ "%s", errstr);
 	}
     }
@@ -293,6 +288,15 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     if (*s == 'v')
 	s++;
     pos = s;
+
+    /* Now that we are through the prescan, start creating the object */
+    av = newAV();
+    hv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
+    (void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
+
+#ifndef NODEFAULT_SHAREKEYS
+    HvSHAREKEYS_on(hv);         /* key-sharing on by default */
+#endif
 
     if ( qv )
 	(void)hv_stores(MUTABLE_HV(hv), "qv", newSViv(qv));

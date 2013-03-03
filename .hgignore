@@ -4,3 +4,4 @@
 version-.*\.tar\.gz
 Changes
 META\.yml
+blib/.*
