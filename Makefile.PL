@@ -16,6 +16,10 @@ if ( $] >= 5.009_001 && $] < 5.010_000 ) {
     	"Please update to the latest bleadperl...";
 }
 
+if ($ENV{PERL_ONLY}) {
+    $no_xs = 1;
+}
+
 for (@ARGV)
 {
     /^--perl_only/ and $no_xs = 1;
