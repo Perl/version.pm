@@ -571,6 +571,10 @@ sub scan_version {
 sub new
 {
 	my ($class, $value) = @_;
+	unless (defined $class) {
+	    require Carp;
+	    Carp::croak('Usage: version::new(class, version)');
+	}
 	my $self = bless ({}, ref ($class) || $class);
 	my $qv = FALSE;
 
