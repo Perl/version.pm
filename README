@@ -1,4 +1,4 @@
-version 0.99
+version 0.9902
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -9,9 +9,20 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
-Major Changes in 0.98 - 2012-04-25
+Major Changes in 0.9902 - 2013-03-05
 =====================================
-Apply missing patch from core Perl to prevent overflow with ludicrous versions.
+Upstream test changess from bleadperl.
+Support env PERL_ONLY=1 as well as --perl-only.
+version::new with no arguments reads past the end of the stack.
+
+Major Changes in 0.9901 - 2012-04-26
+=====================================
+Fix problem with short floating point alpha versions (e.g. 0.52_0).
+
+Major Changes in 0.99 - 2012-04-26
+=====================================
+Apply missing patch from core Perl to prevent overflow with ludicrous
+versions.
 
 Major Changes in 0.98 - 2012-04-25
 =====================================
