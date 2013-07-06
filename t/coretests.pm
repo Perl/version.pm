@@ -452,13 +452,13 @@ EOF
     }
 
 SKIP: {
-    skip 'Cannot test "use base qw(version)"  when require is used', 3
+    skip 'Cannot test "use parent qw(version)"  when require is used', 3
     	unless defined $qv_declare;
     my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
     (my $package = basename($filename)) =~ s/\.pm$//;
     print $fh <<"EOF";
 package $package;
-use base qw(version);
+use parent qw(version);
 1;
 EOF
     close $fh;
