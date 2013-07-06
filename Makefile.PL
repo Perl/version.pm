@@ -85,10 +85,9 @@ sub init
 {
     my $hash = $_[1];
 
-    if ($no_xs) {
-        $hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';
-    }
-    else {
+    # include this always
+    $hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';
+    unless ($no_xs) {
         open MAKEFILE, '>vutil/Makefile.PL';
         while (<DATA>) {
             print MAKEFILE $_;
