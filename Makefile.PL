@@ -43,7 +43,7 @@ sub write_makefile
 	'Test::More' => 0.45,
 	'File::Temp' => 0.13,
     	($] < 5.010001
-	    ? (parent => 1)
+	    ? (parent => 0.221)
 	    : ()
 	),
     );
