@@ -8,8 +8,9 @@ use Test::More qw/no_plan/;
 my $Verbose;
 
 BEGIN {
-    require "t/coretests.pm";
-    use_ok('version', 0.9902);
+    (my $coretests = $0) =~ s'[^/]+\.t'coretests.pm';
+    require $coretests;
+    use_ok('version', 0.9903);
 }
 
 diag "Tests with base class" if $Verbose;
@@ -23,12 +24,12 @@ BaseTests("version","parse", "declare");
 local $SIG{__WARN__} = sub { die $_[0] };
 eval 'use version;';
 unlike ($@, qr/^Subroutine main::declare redefined/,
-    "Only export declare once per package (to prevent redefined warnings)."); 
+    "Only export declare once per package (to prevent redefined warnings).");
 
 # https://rt.cpan.org/Ticket/Display.html?id=47980
 my $v = eval {
     require IO::Handle;
-    $@ = qq(Can't locate some/completely/fictitious/module.pm); 
+    $@ = qq(Can't locate some/completely/fictitious/module.pm);
     return IO::Handle->VERSION;
 };
 ok defined($v), 'Fix for RT #47980';
@@ -44,4 +45,3 @@ ok defined($v), 'Fix for RT #47980';
     like $@, qr'Usage: version::new\(class, version\)',
 	'No implicit object creation when called as function';
 }
-

@@ -5,10 +5,9 @@
 #########################
 
 use Test::More qw/no_plan/;
-my $Verbose;
 
 BEGIN {
-    use_ok('version', 0.9902);
+    use_ok('version', 0.9903);
 }
 
 my $v1 = version->new('1.2');
@@ -31,4 +30,3 @@ eval {$v1 /= 1};
 like $@, qr/operation not supported with version object/, 'No math ops with version objects';
 eval {$v1 *= 1};
 like $@, qr/operation not supported with version object/, 'No math ops with version objects';
-
