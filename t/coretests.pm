@@ -2,6 +2,7 @@
 package main;
 require Test::Harness;
 *Verbose = \$Test::Harness::Verbose;
+*Verbose = 0 if $ENV{PERL_CORE};
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 use File::Basename;
@@ -21,24 +22,24 @@ sub BaseTests {
     my ($CLASS, $method, $qv_declare) = @_;
     my $warning;
     local $SIG{__WARN__} = sub { $warning = $_[0] };
-    
+
     # Insert your test code below, the Test module is use()ed here so read
     # its man page ( perldoc Test ) for help writing this test script.
-    
+
     # Test bare number processing
     diag "tests with bare numbers" if $Verbose;
     $version = $CLASS->$method(5.005_03);
     is ( "$version" , "5.00503" , '5.005_03 eq 5.00503' );
     $version = $CLASS->$method(1.23);
     is ( "$version" , "1.23" , '1.23 eq "1.23"' );
-    
+
     # Test quoted number processing
     diag "tests with quoted numbers" if $Verbose;
     $version = $CLASS->$method("5.005_03");
     is ( "$version" , "5.005_03" , '"5.005_03" eq "5.005_03"' );
     $version = $CLASS->$method("v1.23");
     is ( "$version" , "v1.23" , '"v1.23" eq "v1.23"' );
-    
+
     # Test stringify operator
     diag "tests with stringify" if $Verbose;
     $version = $CLASS->$method("5.005");
@@ -48,21 +49,21 @@ sub BaseTests {
     unlike ($warning, qr/v-string without leading 'v' deprecated/, 'No leading v');
     $version = $CLASS->$method("v1.2.3_4");
     is ( "$version" , "v1.2.3_4" , 'alpha version 1.2.3_4 eq v1.2.3_4' );
-    
+
     # test illegal formats
     diag "test illegal formats" if $Verbose;
     eval {my $version = $CLASS->$method("1.2_3_4")};
     like($@, qr/multiple underscores/,
 	"Invalid version format (multiple underscores)");
-    
+
     eval {my $version = $CLASS->$method("1.2_3.4")};
     like($@, qr/underscores before decimal/,
 	"Invalid version format (underscores before decimal)");
-    
+
     eval {my $version = $CLASS->$method("1_2")};
     like($@, qr/alpha without decimal/,
 	"Invalid version format (alpha without decimal)");
-    
+
     eval { $version = $CLASS->$method("1.2b3")};
     like($@, qr/non-numeric data/,
 	"Invalid version format (non-numeric data)");
@@ -77,25 +78,25 @@ sub BaseTests {
 
     like($@, qr/non-numeric data/,
 	"Invalid version format (non-numeric data)");
-    
+
     eval{$version = $CLASS->$method("something")};
     like($@, qr/non-numeric data/,
 	"Invalid version format (non-numeric data)");
-    
+
     # reset the test object to something reasonable
     $version = $CLASS->$method("1.2.3");
-    
+
     # Test boolean operator
     ok ($version, 'boolean');
-    
+
     # Test class membership
     isa_ok ( $version, $CLASS );
-    
+
     # Test comparison operators with self
     diag "tests with self" if $Verbose;
     is ( $version <=> $version, 0, '$version <=> $version == 0' );
     ok ( $version == $version, '$version == $version' );
-    
+
     # Test Numeric Comparison operators
     # test first with non-object
     $version = $CLASS->$method("5.006.001");
@@ -105,21 +106,21 @@ sub BaseTests {
     ok ( $version < $new_version, '$version < $new_version' );
     ok ( $new_version > $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
-    
+
     # now test with existing object
     $new_version = $CLASS->$method($new_version);
     diag "numeric tests with objects" if $Verbose;
     ok ( $version < $new_version, '$version < $new_version' );
     ok ( $new_version > $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
-    
+
     # now test with actual numbers
     diag "numeric tests with numbers" if $Verbose;
     ok ( $version->numify() == 5.006001, '$version->numify() == 5.006001' );
     ok ( $version->numify() <= 5.006001, '$version->numify() <= 5.006001' );
     ok ( $version->numify() < 5.008, '$version->numify() < 5.008' );
     #ok ( $version->numify() > v5.005_02, '$version->numify() > 5.005_02' );
-    
+
     # test with long decimals
     diag "Tests with extended decimal versions" if $Verbose;
     $version = $CLASS->$method(1.002003);
@@ -129,7 +130,7 @@ sub BaseTests {
     ok ( $version == "2002.9.30.1",'$version == 2002.9.30.1');
     ok ( $version->numify == 2002.009030001,
 	'$version->numify == 2002.009030001');
-    
+
     # now test with alpha version form with string
     $version = $CLASS->$method("1.2.3");
     $new_version = "1.2.3_4";
@@ -137,14 +138,14 @@ sub BaseTests {
     ok ( $version < $new_version, '$version < $new_version' );
     ok ( $new_version > $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
-    
+
     $version = $CLASS->$method("1.2.4");
     diag "numeric tests with alpha-style non-objects"
 	if $Verbose;
     ok ( $version > $new_version, '$version > $new_version' );
     ok ( $new_version < $version, '$new_version < $version' );
     ok ( $version != $new_version, '$version != $new_version' );
-    
+
     # now test with alpha version form with object
     $version = $CLASS->$method("1.2.3");
     $new_version = $CLASS->$method("1.2.3_4");
@@ -154,13 +155,13 @@ sub BaseTests {
     ok ( $version != $new_version, '$version != $new_version' );
     ok ( !$version->is_alpha, '!$version->is_alpha');
     ok ( $new_version->is_alpha, '$new_version->is_alpha');
-    
+
     $version = $CLASS->$method("1.2.4");
     diag "tests with alpha-style objects" if $Verbose;
     ok ( $version > $new_version, '$version > $new_version' );
     ok ( $new_version < $version, '$new_version < $version' );
     ok ( $version != $new_version, '$version != $new_version' );
-    
+
     $version = $CLASS->$method("1.2.3.4");
     $new_version = $CLASS->$method("1.2.3_4");
     diag "tests with alpha-style objects with same subversion"
@@ -168,7 +169,7 @@ sub BaseTests {
     ok ( $version > $new_version, '$version > $new_version' );
     ok ( $new_version < $version, '$new_version < $version' );
     ok ( $version != $new_version, '$version != $new_version' );
-    
+
     diag "test implicit [in]equality" if $Verbose;
     $version = $CLASS->$method("v1.2.3");
     $new_version = $CLASS->$method("1.2.3.0");
@@ -181,12 +182,15 @@ sub BaseTests {
     ok ( $version < $new_version, '$version < $new_version' );
     $new_version = $CLASS->$method("1.1.999");
     ok ( $version > $new_version, '$version > $new_version' );
-    
+
     diag "test with version class names" if $Verbose;
     $version = $CLASS->$method("v1.2.3");
     eval { () = $version < 'version' };
-    like $@, qr/^Invalid version format/, "error with ${CLASS}->${method}(\$version) < 'version'";
-    
+    # this test, and only this test, I have to do this or else $@ gets
+    # "reset" before like() has a chance to evaluate it.  Quite maddening!!!
+    my $err = $@;
+    like $err, qr/^Invalid version format/, "error with $version < 'version'";
+
     # that which is not expressly permitted is forbidden
     diag "forbidden operations" if $Verbose;
     ok ( !eval { ++$version }, "noop ++" );
@@ -197,7 +201,7 @@ sub BaseTests {
 
 SKIP: {
     skip "version require'd instead of use'd, cannot test $qv_declare", 3
-    	unless defined $qv_declare;
+	unless defined $qv_declare;
     # test the $qv_declare() sub
     diag "testing $qv_declare" if $Verbose;
     $version = $CLASS->$qv_declare("1.2");
@@ -224,7 +228,7 @@ SKIP: {
     ok ( $version == "1.2.0", 'qw$Revision: 1.2$ == 1.2.0' );
     $version = new $CLASS qw$Revision: 1.2.3.4$;
     ok ( $version == "1.2.3.4", 'qw$Revision: 1.2.3.4$ == 1.2.3.4' );
-    
+
     # test the CPAN style reduced significant digit form
     diag "testing CPAN-style versions" if $Verbose;
     $version = $CLASS->$method("1.23_01");
@@ -238,7 +242,7 @@ SKIP: {
     my $error_regex = $] < 5.006
 	? 'version \d required'
 	: 'does not define \$t.{7}::VERSION';
-    
+
     {
 	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
 	(my $package = basename($filename)) =~ s/\.pm$//;
@@ -249,7 +253,7 @@ SKIP: {
 	eval "use lib '.'; use $package $version";
 	unlike($@, qr/$package version $version/,
 		'Replacement eval works with exact version');
-	
+
 	# test as class method
 	$new_version = $package->VERSION;
 	cmp_ok($new_version,'==',$version, "Called as class method");
@@ -269,13 +273,13 @@ SKIP: {
 	eval "use lib '.'; use $package $version";
 	like($@, qr/$package version $version/,
 		'Replacement eval works with incremented version');
-	
+
 	$version =~ s/0+$//; #convert to string and remove trailing 0's
 	chop($version);	# shorten by 1 digit, should still succeed
 	eval "use lib '.'; use $package $version";
 	unlike($@, qr/$package version $version/,
 		'Replacement eval works with single digit');
-	
+
 	# this would fail with old UNIVERSAL::VERSION
 	$version += 0.1;
 	eval "use lib '.'; use $package $version";
@@ -293,19 +297,19 @@ SKIP: {
 	eval "use lib '.'; use $package 3;";
 	if ( $] < 5.008 ) {
 	    like($@, qr/$error_regex/,
-		'Replacement handles modules without package or VERSION'); 
+		'Replacement handles modules without package or VERSION');
 	}
 	else {
 	    like($@, qr/defines neither package nor VERSION/,
-		'Replacement handles modules without package or VERSION'); 
+		'Replacement handles modules without package or VERSION');
 	}
 	eval "use lib '.'; use $package; \$version = $package->VERSION";
 	unlike ($@, qr/$error_regex/,
-	    'Replacement handles modules without package or VERSION'); 
+	    'Replacement handles modules without package or VERSION');
 	ok (!defined($version), "Called as class method");
 	unlink $filename;
     }
-    
+
     { # dummy up some variously broken modules for testing
 	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
 	(my $package = basename($filename)) =~ s/\.pm$//;
@@ -313,10 +317,10 @@ SKIP: {
 	close $fh;
 	eval "use lib '.'; use $package 3;";
 	like ($@, qr/$error_regex/,
-	    'Replacement handles modules without VERSION'); 
+	    'Replacement handles modules without VERSION');
 	eval "use lib '.'; use $package; print $package->VERSION";
 	unlike ($@, qr/$error_regex/,
-	    'Replacement handles modules without VERSION'); 
+	    'Replacement handles modules without VERSION');
 	unlink $filename;
     }
 
@@ -327,10 +331,10 @@ SKIP: {
 	close $fh;
 	eval "use lib '.'; use $package 3;";
 	like ($@, qr/$error_regex/,
-	    'Replacement handles modules without VERSION'); 
+	    'Replacement handles modules without VERSION');
 	eval "use lib '.'; use $package; print $package->VERSION";
 	unlike ($@, qr/$error_regex/,
-	    'Replacement handles modules without VERSION'); 
+	    'Replacement handles modules without VERSION');
 	unlink $filename;
     }
 SKIP:    { # https://rt.perl.org/rt3/Ticket/Display.html?id=95544
@@ -350,7 +354,7 @@ SKIP:    { # https://rt.perl.org/rt3/Ticket/Display.html?id=95544
 
 SKIP: 	{
 	skip 'Cannot test bare v-strings with Perl < 5.6.0', 4
-		if $] < 5.006_000; 
+		if $] < 5.006_000;
 	diag "Tests with v-strings" if $Verbose;
 	$version = $CLASS->$method(1.2.3);
 	ok("$version" eq "v1.2.3", '"$version" eq 1.2.3');
@@ -365,7 +369,7 @@ SKIP: 	{
 
 SKIP: 	{
 	skip 'Cannot test bare alpha v-strings with Perl < 5.8.1', 2
-		if $] lt 5.008_001; 
+		if $] lt 5.008_001;
 	diag "Tests with bare alpha v-strings" if $Verbose;
 	$version = $CLASS->$method(v1.2.3_4);
 	is($version, "v1.2.3_4", '"$version" eq "v1.2.3_4"');
@@ -384,7 +388,7 @@ SKIP: 	{
     ok($version->numify eq "1.000000", "trailing zeros preserved");
     $version = $CLASS->$method("1.0.0.0");
     ok($version->numify eq "1.000000000", "trailing zeros preserved");
-    
+
     # leading zero testing (reported by Andreas Koenig).
     $version = $CLASS->$method(".7");
     ok($version->numify eq "0.700", "leading zero inferred");
@@ -412,7 +416,7 @@ SKIP: 	{
 
     $version = $CLASS->$method(0.000001);
     unlike($warning, qr/^Version string '1e-06' contains invalid data/,
-    	"Very small version objects");
+	"Very small version objects");
     }
 
 SKIP: {
@@ -430,19 +434,19 @@ EOF
 
 	eval "use lib '.'; use $package 0.000008;";
 	like ($@, qr/^$package version 0.000008 required/,
-	    "Make sure very small versions don't freak"); 
+	    "Make sure very small versions don't freak");
 	eval "use lib '.'; use $package 1;";
 	like ($@, qr/^$package version 1 required/,
-	    "Comparing vs. version with no decimal"); 
+	    "Comparing vs. version with no decimal");
 	eval "use lib '.'; use $package 1.;";
 	like ($@, qr/^$package version 1 required/,
-	    "Comparing vs. version with decimal only"); 
+	    "Comparing vs. version with decimal only");
 	if ( $] < 5.006_000 ) {
-	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3; 
+	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3;
 	}
 	eval "use lib '.'; use $package v0.0.8;";
 	my $regex = "^$package version v0.0.8 required";
-	like ($@, qr/$regex/, "Make sure very small versions don't freak"); 
+	like ($@, qr/$regex/, "Make sure very small versions don't freak");
 
 	$regex =~ s/8/4/; # set for second test
 	eval "use lib '.'; use $package v0.0.4;";
@@ -453,7 +457,7 @@ EOF
 
 SKIP: {
     skip 'Cannot test "use parent qw(version)"  when require is used', 3
-    	unless defined $qv_declare;
+	unless defined $qv_declare;
     my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
     (my $package = basename($filename)) =~ s/\.pm$//;
     print $fh <<"EOF";
@@ -473,7 +477,7 @@ EOF
 
 SKIP: {
 	if ( $] < 5.006_000 ) {
-	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3; 
+	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3;
 	}
 	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
 	(my $package = basename($filename)) =~ s/\.pm$//;
@@ -485,16 +489,16 @@ EOF
 	close $fh;
 	eval "use lib '.'; use $package 1.001;";
 	like ($@, qr/^$package version 1.001 required/,
-	    "User typed numeric so we error with numeric"); 
+	    "User typed numeric so we error with numeric");
 	eval "use lib '.'; use $package v1.1.0;";
 	like ($@, qr/^$package version v1.1.0 required/,
-	    "User typed extended so we error with extended"); 
+	    "User typed extended so we error with extended");
 	unlink $filename;
     }
 
     eval 'my $v = $CLASS->$method("1._1");';
     unlike($@, qr/^Invalid version format \(alpha with zero width\)/,
-    	"Invalid version format 1._1");
+	"Invalid version format 1._1");
 
     {
 	my $warning;
@@ -517,9 +521,9 @@ EOF
     {
 	# http://rt.perl.org/rt3/Ticket/Display.html?id=56606
 	my $badv = bless { version => [1,2,3] }, "version";
-	is $badv, '1.002003', "Deal with badly serialized versions from YAML";	
+	is $badv, '1.002003', "Deal with badly serialized versions from YAML";
 	my $badv2 = bless { qv => 1, version => [1,2,3] }, "version";
-	is $badv2, 'v1.2.3', "Deal with badly serialized versions from YAML ";	
+	is $badv2, 'v1.2.3', "Deal with badly serialized versions from YAML ";
     }
 
     {
@@ -550,7 +554,7 @@ EOF
 
 SKIP: {
 	if ( $] < 5.006_000 ) {
-	    skip 'No v-string support at all < 5.6.0', 2; 
+	    skip 'No v-string support at all < 5.6.0', 2;
 	}
 	# https://rt.cpan.org/Ticket/Display.html?id=49348
 	my $v = $CLASS->$method("420");
@@ -560,7 +564,7 @@ SKIP: {
     }
 SKIP: {
 	if ( $] < 5.006_000 ) {
-	    skip 'No v-string support at all < 5.6.0', 4; 
+	    skip 'No v-string support at all < 5.6.0', 4;
 	}
 	# https://rt.cpan.org/Ticket/Display.html?id=50347
 	# Check that the qv() implementation does not change

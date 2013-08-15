@@ -9,8 +9,9 @@ use File::Temp qw/tempfile/;
 my $Verbose;
 
 BEGIN {
-    require "t/coretests.pm";
-    use_ok("version", 0.9902);
+    (my $coretests = $0) =~ s'[^/]+\.t'coretests.pm';
+    require $coretests;
+    use_ok("version", 0.9903);
     # If we made it this far, we are ok.
 }
 
