@@ -9,6 +9,12 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+Major Changes in 0.9903 - 2013-08-18
+=====================================
+Upstream test changess from bleadperl.
+Include version::vpp even when installing XS version.
+Subtle locale test changes.
+
 Major Changes in 0.9902 - 2013-03-05
 =====================================
 Upstream test changess from bleadperl.
