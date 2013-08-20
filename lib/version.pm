@@ -6,7 +6,7 @@ use strict;
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 
-$VERSION = 0.9903;
+$VERSION = 0.9904;
 
 $CLASS = 'version';
 
@@ -171,7 +171,7 @@ sub import {
 	map { $args{$_} = 1 } @_
     }
     else { # no parameters at all on use line
-    	%args =
+	%args =
 	(
 	    qv => 1,
 	    'UNIVERSAL::VERSION' => 1,
