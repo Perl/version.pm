@@ -58,10 +58,6 @@ PPCODE:
         vs = sv_newmortal();
         sv_setpvs(vs,"undef");
     }
-    else if ( items == 2 && SvOK(vs) ) {
-        /* getting called as object or class method
-	 * vs is already ST(1) so we are done */
-    }
     else if (items == 3 ) {
         vs = sv_newmortal();
         sv_setpvf(vs,"v%s",SvPV_nolen_const(ST(2)));
