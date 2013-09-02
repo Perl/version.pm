@@ -47,6 +47,9 @@ PPCODE:
     const char * classname = "";
     PERL_UNUSED_ARG(ix);
 
+    /* Just in case this is something like a tied hash */
+    SvGETMAGIC(vs);
+
     if (items > 3 || items == 0)
         Perl_croak(aTHX_ "Usage: version::new(class, version)");
 
@@ -55,9 +58,9 @@ PPCODE:
         vs = sv_newmortal();
         sv_setpvs(vs,"undef");
     }
-    else if ( items == 2 && SvOK(ST(1)) ) {
-        /* getting called as object or class method */
-        vs = ST(1);
+    else if ( items == 2 && SvOK(vs) ) {
+        /* getting called as object or class method
+	 * vs is already ST(1) so we are done */
     }
     else if (items == 3 ) {
         vs = sv_newmortal();
@@ -176,9 +179,16 @@ PPCODE:
     SV * rv;
     const char * classname = "";
     PERL_UNUSED_ARG(ix);
-    if ( items == 2 && SvOK(ST(1)) ) {
-        /* getting called as object or class method */
-        ver = ST(1);
+
+    if ( items == 2 ) {
+	SvGETMAGIC(ST(1));
+	if ( SvOK(ST(1)) ) {
+	    /* getting called as object or class method */
+	    ver = ST(1);
+	}
+	else {
+	    Perl_croak(aTHX_ "Invalid version format (version required)");
+	}
     }
 #ifdef SvVOK
     if ( !SvVOK(ver) ) { /* not already a v-string */

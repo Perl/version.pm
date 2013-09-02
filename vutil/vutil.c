@@ -391,7 +391,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 	}
     }
     if ( qv ) { /* quoted versions always get at least three terms*/
-	I32 len = av_len(av);
+	SSize_t len = av_len(av);
 	/* This for loop appears to trigger a compiler bug on OS X, as it
 	   loops infinitely. Yes, len is negative. No, it makes no sense.
 	   Compiler in question is:
@@ -459,7 +459,7 @@ Perl_new_version(pTHX_ SV *ver)
     PERL_ARGS_ASSERT_NEW_VERSION;
     if ( ISA_CLASS_OBJ(ver,"version") ) /* can just copy directly */
     {
-	I32 key;
+	SSize_t key;
 	AV * const av = newAV();
 	AV *sav;
 	/* This will get reblessed later if a derived class*/
@@ -560,8 +560,11 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	SV *sv = SvNVX(ver) > 10e50 ? newSV(64) : 0;
 	char *buf;
 #ifdef USE_LOCALE_NUMERIC
-	char *loc = savepv(setlocale(LC_NUMERIC, NULL));
-	setlocale(LC_NUMERIC, "C");
+	char *loc = NULL;
+	if (! PL_numeric_standard) {
+	    loc = savepv(setlocale(LC_NUMERIC, NULL));
+	    setlocale(LC_NUMERIC, "C");
+	}
 #endif
 	if (sv) {
 	    Perl_sv_setpvf(aTHX_ sv, "%.9"NVff, SvNVX(ver));
@@ -572,8 +575,10 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	    buf = tbuf;
 	}
 #ifdef USE_LOCALE_NUMERIC
-	setlocale(LC_NUMERIC, loc);
-	Safefree(loc);
+	if (loc) {
+	    setlocale(LC_NUMERIC, loc);
+	    Safefree(loc);
+	}
 #endif
 	while (buf[len-1] == '0' && len > 0) len--;
 	if ( buf[len-1] == '.' ) len--; /* eat the trailing decimal */
@@ -710,7 +715,8 @@ Perl_vnumify2(pTHX_ SV *vs)
 Perl_vnumify(pTHX_ SV *vs)
 #endif
 {
-    I32 i, len, digit;
+    SSize_t i, len;
+    I32 digit;
     int width;
     bool alpha = FALSE;
     SV *sv;
@@ -899,7 +905,8 @@ Perl_vcmp2(pTHX_ SV *lhv, SV *rhv)
 Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
 #endif
 {
-    I32 i,l,m,r,retval;
+    SSize_t i,l,m,r;
+    I32 retval;
     bool lalpha = FALSE;
     bool ralpha = FALSE;
     I32 left = 0;
