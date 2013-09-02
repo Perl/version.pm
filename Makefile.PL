@@ -42,10 +42,7 @@ sub write_makefile
     my %prereq = (
 	'Test::More' => 0.45,
 	'File::Temp' => 0.13,
-    	($] < 5.010001
-	    ? (parent => 0.221)
-	    : ()
-	),
+	'parent'     => 0.221,
     );
 
     WriteMakefile( VERSION_FROM    => 'lib/version.pm',

@@ -11,7 +11,10 @@ replacement code will take effect and Perl will not crash.
 
 Major Changes in 0.9904 - 2013-08-20
 =====================================
-Final upstream changes from bleadperl
+Final upstream changes from bleadperl.  Resolves RT tickets:
+
+    https://rt.cpan.org/Ticket/Display.html?id=87513
+    https://rt.cpan.org/Ticket/Display.html?id=87983
 
 Major Changes in 0.9903 - 2013-08-18
 =====================================
