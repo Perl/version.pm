@@ -1,4 +1,4 @@
-version 0.9902
+version 0.9904
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -18,7 +18,7 @@ Final upstream changes from bleadperl.  Resolves RT tickets:
 
 Major Changes in 0.9903 - 2013-08-18
 =====================================
-Upstream test changess from bleadperl.
+Upstream test changes from bleadperl.
 Include version::vpp even when installing XS version.
 Subtle locale test changes.
 
