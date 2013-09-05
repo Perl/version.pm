@@ -594,7 +594,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
     else /* must be a string or something like a string */
     {
 	STRLEN len;
-	version = savepv(SvPV(ver,len));
+	version = savepvn(SvPV(ver,len), SvCUR(ver));
 #ifndef SvVOK
 #  if PERL_VERSION > 5
 	/* This will only be executed for 5.6.0 - 5.8.0 inclusive */
