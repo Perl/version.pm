@@ -200,7 +200,7 @@ XS(XS_version_new)
 	    : (char *)SvPV_nolen(ST(0));
 
     rv = NEW_VERSION(vs);
-    if ( strcmp(classname,"version::vxs") != 0 ) /* inherited new() */
+    if ( strcmp(classname,VXS_CLASS) != 0 ) /* inherited new() */
 #if PERL_VERSION == 5
         sv_bless(rv, gv_stashpv((char *)classname, GV_ADD));
 #else
