@@ -168,4 +168,5 @@ WriteMakefile(
     VERSION_FROM        => 'lib/version/vxs.pm',
     OBJECT              => q/$(O_FILES)/,
     TYPEMAPS            => ['../lib/version/typemap'],
+    depend              => { qw< vxs.c vxs.inc > },
 );
