@@ -188,7 +188,11 @@ XS(XS_version_new)
     }
     else if (items == 3 ) {
         vs = sv_newmortal();
+#if PERL_VERSION == 5
         sv_setpvf(vs,"v%s",SvPV_nolen_const(ST(2)));
+#else
+        Perl_sv_setpvf(aTHX_ vs,"v%s",SvPV_nolen_const(ST(2)));
+#endif
     }
     classname =
 	sv_isobject(ST(0)) /* get the class if called as an object method */
