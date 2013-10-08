@@ -51,6 +51,19 @@
 #  define dVAR
 #endif
 
+#ifdef HvNAME_HEK
+typedef HEK HVNAME;
+#  ifndef HEKf
+#    define HEKfARG(arg)	((void*)(sv_2mortal(newSVhek(arg))))
+#    define HEKf		SVf
+#  endif
+#else
+typedef char HVNAME;
+#  define HvNAME_HEK	HvNAME_get
+#  define HEKfARG(arg)	arg
+#  define HEKf		"s"
+#endif
+
 XS(XS_UNIVERSAL_VERSION)
 {
     dVAR;
@@ -96,19 +109,22 @@ XS(XS_UNIVERSAL_VERSION)
 
 	if (undef) {
 	    if (pkg) {
-		const char * const name = HvNAME_get(pkg);
+		const HVNAME* const name = HvNAME_HEK(pkg);
 #if PERL_VERSION == 5
 		Perl_croak(aTHX_ "%s version %s required--this is only version ",
 			    name, SvPVx_nolen_const(req));
 #else
-		Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
-			    name, name);
+		Perl_croak(aTHX_
+			   "%"HEKf" does not define $%"HEKf
+			   "::VERSION--version check failed",
+			   HEKfARG(name), HEKfARG(name));
 #endif
 	    }
 	    else {
 #if PERL_VERSION >= 8
-		Perl_croak(aTHX_ "%s defines neither package nor VERSION--version check failed",
-			   SvPVx_nolen_const(ST(0)) );
+		Perl_croak(aTHX_
+			     "%"SVf" defines neither package nor VERSION--version check failed",
+			     (void*)(ST(0)) );
 #else
 		Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
 			   SvPVx_nolen_const(ST(0)),
@@ -131,8 +147,8 @@ XS(XS_UNIVERSAL_VERSION)
 		req = VSTRINGIFY(req);
 		sv  = VSTRINGIFY(sv);
 	    }
-	    Perl_croak(aTHX_ "%s version %"SVf" required--"
-		"this is only version %"SVf"", HvNAME_get(pkg),
+	    Perl_croak(aTHX_ "%"HEKf" version %"SVf" required--"
+		"this is only version %"SVf"", HEKfARG(HvNAME_HEK(pkg)),
 		SVfARG(sv_2mortal(req)),
 		SVfARG(sv_2mortal(sv)));
 	}
