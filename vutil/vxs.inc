@@ -61,9 +61,10 @@ XS(XS_UNIVERSAL_VERSION)
     SV *ret;
     SV *sv;
     const char *undef;
+    PERL_UNUSED_ARG(cv);
 
     if (items < 1)
-       croak_xs_usage("sv, ...");
+       Perl_croak(aTHX_ "Usage: UNIVERSAL::VERSION(sv, ...)");
 
     sv = ST(0);
 
