@@ -389,7 +389,9 @@ XS(XS_version_qv)
     {
 	SV * ver = ST(0);
 	SV * rv;
+        STRLEN len = 0;
         const char * classname = "";
+        U32 flags = 0;
         if ( items == 2 ) {
 	    SvGETMAGIC(ST(1));
 	    if (SvOK(ST(1))) {
@@ -398,6 +400,18 @@ XS(XS_version_qv)
 	    else {
 		Perl_croak(aTHX_ "Invalid version format (version required)");
 	    }
+            if ( sv_isobject(ST(0)) ) { /* class called as an object method */
+                const HV * stash = SvSTASH(SvRV(ST(0)));
+                classname = HvNAME_get(stash);
+                len       = HvNAMELEN_get(stash);
+#ifdef HvNAMEUTF8
+                flags     = HvNAMEUTF8(stash) ? SVf_UTF8 : 0;
+#endif
+            }
+            else {
+	       classname = SvPV(ST(0), len);
+                flags     = SvUTF8(ST(0));
+            }
 	}
 	if ( !SvVOK(ver) ) { /* not already a v-string */
 	    rv = sv_newmortal();
@@ -406,17 +420,12 @@ XS(XS_version_qv)
 	} else {
 	    rv = sv_2mortal(NEW_VERSION(ver));
 	}
-	classname =
-	    sv_isobject(ST(0))
-		/* get the class if called as an object method */
-		? HvNAME_get(SvSTASH(SvRV(ST(0))))
-		: (char *)SvPV_nolen(ST(0));
-	if ( items == 2
-                && strcmp(classname,"version") ) { /* inherited new() */
+	if ( items == 2 && (len != 7
+                || strcmp(classname,"version")) ) { /* inherited new() */
 #if PERL_VERSION == 5
 	    sv_bless(rv, gv_stashpv((char *)classname, GV_ADD));
 #else
-	    sv_bless(rv, gv_stashpv(classname, GV_ADD));
+	    sv_bless(rv, gv_stashpvn(classname, len, GV_ADD | flags));
 #endif
         }
 	PUSHs(rv);
