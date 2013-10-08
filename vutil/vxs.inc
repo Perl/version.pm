@@ -91,7 +91,7 @@ XS(XS_UNIVERSAL_VERSION)
         pkg = gv_stashsv(sv, FALSE);
     }
 
-    gvp = pkg ? (GV**)hv_fetchs(pkg,"VERSION",FALSE) : Null(GV**);
+    gvp = pkg ? (GV**)hv_fetchs(pkg,"VERSION",FALSE) : (GV**)NULL;
 
     if (gvp && isGV(gv = *gvp) && (sv = GvSV(gv)) && SvOK(sv)) {
         sv = sv_mortalcopy(sv);
