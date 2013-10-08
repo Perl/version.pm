@@ -170,16 +170,16 @@ XS(XS_version_new)
     dVAR;
     dXSARGS;
     PERL_UNUSED_VAR(cv);
-    SV *vs = ST(1);
+    SV *vs = items ? ST(1) : &PL_sv_undef;
     SV *rv;
     const char * classname = "";
     SP -= items;
 
-    /* Just in case this is something like a tied hash */
-    SvGETMAGIC(vs);
-
     if (items > 3 || items == 0)
         Perl_croak(aTHX_ "Usage: version::new(class, version)");
+
+    /* Just in case this is something like a tied hash */
+    SvGETMAGIC(vs);
 
     if ( items == 1 || ! SvOK(vs) ) { /* no param or explicit undef */
         /* create empty object */
