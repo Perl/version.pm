@@ -173,6 +173,8 @@ XS(XS_version_new)
     SV *vs = items ? ST(1) : &PL_sv_undef;
     SV *rv;
     const char * classname = "";
+    STRLEN len;
+    U32 flags = 0;
     SP -= items;
 
     if (items > 3 || items == 0)
@@ -194,17 +196,27 @@ XS(XS_version_new)
         Perl_sv_setpvf(aTHX_ vs,"v%s",SvPV_nolen_const(ST(2)));
 #endif
     }
-    classname =
-	sv_isobject(ST(0)) /* get the class if called as an object method */
-	    ? HvNAME_get(SvSTASH(SvRV(ST(0))))
-	    : (char *)SvPV_nolen(ST(0));
+    if ( sv_isobject(ST(0)) ) {
+	/* get the class if called as an object method */
+	const HV * stash = SvSTASH(SvRV(ST(0)));
+	classname = HvNAME_get(stash);
+	len	  = HvNAMELEN_get(stash);
+#ifdef HvNAMEUTF8
+	flags	  = HvNAMEUTF8(stash) ? SVf_UTF8 : 0;
+#endif
+    }
+    else {
+	classname = SvPV(ST(0), len);
+	flags     = SvUTF8(ST(0));
+    }
 
     rv = NEW_VERSION(vs);
-    if ( strcmp(classname,VXS_CLASS) != 0 ) /* inherited new() */
+    if ( len != sizeof(VXS_CLASS)-1
+      || strcmp(classname,VXS_CLASS) != 0 ) /* inherited new() */
 #if PERL_VERSION == 5
         sv_bless(rv, gv_stashpv((char *)classname, GV_ADD));
 #else
-        sv_bless(rv, gv_stashpv(classname, GV_ADD));
+        sv_bless(rv, gv_stashpvn(classname, len, GV_ADD | flags));
 #endif
 
     mPUSHs(rv);
