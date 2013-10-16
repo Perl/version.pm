@@ -19,7 +19,7 @@ struct xsub_details {
     const char *proto; /* ignored */
 };
 
-const struct xsub_details details[] = {
+static const struct xsub_details details[] = {
 #define VXS_XSUB_DETAILS
 #include "vxs.inc"
 #undef VXS_XSUB_DETAILS
