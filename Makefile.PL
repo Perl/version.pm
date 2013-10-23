@@ -37,6 +37,10 @@ unless (defined $no_xs)
 
 write_makefile();
 
+unless ( $ENV{PERL_CORE} ) {
+    qx|perl -pi -e 's/XS_version/XS_version__xs/g' vutil/vxs.inc|;
+}
+
 sub write_makefile
 {
     my %prereq = (
