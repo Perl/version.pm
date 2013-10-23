@@ -573,7 +573,7 @@ sub import {
     my ($class) = shift;
 
     # Set up any derived class
-    unless ($class eq 'version') {
+    unless ($class eq 'version::vpp') {
 	local $^W;
 	*{$class.'::declare'} =  \&version::vpp::declare;
 	*{$class.'::qv'} = \&version::vpp::qv;
