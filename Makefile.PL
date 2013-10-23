@@ -36,7 +36,8 @@ unless (defined $no_xs)
 
     # need to make the XS routines unique from the core
     unless ( $ENV{PERL_CORE} ) {
-	qx|perl -pi -e 's/XS_version/XS_version__xs/g' vutil/vxs.inc|;
+	qx|perl -pi -e 's/XS_version/XS_version__xs/g;
+	s/XS_UNIVERSAL/XS_UNIVERSAL_xs/' vutil/vxs.inc|;
     }
 }
 
