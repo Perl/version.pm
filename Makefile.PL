@@ -33,13 +33,14 @@ unless (defined $no_xs)
 {
     check_for_compiler()
         or no_cc();
+
+    # need to make the XS routines unique from the core
+    unless ( $ENV{PERL_CORE} ) {
+	qx|perl -pi -e 's/XS_version/XS_version__xs/g' vutil/vxs.inc|;
+    }
 }
 
 write_makefile();
-
-unless ( $ENV{PERL_CORE} ) {
-    qx|perl -pi -e 's/XS_version/XS_version__xs/g' vutil/vxs.inc|;
-}
 
 sub write_makefile
 {
