@@ -8,6 +8,7 @@ use strict;
 use ExtUtils::MakeMaker;
 use Config qw(%Config);
 use File::Spec;
+use File::Copy;
 
 use vars qw ($no_xs $force_xs);
 
@@ -35,9 +36,14 @@ unless (defined $no_xs)
         or no_cc();
 
     # need to make the XS routines unique from the core
-    unless ( $ENV{PERL_CORE} ) {
-	qx|perl -pi -e 's/XS_version/XS_version__xs/g;
-	s/XS_UNIVERSAL/XS_UNIVERSAL_xs/' vutil/vxs.inc|;
+    if ( $ENV{PERL_CORE} )
+    {
+	copy('vutil/vxs.in', 'vutil/vxs.inc');
+    }
+    else
+    {
+	qx|perl -pe 's/XS_version/XS_version__xs/g;
+	s/XS_UNIVERSAL/XS_UNIVERSAL_xs/' vutil/vxs.in > vutil/vxs.inc|;
     }
 }
 
@@ -72,7 +78,9 @@ sub write_makefile
 			    '$(INST_LIBDIR)/version/Internals.pod'},
                    PL_FILES        => {},
                    C               => [],
-                   clean           => { FILES => 'vutil/Makefile.PL' },
+                   clean           => { FILES => ['vutil/Makefile.PL',
+			   			  'vutil/vxs.inc',
+					      	 ]},
                    dist            => {
                        COMPRESS => 'gzip -9f', 
                        SUFFIX => 'gz',
