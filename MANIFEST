@@ -1,6 +1,7 @@
 Changes
 lib/version.pm
 lib/version.pod
+lib/version/regex.pm
 lib/version/typemap
 lib/version/Internals.pod
 Makefile.PL

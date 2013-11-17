@@ -14,7 +14,7 @@ use vars qw ($no_xs $force_xs);
 
 if ( $] >= 5.009_001 && $] < 5.010_000 ) {
     die "The CPAN module cannot be tested with Perl $]\n".
-    	"Please update to the latest bleadperl...";
+            "Please update to the latest bleadperl...";
 }
 
 if ($ENV{PERL_ONLY}) {
@@ -38,12 +38,12 @@ unless (defined $no_xs)
     # need to make the XS routines unique from the core
     if ( $ENV{PERL_CORE} )
     {
-	copy('vutil/vxs.in', 'vutil/vxs.inc');
+        copy('vutil/vxs.in', 'vutil/vxs.inc');
     }
     else
     {
-	qx|perl -pe 's/XS_version/XS_version__xs/g;
-	s/XS_UNIVERSAL/XS_UNIVERSAL_xs/' vutil/vxs.in > vutil/vxs.inc|;
+        qx|perl -pe 's/XS_version/XS_version__xs/g;
+        s/XS_UNIVERSAL/XS_UNIVERSAL_xs/' vutil/vxs.in > vutil/vxs.inc|;
     }
 }
 
@@ -52,9 +52,9 @@ write_makefile();
 sub write_makefile
 {
     my %prereq = (
-	'Test::More' => 0.45,
-	'File::Temp' => 0.13,
-	'parent'     => 0.221,
+        'Test::More' => 0.45,
+        'File::Temp' => 0.13,
+        'parent'     => 0.221,
     );
 
     WriteMakefile( VERSION_FROM    => 'lib/version.pm',
@@ -67,20 +67,24 @@ sub write_makefile
                        AUTHOR      => 'John Peacock <jpeacock@cpan.org>') :
                      ()
                    ), 
-		   ( $] >= 5.009001 && $] < 5.011000 ?
-		     ( INSTALLDIRS => 'perl' ) :
-		     ()
-		   ),
+                   ( $] >= 5.009001 && $] < 5.011000 ?
+                     ( INSTALLDIRS => 'perl' ) :
+                     ()
+                   ),
                    PM              => 
                        {'lib/version.pm'  => '$(INST_LIBDIR)/version.pm',
                         'lib/version.pod' => '$(INST_LIBDIR)/version.pod',
+                        'lib/version/regex.pm'  =>
+                            '$(INST_LIBDIR)/version/regex.pm',
                         'lib/version/Internals.pod' =>
-			    '$(INST_LIBDIR)/version/Internals.pod'},
+                            '$(INST_LIBDIR)/version/Internals.pod',
+                        'vperl/vpp.pm' => '$(INST_LIBDIR)/version/vpp.pm',
+                        },
                    PL_FILES        => {},
                    C               => [],
                    clean           => { FILES => ['vutil/Makefile.PL',
-			   			  'vutil/vxs.inc',
-					      	 ]},
+                                                     'vutil/vxs.inc',
+                                                 ]},
                    dist            => {
                        COMPRESS => 'gzip -9f', 
                        SUFFIX => 'gz',
@@ -97,7 +101,6 @@ sub init
     my $hash = $_[1];
 
     # include this always
-    $hash->{'PM'}->{'vperl/vpp.pm'} = '$(INST_LIBDIR)/version/vpp.pm';
     unless ($no_xs) {
         open MAKEFILE, '>vutil/Makefile.PL';
         while (<DATA>) {
