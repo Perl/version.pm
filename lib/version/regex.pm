@@ -1,4 +1,4 @@
-package version::common;
+package version::regex;
 
 use 5.8.0;
 use strict;

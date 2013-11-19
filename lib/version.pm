@@ -9,9 +9,6 @@ use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 $VERSION = 0.9905;
 $CLASS = 'version';
 
-require version::regex;
-@ISA = qw'version::regex';
-
 {
     local $SIG{'__DIE__'};
     eval "use version::vxs $VERSION";
@@ -32,6 +29,8 @@ require version::regex;
 	    *{'version::(<=>'} = \&version::vpp::vcmp;
 	    *version::parse = \&version::vpp::parse;
 	}
+	*version::is_strict = \&version::vpp::is_strict;
+	*version::is_lax = \&version::vpp::is_lax;
     }
     else { # use XS module
 	push @ISA, "version::vxs";
@@ -48,6 +47,8 @@ require version::regex;
 	    *{'version::(<=>'} = \&version::vxs::VCMP;
 	    *version::parse = \&version::vxs::parse;
 	}
+	*version::is_strict = \&version::vxs::is_strict;
+	*version::is_lax = \&version::vxs::is_lax;
     }
 }
 

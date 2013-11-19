@@ -9,7 +9,8 @@ $VERSION = 0.9905;
 $CLASS = 'version::vxs';
 
 require version::regex;
-@ISA = qw'version::regex';
+*version::vxs::is_strict = \&version::regex::is_strict;
+*version::vxs::is_lax = \&version::regex::is_lax;
 
 eval {
     require XSLoader;
