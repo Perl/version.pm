@@ -125,7 +125,8 @@ $VERSION = 0.9905;
 $CLASS = 'version::vpp';
 
 require version::regex;
-@ISA = qw'version::regex';
+*version::vpp::is_strict = \&version::regex::is_strict;
+*version::vpp::is_lax = \&version::regex::is_lax;
 
 use overload (
     '""'       => \&stringify,
