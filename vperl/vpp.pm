@@ -116,6 +116,8 @@ sub currstr {
 }
 
 package version::vpp;
+
+use 5.005_05;
 use strict;
 
 use POSIX qw/locale_h/;
