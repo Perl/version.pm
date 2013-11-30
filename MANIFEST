@@ -2,7 +2,6 @@ Changes
 lib/version.pm
 lib/version.pod
 lib/version/regex.pm
-lib/version/typemap
 lib/version/Internals.pod
 Makefile.PL
 MANIFEST
@@ -10,7 +9,6 @@ MANIFEST.SKIP
 META.yml
 README
 t/00impl-pp.t
-t/00impl-xs.t
 t/01base.t
 t/02derived.t
 t/03require.t

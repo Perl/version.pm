@@ -12,11 +12,6 @@ use File::Copy;
 
 use vars qw ($no_xs $force_xs);
 
-if ( $] >= 5.009_001 && $] < 5.010_000 ) {
-    die "The CPAN module cannot be tested with Perl $]\n".
-            "Please update to the latest bleadperl...";
-}
-
 if ($ENV{PERL_ONLY}) {
     $no_xs = 1;
 }
@@ -26,6 +21,10 @@ for (@ARGV)
     /^--perl_only/ and $no_xs = 1;
     /^--perl-only/ and $no_xs = 1;
     /^--xs/ and $no_xs = 0;
+}
+
+if ($] < 5.010) { # support pure Perl only
+    $no_xs = 1;
 }
 
 map { unlink $_ if -f $_ } <vutil/Makefile*>;
@@ -43,7 +42,7 @@ unless (defined $no_xs)
     else
     {
         qx|perl -pe 's/XS_version/XS_version__xs/g;
-        s/XS_UNIVERSAL/XS_UNIVERSAL_xs/' vutil/vxs.in > vutil/vxs.inc|;
+	    s/XS_UNIVERSAL/XS_UNIVERSAL_xs/' vutil/vxs.in > vutil/vxs.inc|;
     }
 }
 
@@ -184,6 +183,5 @@ WriteMakefile(
     AUTHOR              => 'John Peacock <jpeacock@cpan.org>',
     VERSION_FROM        => 'lib/version/vxs.pm',
     OBJECT              => q/$(O_FILES)/,
-    TYPEMAPS            => ['../lib/version/typemap'],
     depend              => { qw< vxs.c vxs.inc > },
 );
