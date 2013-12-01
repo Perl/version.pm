@@ -122,7 +122,7 @@ use strict;
 
 use POSIX qw/locale_h/;
 use locale;
-our ($VERSION, $CLASS, @ISA);
+use vars qw($VERSION $CLASS @ISA);
 $VERSION = 0.9905;
 $CLASS = 'version::vpp';
 
