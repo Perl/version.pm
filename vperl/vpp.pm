@@ -871,7 +871,7 @@ sub is_alpha {
 
 sub qv {
     my $value = shift;
-    my $class = 'version';
+    my $class = $CLASS;
     if (@_) {
 	$class = ref($value) || $value;
 	$value = shift;
@@ -879,7 +879,7 @@ sub qv {
 
     $value = _un_vstring($value);
     $value = 'v'.$value unless $value =~ /(^v|\d+\.\d+\.\d)/;
-    my $obj = version->new($value);
+    my $obj = $CLASS->new($value);
     return bless $obj, $class;
 }
 
