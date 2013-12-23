@@ -22,8 +22,6 @@ SKIP: {
 	# test locale handling
 	my $warning;
 
-	use locale;
-
 	local $SIG{__WARN__} = sub { $warning = $_[0] };
 
 	my $ver = 1.23;  # has to be floating point number
@@ -33,6 +31,8 @@ SKIP: {
 						      # because have to
 						      # evaluate in current
 						      # scope
+	use locale;
+
 	while (<DATA>) {
 	    chomp;
 	    $loc = setlocale( LC_ALL, $_);
