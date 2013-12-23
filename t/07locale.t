@@ -36,7 +36,7 @@ SKIP: {
 	while (<DATA>) {
 	    chomp;
 	    $loc = setlocale( LC_ALL, $_);
-	    last if localeconv()->{decimal_point} eq ',';
+	    last if $loc && localeconv()->{decimal_point} eq ',';
 	}
 	skip 'Cannot test locale handling without a comma locale', 5
 	    unless $loc and localeconv()->{decimal_point} eq ',';
