@@ -521,7 +521,7 @@ Perl_new_version(pTHX_ SV *ver)
 	}
 	else {
 #endif
-	sv_setsv(rv,ver); /* make a duplicate */
+	SvSetSV_nosteal(rv, ver); /* make a duplicate */
 #ifdef SvVOK
 	}
     }
