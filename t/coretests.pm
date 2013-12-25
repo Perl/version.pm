@@ -30,6 +30,10 @@ sub BaseTests {
     $version = $CLASS->$method(1.23);
     is ( "$version" , "1.23" , '1.23 eq "1.23"' );
 
+    # Test explicit integer
+    $version = $CLASS->$method(23);
+    is ( "$version" , 23 , '23 eq "23"' );
+
     # Test quoted number processing
     $version = $CLASS->$method("5.005_03");
     is ( "$version" , "5.005_03" , '"5.005_03" eq "5.005_03"' );
