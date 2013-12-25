@@ -17,6 +17,7 @@ t/05sigdie.t
 t/06noop.t
 t/07locale.t
 t/08_corelist.t
+t/09_list_util.t
 t/coretests.pm
 t/survey_locales
 vperl/vpp.pm
