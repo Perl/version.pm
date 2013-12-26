@@ -572,8 +572,9 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	}
 #endif
 	if (sv) {
-	    Perl_sv_setpvf(aTHX_ sv, "%.9"NVff, SvNVX(ver));
-	    buf = SvPV(sv, len);
+	    Perl_sv_catpvf(aTHX_ sv, "%.9"NVff, SvNVX(ver));
+	    len = SvCUR(sv);
+	    buf = SvPVX(sv);
 	}
 	else {
 	    len = my_snprintf(tbuf, sizeof(tbuf), "%.9"NVff, SvNVX(ver));
