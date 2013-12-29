@@ -9,6 +9,7 @@ use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 $VERSION = 0.9905;
 $CLASS = 'version';
 
+# !!!!Delete this next block completely when adding to Perl core!!!!
 {
     local $SIG{'__DIE__'};
     eval "use version::vxs $VERSION";
@@ -29,8 +30,6 @@ $CLASS = 'version';
 	    *{'version::(<=>'} = \&version::vpp::vcmp;
 	    *version::parse = \&version::vpp::parse;
 	}
-	*version::is_strict = \&version::vpp::is_strict;
-	*version::is_lax = \&version::vpp::is_lax;
     }
     else { # use XS module
 	push @ISA, "version::vxs";
@@ -47,10 +46,13 @@ $CLASS = 'version';
 	    *{'version::(<=>'} = \&version::vxs::VCMP;
 	    *version::parse = \&version::vxs::parse;
 	}
-	*version::is_strict = \&version::vxs::is_strict;
-	*version::is_lax = \&version::vxs::is_lax;
     }
 }
+
+# avoid using Exporter
+require version::regex;
+*version::is_lax = \&version::regex::is_lax;
+*version::is_strict = \&version::regex::is_strict;
 
 sub import {
     no strict 'refs';
