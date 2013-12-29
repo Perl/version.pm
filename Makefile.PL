@@ -34,16 +34,6 @@ unless (defined $no_xs)
     check_for_compiler()
         or no_cc();
 
-    # need to make the XS routines unique from the core
-    if ( $ENV{PERL_CORE} )
-    {
-        copy('vutil/vxs.in', 'vutil/vxs.inc');
-    }
-    else
-    {
-        qx|perl -pe 's/XS_version/XS_version__xs/g;
-	    s/XS_UNIVERSAL/XS_UNIVERSAL_xs/' vutil/vxs.in > vutil/vxs.inc|;
-    }
 }
 
 write_makefile();
@@ -90,7 +80,6 @@ sub write_makefile
                    PL_FILES        => {},
                    C               => [],
                    clean           => { FILES => ['vutil/Makefile.PL',
-                                                     'vutil/vxs.inc',
                                                  ]},
                    dist            => {
                        COMPRESS => 'gzip -9f', 
