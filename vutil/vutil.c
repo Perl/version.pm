@@ -610,7 +610,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
     else if ( SvUOK(ver) || SvIOK(ver) ) {
 	version = savesvpv(ver);
     }
-    else /* must be a string or something like a string */
+    else if ( SvPOK(ver) )/* must be a string or something like a string */
     {
 	STRLEN len;
 	version = savepvn(SvPV(ver,len), SvCUR(ver));
@@ -650,6 +650,11 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	}
 #  endif
 #endif
+    }
+    else
+    {
+	/* no idea what this is */
+	Perl_croak(aTHX_ "Invalid version format (non-numeric data)");
     }
 
     s = SCAN_VERSION(version, ver, qv);
