@@ -586,6 +586,13 @@ SKIP: {
 	is ref(ver->qv("1.2.3")), 'ver', 'ver can inherit from version';
     }
 
+    { # discovered while integrating with bleadperl
+	eval {my $v = $CLASS->new([1,2,3]) };
+	like $@, qr/Invalid version format/, 'Do not crash for garbage';
+	eval {my $v = $CLASS->new({1 => 2}) };
+	like $@, qr/Invalid version format/, 'Do not crash for garbage';
+    }
+
 }
 
 1;
