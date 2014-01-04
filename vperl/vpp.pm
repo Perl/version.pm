@@ -116,12 +116,19 @@ sub currstr {
 }
 
 package version::vpp;
+
+use 5.005_05;
 use strict;
 
 use POSIX qw/locale_h/;
 use locale;
-use vars qw ($VERSION @ISA @REGEXS);
+use vars qw($VERSION $CLASS @ISA);
 $VERSION = 0.9905;
+$CLASS = 'version::vpp';
+
+require version::regex;
+*version::vpp::is_strict = \&version::regex::is_strict;
+*version::vpp::is_lax = \&version::regex::is_lax;
 
 use overload (
     '""'       => \&stringify,
@@ -148,6 +155,64 @@ if ($@) {
 	sub enabled {return $^W;}
 	1;
     ';
+}
+
+sub import {
+    no strict 'refs';
+    my ($class) = shift;
+
+    # Set up any derived class
+    unless ($class eq $CLASS) {
+	local $^W;
+	*{$class.'::declare'} =  \&{$CLASS.'::declare'};
+	*{$class.'::qv'} = \&{$CLASS.'::qv'};
+    }
+
+    my %args;
+    if (@_) { # any remaining terms are arguments
+	map { $args{$_} = 1 } @_
+    }
+    else { # no parameters at all on use line
+	%args =
+	(
+	    qv => 1,
+	    'UNIVERSAL::VERSION' => 1,
+	);
+    }
+
+    my $callpkg = caller();
+
+    if (exists($args{declare})) {
+	*{$callpkg.'::declare'} =
+	    sub {return $class->declare(shift) }
+	  unless defined(&{$callpkg.'::declare'});
+    }
+
+    if (exists($args{qv})) {
+	*{$callpkg.'::qv'} =
+	    sub {return $class->qv(shift) }
+	  unless defined(&{$callpkg.'::qv'});
+    }
+
+    if (exists($args{'UNIVERSAL::VERSION'})) {
+	local $^W;
+	*UNIVERSAL::VERSION
+		= \&{$CLASS.'::_VERSION'};
+    }
+
+    if (exists($args{'VERSION'})) {
+	*{$callpkg.'::VERSION'} = \&{$CLASS.'::_VERSION'};
+    }
+
+    if (exists($args{'is_strict'})) {
+	*{$callpkg.'::is_strict'} = \&{$CLASS.'::is_strict'}
+	  unless defined(&{$callpkg.'::is_strict'});
+    }
+
+    if (exists($args{'is_lax'})) {
+	*{$callpkg.'::is_lax'} = \&{$CLASS.'::is_lax'}
+	  unless defined(&{$callpkg.'::is_lax'});
+    }
 }
 
 my $VERSION_MAX = 0x7FFFFFFF;
@@ -568,64 +633,6 @@ sub scan_version {
     return $s;
 }
 
-sub import {
-    no strict 'refs';
-    my ($class) = shift;
-
-    # Set up any derived class
-    unless ($class eq 'version::vpp') {
-	local $^W;
-	*{$class.'::declare'} =  \&version::vpp::declare;
-	*{$class.'::qv'} = \&version::vpp::qv;
-    }
-
-    my %args;
-    if (@_) { # any remaining terms are arguments
-	map { $args{$_} = 1 } @_
-    }
-    else { # no parameters at all on use line
-	%args =
-	(
-	    qv => 1,
-	    'UNIVERSAL::VERSION' => 1,
-	);
-    }
-
-    my $callpkg = caller();
-
-    if (exists($args{declare})) {
-	*{$callpkg.'::declare'} =
-	    sub {return $class->declare(shift) }
-	  unless defined(&{$callpkg.'::declare'});
-    }
-
-    if (exists($args{qv})) {
-	*{$callpkg.'::qv'} =
-	    sub {return $class->qv(shift) }
-	  unless defined(&{$callpkg.'::qv'});
-    }
-
-    if (exists($args{'UNIVERSAL::VERSION'})) {
-	local $^W;
-	*UNIVERSAL::VERSION
-		= \&version::vpp::_VERSION;
-    }
-
-    if (exists($args{'VERSION'})) {
-	*{$callpkg.'::VERSION'} = \&version::vpp::_VERSION;
-    }
-
-    if (exists($args{'is_strict'})) {
-	*{$callpkg.'::is_strict'} = \&version::vpp::is_strict
-	  unless defined(&{$callpkg.'::is_strict'});
-    }
-
-    if (exists($args{'is_lax'})) {
-	*{$callpkg.'::is_lax'} = \&version::vpp::is_lax
-	  unless defined(&{$callpkg.'::is_lax'});
-    }
-}
-
 sub new
 {
 	my ($class, $value) = @_;
@@ -665,6 +672,11 @@ sub new
 	if ( $#_ == 2 ) { # must be CVS-style
 	    $value = $_[2];
 	    $qv = TRUE;
+	}
+
+	if (ref($value) =~ m/ARRAY|HASH/) {
+	    require Carp;
+	    Carp::croak("Invalid version format (non-numeric data)");
 	}
 
 	$value = _un_vstring($value);
@@ -864,7 +876,7 @@ sub is_alpha {
 
 sub qv {
     my $value = shift;
-    my $class = 'version';
+    my $class = $CLASS;
     if (@_) {
 	$class = ref($value) || $value;
 	$value = shift;
@@ -872,7 +884,7 @@ sub qv {
 
     $value = _un_vstring($value);
     $value = 'v'.$value unless $value =~ /(^v|\d+\.\d+\.\d)/;
-    my $obj = version->new($value);
+    my $obj = $CLASS->new($value);
     return bless $obj, $class;
 }
 
