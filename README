@@ -9,6 +9,14 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+
+Major Changes in 0.9906 - 2014-01-04
+=====================================
+Applied C89 compatibility fix from Karl Williamson to vxs.inc.  Added back
+support for $version::LAX and $version::STRICT to resolve:
+
+    https://rt.cpan.org/Ticket/Display.html?id=91858
+
 Major Changes in 0.9905 - 2014-01-04
 =====================================
 Major rewrite of XS code to permit easier inclusion in core Perl (mostly 
