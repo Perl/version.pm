@@ -11,6 +11,7 @@ use File::Spec;
 use File::Copy;
 
 use vars qw ($no_xs $force_xs);
+unlink 'pm_to_blib'; # belts and braces
 
 if ($ENV{PERL_ONLY}) {
     $no_xs = 1;
