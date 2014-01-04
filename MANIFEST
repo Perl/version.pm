@@ -1,13 +1,14 @@
 Changes
 lib/version.pm
 lib/version.pod
-lib/version/typemap
+lib/version/regex.pm
 lib/version/Internals.pod
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 META.yml
 README
+t/00impl-pp.t
 t/01base.t
 t/02derived.t
 t/03require.t
@@ -16,6 +17,7 @@ t/05sigdie.t
 t/06noop.t
 t/07locale.t
 t/08_corelist.t
+t/09_list_util.t
 t/coretests.pm
 t/survey_locales
 vperl/vpp.pm
@@ -23,4 +25,5 @@ vutil/lib/version/vxs.pm
 vutil/ppport.h
 vutil/vutil.c
 vutil/vutil.h
+vutil/vxs.inc
 vutil/vxs.xs
