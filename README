@@ -9,12 +9,12 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
-Major Changes in 0.9905 - 2013-11-30
+Major Changes in 0.9905 - 2014-01-04
 =====================================
 Major rewrite of XS code to permit easier inclusion in core Perl (mostly 
 written by Father Chrysostomos <sprout@cpan.org>).  XS code is no longer
 supported for any Perl < v5.10, although the pure Perl code still works
-going back to 5.005_05 if needed.
+going back to 5.005_04.
 
 In addition, the version::vpp class is now completely independent and can
 be use'd exactly like the base version class.  It is still better to use
