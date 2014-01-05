@@ -96,7 +96,7 @@ VXS(universal_version)
 
     if (gvp && isGV(gv = *gvp) && (sv = GvSV(gv)) && SvOK(sv)) {
         sv = sv_mortalcopy(sv);
-	if ( ! ISA_CLASS_OBJ(sv, "version"))
+	if ( ! ISA_VERSION_OBJ(sv) )
 	    UPG_VERSION(sv, FALSE);
         undef = NULL;
     }
@@ -134,7 +134,7 @@ VXS(universal_version)
 	    }
 	}
 
-	if ( ! ISA_CLASS_OBJ(req, "version")) {
+	if ( ! ISA_VERSION_OBJ(req) ) {
 	    /* req may very well be R/O, so create a new object */
 	    req = sv_2mortal( NEW_VERSION(req) );
 	}
@@ -156,7 +156,7 @@ VXS(universal_version)
     }
 
     /* if the package's $VERSION is not undef, it is upgraded to be a version object */
-    if (ISA_CLASS_OBJ(sv, "version")) {
+    if (ISA_VERSION_OBJ(sv)) {
 	ST(0) = sv_2mortal(VSTRINGIFY(sv));
     } else {
 	ST(0) = sv;
@@ -227,7 +227,7 @@ VXS(version_new)
 
 #define VTYPECHECK(var, val, varname) \
     STMT_START {							\
-	if (ISA_CLASS_OBJ(val, "version")) {				\
+	if (ISA_VERSION_OBJ(val)) {				\
 	    (var) = SvRV(val);						\
 	}								\
 	else								\
@@ -302,7 +302,7 @@ VXS(version_vcmp)
 	       SV * robj = ST(1);
 	       const IV	 swap = (IV)SvIV(ST(2));
 
-	       if ( !ISA_CLASS_OBJ(robj, "version") )
+	       if ( !ISA_VERSION_OBJ(robj) )
 	       {
 		    robj = NEW_VERSION(SvOK(robj) ? robj : newSVpvs_flags("0", SVs_TEMP));
 		    sv_2mortal(robj);
@@ -355,7 +355,7 @@ VXS(version_noop)
     dXSARGS;
     if (items < 1)
 	croak_xs_usage(cv, "lobj, ...");
-    if (ISA_CLASS_OBJ(ST(0), "version"))
+    if (ISA_VERSION_OBJ(ST(0)))
 	Perl_croak(aTHX_ "operation not supported with version object");
     else
 	Perl_croak(aTHX_ "lobj is not of type version");

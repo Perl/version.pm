@@ -461,7 +461,7 @@ Perl_new_version(pTHX_ SV *ver)
     dVAR;
     SV * const rv = newSV(0);
     PERL_ARGS_ASSERT_NEW_VERSION;
-    if ( ISA_CLASS_OBJ(ver,"version") ) /* can just copy directly */
+    if ( ISA_VERSION_OBJ(ver) ) /* can just copy directly */
     {
 	SSize_t key;
 	AV * const av = newAV();
