@@ -556,7 +556,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 
     PERL_ARGS_ASSERT_UPG_VERSION;
 
-    if ( SvNOK(ver) && !( SvPOK(ver) && sv_len(ver) == 3 ) )
+    if ( SvNOK(ver) && !( SvPOK(ver) && SvCUR(ver) == 3 ) )
     {
 	STRLEN len;
 
