@@ -283,7 +283,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     last = PRESCAN_VERSION(s, FALSE, &errstr, &qv, &saw_decimal, &width, &alpha);
     if (errstr) {
 	/* "undef" is a special case and not an error */
-	if ( ! ( *s == 'u' && strEQ(s,"undef")) ) {
+	if ( ! ( *s == 'u' && strEQ(s+1,"ndef")) ) {
 	    Perl_croak(aTHX_ "%s", errstr);
 	}
     }
@@ -431,7 +431,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     (void)hv_stores(MUTABLE_HV(hv), "version", newRV_noinc(MUTABLE_SV(av)));
 
     /* fix RT#19517 - special case 'undef' as string */
-    if ( *s == 'u' && strEQ(s,"undef") ) {
+    if ( *s == 'u' && strEQ(s+1,"ndef") ) {
 	s += 5;
     }
 
