@@ -26,4 +26,3 @@ vutil/ppport.h
 vutil/vutil.c
 vutil/vutil.h
 vutil/vxs.inc
-vutil/vxs.xs
