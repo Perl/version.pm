@@ -284,7 +284,6 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     if (errstr) {
 	/* "undef" is a special case and not an error */
 	if ( ! ( *s == 'u' && strEQ(s,"undef")) ) {
-	    Safefree(start);
 	    Perl_croak(aTHX_ "%s", errstr);
 	}
     }
@@ -513,11 +512,11 @@ Perl_new_version(pTHX_ SV *ver)
 	if ( mg ) { /* already a v-string */
 	    const STRLEN len = mg->mg_len;
 	    char * const version = savepvn( (const char*)mg->mg_ptr, len);
+	    SAVEFREEPV(version);
 	    sv_setpvn(rv,version,len);
 	    /* this is for consistency with the pure Perl class */
 	    if ( isDIGIT(*version) )
 		sv_insert(rv, 0, 0, "v", 1);
-	    Safefree(version);
 	}
 	else {
 #endif
@@ -578,11 +577,13 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	while (buf[len-1] == '0' && len > 0) len--;
 	if ( buf[len-1] == '.' ) len--; /* eat the trailing decimal */
 	version = savepvn(buf, len);
+	SAVEFREEPV(version);
 	SvREFCNT_dec(sv);
     }
 #ifdef SvVOK
     else if ( (mg = SvVSTRING_mg(ver)) ) { /* already a v-string */
 	version = savepvn( (const char*)mg->mg_ptr,mg->mg_len );
+	SAVEFREEPV(version);
 	qv = TRUE;
     }
 #endif
@@ -593,6 +594,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	char tbuf[64];
 	len = my_snprintf(tbuf, sizeof(tbuf), "%d", VERSION_MAX);
 	version = savepvn(tbuf, len);
+	SAVEFREEPV(version);
 	Perl_ck_warner(aTHX_ packWARN(WARN_OVERFLOW),
 		       "Integer overflow in version %d",VERSION_MAX);
     }
@@ -603,6 +605,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
     {
 	STRLEN len;
 	version = savepvn(SvPV(ver,len), SvCUR(ver));
+	SAVEFREEPV(version);
 #ifndef SvVOK
 #  if PERL_VERSION > 5
 	/* This will only be executed for 5.6.0 - 5.8.0 inclusive */
@@ -630,7 +633,6 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 
 		    /* is definitely a v-string */
 		    if ( saw_decimal >= 2 ) {
-			Safefree(version);
 			version = nver;
 		    }
 		    break;
@@ -651,7 +653,6 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	Perl_ck_warner(aTHX_ packWARN(WARN_MISC), 
 		       "Version string '%s' contains invalid data; "
 		       "ignoring: '%s'", version, s);
-    Safefree(version);
     return ver;
 }
 
