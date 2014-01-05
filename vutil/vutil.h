@@ -83,7 +83,7 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
-#define ISA_CLASS_OBJ(v,c) (sv_isobject(v) && sv_derived_from_pvn(v,c))
+#define ISA_VERSION_OBJ(v) (sv_isobject(v) && sv_derived_from_pvn(v,"version",7,0))
 
 #if PERL_VERSION_GE(5,9,0) && !defined(PERL_CORE)
 
