@@ -73,7 +73,6 @@ VXS(universal_version)
     HV *pkg;
     GV **gvp;
     GV *gv;
-    SV *ret;
     SV *sv;
     const char *undef;
     PERL_UNUSED_ARG(cv);
@@ -102,7 +101,7 @@ VXS(universal_version)
         undef = NULL;
     }
     else {
-        sv = ret = &PL_sv_undef;
+        sv = &PL_sv_undef;
         undef = "(undef)";
     }
 
@@ -155,7 +154,6 @@ VXS(universal_version)
 		SVfARG(sv_2mortal(sv)));
 	}
     }
-    ST(0) = ret;
 
     /* if the package's $VERSION is not undef, it is upgraded to be a version object */
     if (ISA_CLASS_OBJ(sv, "version")) {
