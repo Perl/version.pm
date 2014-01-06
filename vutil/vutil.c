@@ -2,6 +2,7 @@
    editing it in the perl core. */
 
 #ifndef PERL_CORE
+#  define PERL_NO_GET_CONTEXT
 #  include "EXTERN.h"
 #  include "perl.h"
 #  include "XSUB.h"
@@ -482,24 +483,24 @@ Perl_new_version(pTHX_ SV *ver)
 
 	if ( hv_exists(MUTABLE_HV(ver), "alpha", 5) )
 	    (void)hv_stores(MUTABLE_HV(hv), "alpha", newSViv(1));
-
-	if ( hv_exists(MUTABLE_HV(ver), "width", 5 ) )
 	{
-	    const I32 width = SvIV(*hv_fetchs(MUTABLE_HV(ver), "width", FALSE));
-	    (void)hv_stores(MUTABLE_HV(hv), "width", newSViv(width));
+	    SV ** svp = hv_fetchs(MUTABLE_HV(ver), "width", FALSE);
+	    if(svp) {
+		const I32 width = SvIV(*svp);
+		(void)hv_stores(MUTABLE_HV(hv), "width", newSViv(width));
+	    }
 	}
-
-	if ( hv_exists(MUTABLE_HV(ver), "original", 8 ) )
 	{
-	    SV * pv = *hv_fetchs(MUTABLE_HV(ver), "original", FALSE);
-	    (void)hv_stores(MUTABLE_HV(hv), "original", newSVsv(pv));
+	    SV ** svp = hv_fetchs(MUTABLE_HV(ver), "original", FALSE);
+	    if(svp)
+		(void)hv_stores(MUTABLE_HV(hv), "original", newSVsv(*svp));
 	}
-
 	sav = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(ver), "version", FALSE)));
 	/* This will get reblessed later if a derived class*/
 	for ( key = 0; key <= av_len(sav); key++ )
 	{
-	    const I32 rev = SvIV(*av_fetch(sav, key, FALSE));
+	    SV * const sv = *av_fetch(sav, key, FALSE);
+	    const I32 rev = SvIV(sv);
 	    av_push(av, newSViv(rev));
 	}
 
@@ -511,8 +512,7 @@ Perl_new_version(pTHX_ SV *ver)
 	const MAGIC* const mg = SvVSTRING_mg(ver);
 	if ( mg ) { /* already a v-string */
 	    const STRLEN len = mg->mg_len;
-	    char * const version = savepvn( (const char*)mg->mg_ptr, len);
-	    SAVEFREEPV(version);
+	    const char * const version = (const char*)mg->mg_ptr;
 	    sv_setpvn(rv,version,len);
 	    /* this is for consistency with the pure Perl class */
 	    if ( isDIGIT(*version) )
@@ -600,6 +600,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
     }
     else if ( SvUOK(ver) || SvIOK(ver) ) {
 	version = savesvpv(ver);
+	SAVEFREEPV(version);
     }
     else if ( SvPOK(ver) )/* must be a string or something like a string */
     {
@@ -622,6 +623,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 		    int saw_decimal = 0;
 		    sv_setpvf(nsv,"v%vd",ver);
 		    pos = nver = savepv(SvPV_nolen(nsv));
+                    SAVEFREEPV(pos);
 
 		    /* scan the resulting formatted string */
 		    pos++; /* skip the leading 'v' */
@@ -690,6 +692,7 @@ Perl_vverify(pTHX_ SV *vs)
 #endif
 {
     SV *sv;
+    SV **svp;
 
     PERL_ARGS_ASSERT_VVERIFY;
 
@@ -698,8 +701,8 @@ Perl_vverify(pTHX_ SV *vs)
 
     /* see if the appropriate elements exist */
     if ( SvTYPE(vs) == SVt_PVHV
-	 && hv_exists(MUTABLE_HV(vs), "version", 7)
-	 && (sv = SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE)))
+	 && (svp = hv_fetchs(MUTABLE_HV(vs), "version", FALSE))
+	 && (sv = SvRV(*svp))
 	 && SvTYPE(sv) == SVt_PVAV )
 	return vs;
     else
@@ -746,10 +749,13 @@ Perl_vnumify(pTHX_ SV *vs)
     /* see if various flags exist */
     if ( hv_exists(MUTABLE_HV(vs), "alpha", 5 ) )
 	alpha = TRUE;
-    if ( hv_exists(MUTABLE_HV(vs), "width", 5 ) )
-	width = SvIV(*hv_fetchs(MUTABLE_HV(vs), "width", FALSE));
-    else
-	width = 3;
+    {
+	SV ** svp = hv_fetchs(MUTABLE_HV(vs), "width", 5 );
+	if ( svp )
+	    width = SvIV(*svp);
+	else
+	    width = 3;
+    }
 
 
     /* attempt to retrieve the version array */
@@ -763,11 +769,15 @@ Perl_vnumify(pTHX_ SV *vs)
 	return newSVpvs("0");
     }
 
-    digit = SvIV(*av_fetch(av, 0, 0));
+    {
+	SV * tsv = *av_fetch(av, 0, 0);
+	digit = SvIV(tsv);
+    }
     sv = Perl_newSVpvf(aTHX_ "%d.", (int)PERL_ABS(digit));
     for ( i = 1 ; i < len ; i++ )
     {
-	digit = SvIV(*av_fetch(av, i, 0));
+	SV * tsv = *av_fetch(av, i, 0);
+	digit = SvIV(tsv);
 	if ( width < 3 ) {
 	    const int denom = (width == 2 ? 10 : 100);
 	    const div_t term = div((int)PERL_ABS(digit),denom);
@@ -780,7 +790,8 @@ Perl_vnumify(pTHX_ SV *vs)
 
     if ( len > 0 )
     {
-	digit = SvIV(*av_fetch(av, len, 0));
+	SV * tsv = *av_fetch(av, len, 0);
+	digit = SvIV(tsv);
 	if ( alpha && width == 3 ) /* alpha version */
 	    sv_catpvs(sv,"_");
 	Perl_sv_catpvf(aTHX_ sv, "%0*d", width, (int)digit);
@@ -836,17 +847,22 @@ Perl_vnormal(pTHX_ SV *vs)
     {
 	return newSVpvs("");
     }
-    digit = SvIV(*av_fetch(av, 0, 0));
+    {
+	SV * tsv = *av_fetch(av, 0, 0);
+	digit = SvIV(tsv);
+    }
     sv = Perl_newSVpvf(aTHX_ "v%"IVdf, (IV)digit);
     for ( i = 1 ; i < len ; i++ ) {
-	digit = SvIV(*av_fetch(av, i, 0));
+	SV * tsv = *av_fetch(av, i, 0);
+	digit = SvIV(tsv);
 	Perl_sv_catpvf(aTHX_ sv, ".%"IVdf, (IV)digit);
     }
 
     if ( len > 0 )
     {
 	/* handle last digit specially */
-	digit = SvIV(*av_fetch(av, len, 0));
+	SV * tsv = *av_fetch(av, len, 0);
+	digit = SvIV(tsv);
 	if ( alpha )
 	    Perl_sv_catpvf(aTHX_ sv, "_%"IVdf, (IV)digit);
 	else
@@ -880,6 +896,7 @@ Perl_vstringify2(pTHX_ SV *vs)
 Perl_vstringify(pTHX_ SV *vs)
 #endif
 {
+    SV ** svp;
     PERL_ARGS_ASSERT_VSTRINGIFY;
 
     /* extract the HV from the object */
@@ -887,9 +904,10 @@ Perl_vstringify(pTHX_ SV *vs)
     if ( ! vs )
 	Perl_croak(aTHX_ "Invalid version object");
 
-    if (hv_exists(MUTABLE_HV(vs), "original",  sizeof("original") - 1)) {
+    svp = hv_fetchs(MUTABLE_HV(vs), "original", FALSE);
+    if (svp) {
 	SV *pv;
-	pv = *hv_fetchs(MUTABLE_HV(vs), "original", FALSE);
+	pv = *svp;
 	if ( SvPOK(pv) )
 	    return newSVsv(pv);
 	else
@@ -952,8 +970,11 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
     i = 0;
     while ( i <= m && retval == 0 )
     {
-	left  = SvIV(*av_fetch(lav,i,0));
-	right = SvIV(*av_fetch(rav,i,0));
+	SV * const lsv = *av_fetch(lav,i,0);
+	SV * rsv;
+	left = SvIV(lsv);
+	rsv = *av_fetch(rav,i,0);
+	right = SvIV(rsv);
 	if ( left < right  )
 	    retval = -1;
 	if ( left > right )
@@ -980,7 +1001,8 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
 	{
 	    while ( i <= r && retval == 0 )
 	    {
-		if ( SvIV(*av_fetch(rav,i,0)) != 0 )
+		SV * const rsv = *av_fetch(rav,i,0);
+		if ( SvIV(rsv) != 0 )
 		    retval = -1; /* not a match after all */
 		i++;
 	    }
@@ -989,7 +1011,8 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
 	{
 	    while ( i <= l && retval == 0 )
 	    {
-		if ( SvIV(*av_fetch(lav,i,0)) != 0 )
+		SV * const lsv = *av_fetch(lav,i,0);
+		if ( SvIV(lsv) != 0 )
 		    retval = +1; /* not a match after all */
 		i++;
 	    }
