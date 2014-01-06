@@ -4,49 +4,53 @@
 #ifdef PERL_CORE
 #  define VXS_CLASS "version"
 #  define VXSp(name) XS_##name
+/* VXSXSDP = XSUB Details Proto */
+#  define VXSXSDP(x) x
 #else
 #  define VXS_CLASS "version::vxs"
 #  define VXSp(name) VXS_##name
+/* proto member is unused in version, it is used in CORE by non version xsubs */
+#  define VXSXSDP(x)
 #endif
 #define VXS(name) XS(VXSp(name))
 
 #ifdef VXS_XSUB_DETAILS
 #  ifdef PERL_CORE
-    {"UNIVERSAL::VERSION", VXSp(universal_version), NULL},
+    {"UNIVERSAL::VERSION", VXSp(universal_version), VXSXSDP(NULL)},
 #  endif
-    {VXS_CLASS "::_VERSION", VXSp(universal_version), NULL},
-    {VXS_CLASS "::()", VXSp(version_noop), NULL},
-    {VXS_CLASS "::new", VXSp(version_new), NULL},
-    {VXS_CLASS "::parse", VXSp(version_new), NULL},
-    {VXS_CLASS "::(\"\"", VXSp(version_stringify), NULL},
-    {VXS_CLASS "::stringify", VXSp(version_stringify), NULL},
-    {VXS_CLASS "::(0+", VXSp(version_numify), NULL},
-    {VXS_CLASS "::numify", VXSp(version_numify), NULL},
-    {VXS_CLASS "::normal", VXSp(version_normal), NULL},
-    {VXS_CLASS "::(cmp", VXSp(version_vcmp), NULL},
-    {VXS_CLASS "::(<=>", VXSp(version_vcmp), NULL},
+    {VXS_CLASS "::_VERSION", VXSp(universal_version), VXSXSDP(NULL)},
+    {VXS_CLASS "::()", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::new", VXSp(version_new), VXSXSDP(NULL)},
+    {VXS_CLASS "::parse", VXSp(version_new), VXSXSDP(NULL)},
+    {VXS_CLASS "::(\"\"", VXSp(version_stringify), VXSXSDP(NULL)},
+    {VXS_CLASS "::stringify", VXSp(version_stringify), VXSXSDP(NULL)},
+    {VXS_CLASS "::(0+", VXSp(version_numify), VXSXSDP(NULL)},
+    {VXS_CLASS "::numify", VXSp(version_numify), VXSXSDP(NULL)},
+    {VXS_CLASS "::normal", VXSp(version_normal), VXSXSDP(NULL)},
+    {VXS_CLASS "::(cmp", VXSp(version_vcmp), VXSXSDP(NULL)},
+    {VXS_CLASS "::(<=>", VXSp(version_vcmp), VXSXSDP(NULL)},
 #  ifdef PERL_CORE
-    {VXS_CLASS "::vcmp", XS_version_vcmp, NULL},
+    {VXS_CLASS "::vcmp", XS_version_vcmp, VXSXSDP(NULL)},
 #  else
-    {VXS_CLASS "::VCMP", VXS_version_vcmp, NULL},
+    {VXS_CLASS "::VCMP", VXS_version_vcmp, VXSXSDP(NULL)},
 #  endif
-    {VXS_CLASS "::(bool", VXSp(version_boolean), NULL},
-    {VXS_CLASS "::boolean", VXSp(version_boolean), NULL},
-    {VXS_CLASS "::(+", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(-", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(*", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(/", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(+=", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(-=", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(*=", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(/=", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(abs", VXSp(version_noop), NULL},
-    {VXS_CLASS "::(nomethod", VXSp(version_noop), NULL},
-    {VXS_CLASS "::noop", VXSp(version_noop), NULL},
-    {VXS_CLASS "::is_alpha", VXSp(version_is_alpha), NULL},
-    {VXS_CLASS "::qv", VXSp(version_qv), NULL},
-    {VXS_CLASS "::declare", VXSp(version_qv), NULL},
-    {VXS_CLASS "::is_qv", VXSp(version_is_qv), NULL},
+    {VXS_CLASS "::(bool", VXSp(version_boolean), VXSXSDP(NULL)},
+    {VXS_CLASS "::boolean", VXSp(version_boolean), VXSXSDP(NULL)},
+    {VXS_CLASS "::(+", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(-", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(*", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(/", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(+=", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(-=", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(*=", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(/=", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(abs", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::(nomethod", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::noop", VXSp(version_noop), VXSXSDP(NULL)},
+    {VXS_CLASS "::is_alpha", VXSp(version_is_alpha), VXSXSDP(NULL)},
+    {VXS_CLASS "::qv", VXSp(version_qv), VXSXSDP(NULL)},
+    {VXS_CLASS "::declare", VXSp(version_qv), VXSXSDP(NULL)},
+    {VXS_CLASS "::is_qv", VXSp(version_is_qv), VXSXSDP(NULL)},
 #else
 
 #ifndef dVAR
@@ -174,6 +178,7 @@ VXS(version_new)
     const char * classname = "";
     STRLEN len;
     U32 flags = 0;
+    SV * svarg0 = NULL;
     PERL_UNUSED_VAR(cv);
 
     SP -= items;
@@ -190,16 +195,19 @@ VXS(version_new)
         sv_setpvs(vs,"undef");
     }
     else if (items == 3 ) {
+        SV * svarg2;
         vs = sv_newmortal();
+        svarg2 = ST(2);
 #if PERL_VERSION == 5
-        sv_setpvf(vs,"v%s",SvPV_nolen_const(ST(2)));
+        sv_setpvf(vs,"v%s",SvPV_nolen_const(svarg2));
 #else
-        Perl_sv_setpvf(aTHX_ vs,"v%s",SvPV_nolen_const(ST(2)));
+        Perl_sv_setpvf(aTHX_ vs,"v%s",SvPV_nolen_const(svarg2));
 #endif
     }
-    if ( sv_isobject(ST(0)) ) {
+    svarg0 = ST(0);
+    if ( sv_isobject(svarg0) ) {
 	/* get the class if called as an object method */
-	const HV * stash = SvSTASH(SvRV(ST(0)));
+	const HV * stash = SvSTASH(SvRV(svarg0));
 	classname = HvNAME_get(stash);
 	len	  = HvNAMELEN_get(stash);
 #ifdef HvNAMEUTF8
@@ -207,8 +215,8 @@ VXS(version_new)
 #endif
     }
     else {
-	classname = SvPV(ST(0), len);
-	flags     = SvUTF8(ST(0));
+	classname = SvPV(svarg0, len);
+	flags     = SvUTF8(svarg0);
     }
 
     rv = NEW_VERSION(vs);
@@ -227,8 +235,9 @@ VXS(version_new)
 
 #define VTYPECHECK(var, val, varname) \
     STMT_START {							\
-	if (ISA_VERSION_OBJ(val)) {				\
-	    (var) = SvRV(val);						\
+	SV * sv_vtc = val;						\
+	if (ISA_VERSION_OBJ(sv_vtc)) {				\
+	    (var) = SvRV(sv_vtc);						\
 	}								\
 	else								\
 	    Perl_croak(aTHX_ varname " is not of type version");	\
@@ -304,8 +313,7 @@ VXS(version_vcmp)
 
 	       if ( !ISA_VERSION_OBJ(robj) )
 	       {
-		    robj = NEW_VERSION(SvOK(robj) ? robj : newSVpvs_flags("0", SVs_TEMP));
-		    sv_2mortal(robj);
+		    robj = sv_2mortal(NEW_VERSION(SvOK(robj) ? robj : newSVpvs_flags("0", SVs_TEMP)));
 	       }
 	       rvs = SvRV(robj);
 
@@ -362,23 +370,31 @@ VXS(version_noop)
     XSRETURN_EMPTY;
 }
 
-VXS(version_is_alpha)
+static
+void
+S_version_check_key(pTHX_ CV * cv, const char * key, int keylen)
 {
     dVAR;
     dXSARGS;
     if (items != 1)
 	croak_xs_usage(cv, "lobj");
-    SP -= items;
     {
-	SV *lobj;
-	VTYPECHECK(lobj, ST(0), "lobj");
-	if ( hv_exists(MUTABLE_HV(lobj), "alpha", 5 ) )
-	    XSRETURN_YES;
+	SV *lobj = POPs;
+	SV *ret;
+	VTYPECHECK(lobj, lobj, "lobj");
+	if ( hv_exists(MUTABLE_HV(lobj), key, keylen ) )
+	    ret = &PL_sv_yes;
 	else
-	    XSRETURN_NO;
+	    ret = &PL_sv_no;
+	PUSHs(ret);
 	PUTBACK;
 	return;
     }
+}
+
+VXS(version_is_alpha)
+{
+    S_version_check_key(aTHX_ cv, "alpha", 5);
 }
 
 VXS(version_qv)
@@ -389,20 +405,22 @@ VXS(version_qv)
     SP -= items;
     {
 	SV * ver = ST(0);
+	SV * sv0 = ver;
 	SV * rv;
         STRLEN len = 0;
         const char * classname = "";
         U32 flags = 0;
         if ( items == 2 ) {
-	    SvGETMAGIC(ST(1));
-	    if (SvOK(ST(1))) {
-		ver = ST(1);
+	    SV * sv1 = ST(1);
+	    SvGETMAGIC(sv1);
+	    if (SvOK(sv1)) {
+		ver = sv1;
 	    }
 	    else {
 		Perl_croak(aTHX_ "Invalid version format (version required)");
 	    }
-            if ( sv_isobject(ST(0)) ) { /* class called as an object method */
-                const HV * stash = SvSTASH(SvRV(ST(0)));
+            if ( sv_isobject(sv0) ) { /* class called as an object method */
+                const HV * stash = SvSTASH(SvRV(sv0));
                 classname = HvNAME_get(stash);
                 len       = HvNAMELEN_get(stash);
 #ifdef HvNAMEUTF8
@@ -410,8 +428,8 @@ VXS(version_qv)
 #endif
             }
             else {
-	       classname = SvPV(ST(0), len);
-                flags     = SvUTF8(ST(0));
+	       classname = SvPV(sv0, len);
+                flags     = SvUTF8(sv0);
             }
 	}
 	if ( !SvVOK(ver) ) { /* not already a v-string */
@@ -435,23 +453,10 @@ VXS(version_qv)
     return;
 }
 
+
 VXS(version_is_qv)
 {
-    dVAR;
-    dXSARGS;
-    if (items != 1)
-	croak_xs_usage(cv, "lobj");
-    SP -= items;
-    {
-	SV *lobj;
-	VTYPECHECK(lobj, ST(0), "lobj");
-	if ( hv_exists(MUTABLE_HV(lobj), "qv", 2 ) )
-	    XSRETURN_YES;
-	else
-	    XSRETURN_NO;
-	PUTBACK;
-	return;
-    }
+    S_version_check_key(aTHX_ cv, "qv", 2);
 }
 
 #endif

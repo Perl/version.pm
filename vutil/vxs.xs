@@ -1,3 +1,4 @@
+#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -16,7 +17,9 @@ typedef     SV *version_vxs;
 struct xsub_details {
     const char *name;
     XSUBADDR_t xsub;
+#ifdef PERL_CORE
     const char *proto; /* ignored */
+#endif
 };
 
 static const struct xsub_details details[] = {
