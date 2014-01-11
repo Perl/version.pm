@@ -151,8 +151,10 @@ const char * Perl_prescan_version2(pTHX_ const char *s, bool strict, const char*
 #  define VNORMAL(a)		Perl_vnormal2(aTHX_ a)
 #  define VCMP(a,b)		Perl_vcmp2(aTHX_ a,b)
 #  define PRESCAN_VERSION(a,b,c,d,e,f,g)	Perl_prescan_version2(aTHX_ a,b,c,d,e,f,g)
+#  undef is_LAX_VERSION
 #  define is_LAX_VERSION(a,b) \
 	(a != Perl_prescan_version2(aTHX_ a, FALSE, b, NULL, NULL, NULL, NULL))
+#  undef is_STRICT_VERSION
 #  define is_STRICT_VERSION(a,b) \
 	(a != Perl_prescan_version2(aTHX_ a, TRUE, b, NULL, NULL, NULL, NULL))
 
@@ -218,4 +220,17 @@ const char * Perl_prescan_version(pTHX_ const char *s, bool strict, const char**
 	assert(lhv); assert(rhv)
 #  define PERL_ARGS_ASSERT_CK_WARNER      \
 	assert(pat)
+#endif
+
+
+#if PERL_VERSION_LT(5,19,0)
+#  undef STORE_NUMERIC_LOCAL_SET_STANDARD
+#  define STORE_NUMERIC_LOCAL_SET_STANDARD()\
+	char *loc = savepv(setlocale(LC_NUMERIC, NULL)); \
+	SAVEFREEPV(loc); \
+	setlocale(LC_NUMERIC, "C");
+
+#  undef RESTORE_NUMERIC_LOCAL
+#  define RESTORE_NUMERIC_LOCAL()\
+	setlocale(LC_NUMERIC, loc);
 #endif
