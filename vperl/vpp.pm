@@ -123,7 +123,7 @@ use strict;
 use POSIX qw/locale_h/;
 use locale;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT);
-$VERSION = 0.9906;
+$VERSION = 0.9907;
 $CLASS = 'version::vpp';
 
 require version::regex;
