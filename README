@@ -1,4 +1,4 @@
-version 0.9904
+version 0.9907
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -9,6 +9,22 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+Major Changes in 0.9907 - 2014-01-12
+=====================================
+Lots of optimizations of XS and C code courtesy of Daniel Dragon
+(bulk88@hotmail.com).  Lots of minor tweaks as well.
+
+Resolves:
+  https://rt.cpan.org/Ticket/Display.html?id=91892
+  https://rt.cpan.org/Ticket/Display.html?id=91867
+  https://rt.cpan.org/Ticket/Display.html?id=91987
+
+NOTE: due to insufficient locale support, version:vpp is not supported
+on Android at this time, see
+
+  https://rt.cpan.org/Ticket/Display.html?id=92051
+
+for more details.
 
 Major Changes in 0.9906 - 2014-01-04
 =====================================
