@@ -15,17 +15,19 @@ Lots of optimizations of XS and C code courtesy of Daniel Dragan
 (bulk88@hotmail.com).  Lots of minor tweaks as well.
 
 Resolves:
-  https://rt.cpan.org/Ticket/Display.html?id=91892
-  https://rt.cpan.org/Ticket/Display.html?id=91867
-  https://rt.cpan.org/Ticket/Display.html?id=91987
-  https://rt.cpan.org/Ticket/Display.html?id=92051
+    https://rt.cpan.org/Ticket/Display.html?id=91892
+    https://rt.cpan.org/Ticket/Display.html?id=91867
+    https://rt.cpan.org/Ticket/Display.html?id=91987
+    https://rt.cpan.org/Ticket/Display.html?id=92051
 
 Major Changes in 0.9906 - 2014-01-04
 =====================================
 Applied C89 compatibility fix from Karl Williamson to vxs.inc.  Added back
 support for $version::LAX and $version::STRICT to resolve:
 
+    https://rt.cpan.org/Ticket/Display.html?id=88458
     https://rt.cpan.org/Ticket/Display.html?id=91858
+    https://rt.cpan.org/Ticket/Display.html?id=91868
 
 Major Changes in 0.9905 - 2014-01-04
 =====================================
