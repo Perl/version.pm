@@ -224,13 +224,18 @@ const char * Perl_prescan_version(pTHX_ const char *s, bool strict, const char**
 
 
 #if PERL_VERSION_LT(5,19,0)
-#  undef STORE_NUMERIC_LOCAL_SET_STANDARD
+# undef STORE_NUMERIC_LOCAL_SET_STANDARD
+# undef RESTORE_NUMERIC_LOCAL
+# ifdef USE_LOCALE
 #  define STORE_NUMERIC_LOCAL_SET_STANDARD()\
 	char *loc = savepv(setlocale(LC_NUMERIC, NULL)); \
 	SAVEFREEPV(loc); \
 	setlocale(LC_NUMERIC, "C");
 
-#  undef RESTORE_NUMERIC_LOCAL
 #  define RESTORE_NUMERIC_LOCAL()\
 	setlocale(LC_NUMERIC, loc);
+# else
+#  define STORE_NUMERIC_LOCAL_SET_STANDARD()
+#  define RESTORE_NUMERIC_LOCAL()
+# endif
 #endif
