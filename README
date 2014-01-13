@@ -18,13 +18,7 @@ Resolves:
   https://rt.cpan.org/Ticket/Display.html?id=91892
   https://rt.cpan.org/Ticket/Display.html?id=91867
   https://rt.cpan.org/Ticket/Display.html?id=91987
-
-NOTE: due to insufficient locale support, version:vpp is not supported
-on Android at this time, see
-
   https://rt.cpan.org/Ticket/Display.html?id=92051
-
-for more details.
 
 Major Changes in 0.9906 - 2014-01-04
 =====================================

@@ -655,7 +655,7 @@ sub new
 
 	if ($Config{d_setlocale}) {
 	    use POSIX qw/locale_h/;
-	    use locale;
+	    use if $^O !~ /android/, 'locale';
 	    my $currlocale = setlocale(LC_ALL);
 
 	    # if the current locale uses commas for decimal points, we

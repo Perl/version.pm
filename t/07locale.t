@@ -31,7 +31,7 @@ SKIP: {
 						      # because have to
 						      # evaluate in current
 						      # scope
-	use locale;
+	use if $^O !~ /android/, 'locale';
 
 	while (<DATA>) {
 	    chomp;
