@@ -11,7 +11,7 @@ replacement code will take effect and Perl will not crash.
 
 Major Changes in 0.9907 - 2014-01-12
 =====================================
-Lots of optimizations of XS and C code courtesy of Daniel Dragon
+Lots of optimizations of XS and C code courtesy of Daniel Dragan
 (bulk88@hotmail.com).  Lots of minor tweaks as well.
 
 Resolves:
