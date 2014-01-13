@@ -107,6 +107,11 @@ sub init
         @{ $hash }{ 'DIR' } = ['vutil'];
     }
 
+    if ($^O =~ m/android/) {
+	qx|perl -pi -e 's/\s*use locale;//g' t/07locale.t|;
+	qx|perl -pi -e 's/\s*use locale;//g' vperl/vpp.pm|;
+    }
+
     return $hash;
 }
 
