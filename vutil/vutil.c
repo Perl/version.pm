@@ -750,7 +750,7 @@ Perl_vnumify(pTHX_ SV *vs)
     if ( hv_exists(MUTABLE_HV(vs), "alpha", 5 ) )
 	alpha = TRUE;
     {
-	SV ** svp = hv_fetchs(MUTABLE_HV(vs), "width", 5 );
+	SV ** svp = hv_fetchs(MUTABLE_HV(vs), "width", FALSE);
 	if ( svp )
 	    width = SvIV(*svp);
 	else
