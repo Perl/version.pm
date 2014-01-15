@@ -117,7 +117,7 @@ sub currstr {
 
 package version::vpp;
 
-use 5.005_04;
+use 5.006002;
 use strict;
 
 use Config;
@@ -478,7 +478,7 @@ sub scan_version {
     if ($errstr) {
 	# 'undef' is a special case and not an error
 	if ( $s ne 'undef') {
-	    use Carp;
+	    require Carp;
 	    Carp::croak($errstr);
 	}
     }
@@ -655,7 +655,7 @@ sub new
 
 	if ($Config{d_setlocale}) {
 	    use POSIX qw/locale_h/;
-	    use if $^O !~ /android/, 'locale';
+	    use if $Config{d_setlocale}, 'locale';
 	    my $currlocale = setlocale(LC_ALL);
 
 	    # if the current locale uses commas for decimal points, we

@@ -20,6 +20,10 @@ Resolves:
     https://rt.cpan.org/Ticket/Display.html?id=91987
     https://rt.cpan.org/Ticket/Display.html?id=92051
 
+IMPORTANT CHANGE - 0.9906 is the last release that fully supports Perl
+releases prior to 5.6.2.  It is just too much trouble to continue to
+fight to maintain full backward compatibility.
+
 Major Changes in 0.9906 - 2014-01-04
 =====================================
 Applied C89 compatibility fix from Karl Williamson to vxs.inc.  Added back
