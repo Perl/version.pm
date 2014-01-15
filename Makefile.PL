@@ -10,6 +10,13 @@ use Config qw(%Config);
 use File::Spec;
 use File::Copy;
 
+if ($] < 5.006002) {
+    die <<'EOL'
+Perl 5.006002 required.  Please install version-0.9906 if you need
+to support an earlier Perl release.
+EOL
+}
+
 use vars qw ($no_xs $force_xs);
 unlink 'pm_to_blib'; # belts and braces
 
@@ -50,6 +57,7 @@ sub write_makefile
     WriteMakefile( VERSION_FROM    => 'lib/version.pm',
                    NAME            => 'version',
                    LICENSE         => 'perl',
+                   MIN_PERL_VERSION=> 5.006002,
                    PREREQ_PM       => \%prereq,
                    CONFIGURE       => \&init,
                    ( $] >= 5.005 ?
@@ -80,8 +88,7 @@ sub write_makefile
                         },
                    PL_FILES        => {},
                    C               => [],
-                   clean           => { FILES => ['vutil/Makefile.PL',
-                                                 ]},
+                   clean           => { FILES => 'vutil/Makefile.PL' },
                    dist            => {
                        COMPRESS => 'gzip -9f', 
                        SUFFIX => 'gz',
