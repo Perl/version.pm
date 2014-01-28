@@ -173,7 +173,7 @@ VXS(version_new)
 {
     dVAR;
     dXSARGS;
-    SV *vs = items ? ST(1) : &PL_sv_undef;
+    SV *vs;
     SV *rv;
     const char * classname = "";
     STRLEN len;
@@ -183,18 +183,8 @@ VXS(version_new)
 
     SP -= items;
 
-    if (items > 3 || items == 0)
-        Perl_croak(aTHX_ "Usage: version::new(class, version)");
-
-    /* Just in case this is something like a tied hash */
-    SvGETMAGIC(vs);
-
-    if ( items == 1 || ! SvOK(vs) ) { /* no param or explicit undef */
-        /* create empty object */
-        vs = sv_newmortal();
-        sv_setpvs(vs,"undef");
-    }
-    else if (items == 3 ) {
+    switch((U32)items) {
+    case 3: {
         SV * svarg2;
         vs = sv_newmortal();
         svarg2 = ST(2);
@@ -203,7 +193,27 @@ VXS(version_new)
 #else
         Perl_sv_setpvf(aTHX_ vs,"v%s",SvPV_nolen_const(svarg2));
 #endif
+        break;
     }
+    case 2:
+        vs = ST(1);
+    /* Just in case this is something like a tied hash */
+        SvGETMAGIC(vs);
+        if(SvOK(vs))
+            break;
+        /* drop through */
+    case 1:
+        /* no param or explicit undef */
+        /* create empty object */
+        vs = sv_newmortal();
+        sv_setpvs(vs,"undef");
+        break;
+    default:
+    case 0:
+        Perl_croak_nocontext("Usage: version::new(class, version)");
+        break;
+    }
+
     svarg0 = ST(0);
     if ( sv_isobject(svarg0) ) {
 	/* get the class if called as an object method */
@@ -215,7 +225,7 @@ VXS(version_new)
 #endif
     }
     else {
-	classname = SvPV(svarg0, len);
+	classname = SvPV_nomg(svarg0, len);
 	flags     = SvUTF8(svarg0);
     }
 
