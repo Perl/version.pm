@@ -14,6 +14,20 @@
 #endif
 #define VXS(name) XS(VXSp(name))
 
+/* uses PUSHs, so SP must be at start, PUSHs sv on Perl stack, then returns from
+   xsub; this is a little more machine code/tailcall friendly than mPUSHs(foo);
+   PUTBACK; return; */
+
+#define VXS_RETURN_M_SV(sv) \
+    STMT_START {							\
+	SV * sv_vtc = sv;						\
+	PUSHs(sv_vtc);							\
+	PUTBACK;							\
+	sv_2mortal(sv_vtc);						\
+	return;								\
+    } STMT_END
+
+
 #ifdef VXS_XSUB_DETAILS
 #  ifdef PERL_CORE
     {"UNIVERSAL::VERSION", VXSp(universal_version), VXSXSDP(NULL)},
@@ -238,9 +252,7 @@ VXS(version_new)
         sv_bless(rv, gv_stashpvn(classname, len, GV_ADD | flags));
 #endif
 
-    mPUSHs(rv);
-    PUTBACK;
-    return;
+    VXS_RETURN_M_SV(rv);
 }
 
 #define VTYPECHECK(var, val, varname) \
@@ -250,7 +262,7 @@ VXS(version_new)
 	    (var) = SvRV(sv_vtc);						\
 	}								\
 	else								\
-	    Perl_croak(aTHX_ varname " is not of type version");	\
+	    Perl_croak_nocontext(varname " is not of type version");	\
     } STMT_END
 
 VXS(version_stringify)
@@ -264,10 +276,7 @@ VXS(version_stringify)
 	  SV *	lobj;
 	  VTYPECHECK(lobj, ST(0), "lobj");
 
-	  mPUSHs(VSTRINGIFY(lobj));
-
-	  PUTBACK;
-	  return;
+	  VXS_RETURN_M_SV(VSTRINGIFY(lobj));
      }
 }
 
@@ -281,9 +290,7 @@ VXS(version_numify)
      {
 	  SV *	lobj;
 	  VTYPECHECK(lobj, ST(0), "lobj");
-	  mPUSHs(VNUMIFY(lobj));
-	  PUTBACK;
-	  return;
+	  VXS_RETURN_M_SV(VNUMIFY(lobj));
      }
 }
 
@@ -298,10 +305,7 @@ VXS(version_normal)
 	  SV *	ver;
 	  VTYPECHECK(ver, ST(0), "ver");
 
-	  mPUSHs(VNORMAL(ver));
-
-	  PUTBACK;
-	  return;
+	  VXS_RETURN_M_SV(VNORMAL(ver));
      }
 }
 
@@ -336,11 +340,8 @@ VXS(version_vcmp)
 		    rs = newSViv(VCMP(lobj,rvs));
 	       }
 
-	       mPUSHs(rs);
+	       VXS_RETURN_M_SV(rs);
 	  }
-
-	  PUTBACK;
-	  return;
      }
 }
 
@@ -361,9 +362,7 @@ VXS(version_boolean)
 				    ))
 			 )
 		   );
-	mPUSHs(rs);
-	PUTBACK;
-	return;
+	VXS_RETURN_M_SV(rs);
     }
 }
 
