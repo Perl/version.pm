@@ -557,10 +557,30 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
     ENTER;
 #endif
     PERL_ARGS_ASSERT_UPG_VERSION;
+    sv_dump(ver);
 
-    if (SvNOK(ver)
+    if ( (SvUOK(ver) && SvUVX(ver) > VERSION_MAX)
+	   || (SvIOK(ver) && SvIVX(ver) > VERSION_MAX) ) {
+	/* out of bounds [unsigned] integer */
+	STRLEN len;
+	char tbuf[64];
+	len = my_snprintf(tbuf, sizeof(tbuf), "%d", VERSION_MAX);
+	version = savepvn(tbuf, len);
+	SAVEFREEPV(version);
+	Perl_ck_warner(aTHX_ packWARN(WARN_OVERFLOW),
+		       "Integer overflow in version %d",VERSION_MAX);
+    }
+    else if ( SvUOK(ver) || SvIOK(ver)
 #if PERL_VERSION_LT(5,17,2)
-	|| (SvTYPE(ver) == SVt_PVMG && !SvPOK(ver) && SvNOKp(ver))
+	      || (!SvPOK(ver) && SvIOKp(ver))
+#endif
+	    ) {
+	version = savesvpv(ver);
+	SAVEFREEPV(version);
+    }
+    else if (SvNOK(ver)
+#if PERL_VERSION_LT(5,17,2)
+	|| (!SvPOK(ver) && SvNOKp(ver))
 #endif
 	&& !( SvPOK(ver) && SvCUR(ver) == 3 ) )
     {
@@ -594,28 +614,9 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	qv = TRUE;
     }
 #endif
-    else if ( (SvUOK(ver) && SvUVX(ver) > VERSION_MAX)
-	   || (SvIOK(ver) && SvIVX(ver) > VERSION_MAX) ) {
-	/* out of bounds [unsigned] integer */
-	STRLEN len;
-	char tbuf[64];
-	len = my_snprintf(tbuf, sizeof(tbuf), "%d", VERSION_MAX);
-	version = savepvn(tbuf, len);
-	SAVEFREEPV(version);
-	Perl_ck_warner(aTHX_ packWARN(WARN_OVERFLOW),
-		       "Integer overflow in version %d",VERSION_MAX);
-    }
-    else if ( SvUOK(ver) || SvIOK(ver)
-#if PERL_VERSION_LT(5,17,2)
-	      || (SvTYPE(ver) == SVt_PVMG && !SvPOK(ver) && SvIOKp(ver))
-#endif
-	    ) {
-	version = savesvpv(ver);
-	SAVEFREEPV(version);
-    }
     else if ( SvPOK(ver)
 #if PERL_VERSION_LT(5,17,2)
-	      || (SvTYPE(ver) == SVt_PVMG && SvPOKp(ver))
+	      || SvPOKp(ver)
 #endif
 	    )/* must be a string or something like a string */
     {
@@ -674,6 +675,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 #if PERL_VERSION_LT(5,19,8) && defined(USE_ITHREADS)
     LEAVE;
 #endif
+
     return ver;
 }
 
