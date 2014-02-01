@@ -560,7 +560,7 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 
     if (SvNOK(ver)
 #if PERL_VERSION_LT(5,17,2)
-	|| (SvTYPE(ver) == SVt_PVMG && SvNOKp(ver))
+	|| (SvTYPE(ver) == SVt_PVMG && !SvPOK(ver) && SvNOKp(ver))
 #endif
 	&& !( SvPOK(ver) && SvCUR(ver) == 3 ) )
     {
