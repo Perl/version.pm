@@ -558,7 +558,11 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 #endif
     PERL_ARGS_ASSERT_UPG_VERSION;
 
-    if ( SvNOK(ver) && !( SvPOK(ver) && SvCUR(ver) == 3 ) )
+    if (SvNOK(ver)
+#if PERL_VERSION_LT(5,17,2)
+	|| (SvTYPE(ver) == SVt_PVMG && SvNOKp(ver))
+#endif
+	&& !( SvPOK(ver) && SvCUR(ver) == 3 ) )
     {
 	STRLEN len;
 
@@ -605,7 +609,11 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	version = savesvpv(ver);
 	SAVEFREEPV(version);
     }
-    else if ( SvPOK(ver) )/* must be a string or something like a string */
+    else if ( SvPOK(ver)
+#if PERL_VERSION_LT(5,17,2)
+	      || (SvTYPE(ver) == SVt_PVMG && SvPOKp(ver))
+#endif
+	    )/* must be a string or something like a string */
     {
 	STRLEN len;
 	version = savepvn(SvPV(ver,len), SvCUR(ver));
