@@ -557,7 +557,6 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
     ENTER;
 #endif
     PERL_ARGS_ASSERT_UPG_VERSION;
-    sv_dump(ver);
 
     if ( (SvUOK(ver) && SvUVX(ver) > VERSION_MAX)
 	   || (SvIOK(ver) && SvIVX(ver) > VERSION_MAX) ) {
@@ -570,19 +569,14 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	Perl_ck_warner(aTHX_ packWARN(WARN_OVERFLOW),
 		       "Integer overflow in version %d",VERSION_MAX);
     }
-    else if ( SvUOK(ver) || SvIOK(ver)
-#if PERL_VERSION_LT(5,17,2)
-	      || (!SvPOK(ver) && SvIOKp(ver))
-#endif
-	    ) {
+    else if ( SvUOK(ver) || SvIOK(ver))
+VER_IV:
+    {
 	version = savesvpv(ver);
 	SAVEFREEPV(version);
     }
-    else if (SvNOK(ver)
-#if PERL_VERSION_LT(5,17,2)
-	|| (!SvPOK(ver) && SvNOKp(ver))
-#endif
-	&& !( SvPOK(ver) && SvCUR(ver) == 3 ) )
+    else if (SvNOK(ver) && !( SvPOK(ver) && SvCUR(ver) == 3 ) )
+VER_NV:
     {
 	STRLEN len;
 
@@ -614,11 +608,8 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	qv = TRUE;
     }
 #endif
-    else if ( SvPOK(ver)
-#if PERL_VERSION_LT(5,17,2)
-	      || SvPOKp(ver)
-#endif
-	    )/* must be a string or something like a string */
+    else if ( SvPOK(ver))/* must be a string or something like a string */
+VER_PV:
     {
 	STRLEN len;
 	version = savepvn(SvPV(ver,len), SvCUR(ver));
@@ -660,6 +651,17 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 #  endif
 #endif
     }
+#if PERL_VERSION_LT(5,17,2)
+    else if (SvIOKp(ver)) {
+	goto VER_IV;
+    }
+    else if (SvNOKp(ver)) {
+	goto VER_NV;
+    }
+    else if (SvPOKp(ver)) {
+	goto VER_PV;
+    }
+#endif
     else
     {
 	/* no idea what this is */
