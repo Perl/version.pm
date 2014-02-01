@@ -558,6 +558,8 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 #endif
     PERL_ARGS_ASSERT_UPG_VERSION;
 
+    sv_2mortal(ver); /* in case we croak before we return */
+
     if ( (SvUOK(ver) && SvUVX(ver) > VERSION_MAX)
 	   || (SvIOK(ver) && SvIVX(ver) > VERSION_MAX) ) {
 	/* out of bounds [unsigned] integer */
@@ -678,7 +680,7 @@ VER_PV:
     LEAVE;
 #endif
 
-    return ver;
+    return SvREFCNT_inc_NN(ver);
 }
 
 /*
