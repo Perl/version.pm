@@ -1,4 +1,4 @@
-version 0.9907
+version 0.9908
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -8,6 +8,18 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+IMPORTANT NOTE - 0.9906 is the last release that fully supports Perl
+releases prior to 5.6.2.  It is just too much trouble to continue to
+fight to maintain full backward compatibility.
+
+Major Changes in 0.9908 - 2014-02-02
+=====================================
+More optimizations courtesy of Daniel Dragan (bulk88@hotmail.com).
+Also resolves:
+    https://rt.cpan.org/Ticket/Display.html?id=92438
+    https://rt.cpan.org/Ticket/Display.html?id=92540
+    https://rt.cpan.org/Ticket/Display.html?id=92642
 
 Major Changes in 0.9907 - 2014-01-12
 =====================================
@@ -19,10 +31,6 @@ Resolves:
     https://rt.cpan.org/Ticket/Display.html?id=91867
     https://rt.cpan.org/Ticket/Display.html?id=91987
     https://rt.cpan.org/Ticket/Display.html?id=92051
-
-IMPORTANT CHANGE - 0.9906 is the last release that fully supports Perl
-releases prior to 5.6.2.  It is just too much trouble to continue to
-fight to maintain full backward compatibility.
 
 Major Changes in 0.9906 - 2014-01-04
 =====================================
