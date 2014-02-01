@@ -636,13 +636,19 @@ sub scan_version {
 
 sub new
 {
-	my ($class, $value) = @_;
-	unless (defined $class) {
+	my $class = shift;
+	unless (defined $class or $#_ > 1) {
 	    require Carp;
 	    Carp::croak('Usage: version::new(class, version)');
 	}
+
 	my $self = bless ({}, ref ($class) || $class);
 	my $qv = FALSE;
+
+	if ( $#_ == 1 ) { # must be CVS-style
+	    $qv = TRUE;
+	}
+	my $value = pop; # always going to be the last element
 
 	if ( ref($value) && eval('$value->isa("version")') ) {
 	    # Can copy the elements directly
@@ -661,10 +667,6 @@ sub new
 	    return ($self);
 	}
 
-	if ( $#_ == 2 ) { # must be CVS-style
-	    $value = $_[2];
-	    $qv = TRUE;
-	}
 
 	if (ref($value) =~ m/ARRAY|HASH/) {
 	    require Carp;
