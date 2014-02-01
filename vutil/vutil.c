@@ -605,7 +605,11 @@ Perl_upg_version(pTHX_ SV *ver, bool qv)
 	Perl_ck_warner(aTHX_ packWARN(WARN_OVERFLOW),
 		       "Integer overflow in version %d",VERSION_MAX);
     }
-    else if ( SvUOK(ver) || SvIOK(ver) ) {
+    else if ( SvUOK(ver) || SvIOK(ver)
+#if PERL_VERSION_LT(5,17,2)
+	      || (SvTYPE(ver) == SVt_PVMG && !SvPOK(ver) && SvIOKp(ver))
+#endif
+	    ) {
 	version = savesvpv(ver);
 	SAVEFREEPV(version);
     }
