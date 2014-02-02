@@ -5,10 +5,9 @@
 
 use strict;
 
-use ExtUtils::MakeMaker;
 use Config qw(%Config);
-use File::Spec;
-use File::Copy;
+use ExtUtils::MakeMaker;
+use File::Temp qw/tempdir tempfile/;
 
 if ($] < 5.006002) {
     die <<'EOL'
@@ -28,16 +27,14 @@ for (@ARGV)
 {
     /^--perl_only/ and $no_xs = 1;
     /^--perl-only/ and $no_xs = 1;
-    /^--xs/ and $no_xs = 0;
+    /^--xs/ and $force_xs = 1;
 }
 
 if ($] < 5.010) { # support pure Perl only
     $no_xs = 1;
 }
 
-map { unlink $_ if -f $_ } <vutil/Makefile*>;
-
-unless (defined $no_xs)
+unless (defined $no_xs or $force_xs)
 {
     check_for_compiler()
         or no_cc();
@@ -49,9 +46,10 @@ write_makefile();
 sub write_makefile
 {
     my %prereq = (
-        'Test::More' => 0.45,
-        'File::Temp' => 0.13,
-        'parent'     => 0.221,
+        'ExtUtils::MakeMaker'   => 6.17,
+        'Test::More'            => 0.45,
+        'File::Temp'            => 0.13,
+        'parent'                => 0.221,
     );
 
     WriteMakefile( VERSION_FROM    => 'lib/version.pm',
@@ -59,12 +57,9 @@ sub write_makefile
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,
                    PREREQ_PM       => \%prereq,
-                   CONFIGURE       => \&init,
-                   ( $] >= 5.005 ?
-                     ( ABSTRACT    => 'Structured version objects',
-                       AUTHOR      => 'John Peacock <jpeacock@cpan.org>') :
-                     ()
-                   ), 
+                   NORECURS        => $no_xs,
+                   ABSTRACT    => 'Structured version objects',
+                   AUTHOR      => 'John Peacock <jpeacock@cpan.org>',
                    ( $] >= 5.009001 && $] < 5.011000 ?
                      ( INSTALLDIRS => 'perl' ) :
                      ()
@@ -77,7 +72,7 @@ sub write_makefile
 		     ( UNINST => 1 ) :
 		     ()
 		   ),
-                   PM              => 
+                   PM              =>
                        {'lib/version.pm'  => '$(INST_LIBDIR)/version.pm',
                         'lib/version.pod' => '$(INST_LIBDIR)/version.pod',
                         'lib/version/regex.pm'  =>
@@ -88,33 +83,18 @@ sub write_makefile
                         },
                    PL_FILES        => {},
                    C               => [],
-                   clean           => { FILES => 'vutil/Makefile.PL' },
+		   ( $no_xs ?
+		       () :
+		       ( DIR       => ['vutil'])
+		   ),
                    dist            => {
-                       COMPRESS => 'gzip -9f', 
+                       COMPRESS => 'gzip -9f',
                        SUFFIX => 'gz',
                        PREOP  => (
                           'hg log --style changelog > Changes'
                        ),
                    },
                  );
-}
-
-sub init
-{
-    my $hash = $_[1];
-
-    # include this always
-    unless ($no_xs) {
-        open MAKEFILE, '>vutil/Makefile.PL';
-        while (<DATA>) {
-            print MAKEFILE $_;
-        }
-        close MAKEFILE;
-        sleep(1);
-        @{ $hash }{ 'DIR' } = ['vutil'];
-    }
-
-    return $hash;
 }
 
 sub no_cc
@@ -135,6 +115,13 @@ EOF
 
 sub check_for_compiler
 {
+    # IMPORTANT NOTE:  This is NOT used to determine how to compile
+    # extensions properly; EU::MM does that for us.  This is only
+    # intended to see if that is likely to succeed.  We do not try
+    # to do anything here except compile (not even link).  If you
+    # want this to be a full featured test, feel free to submit a
+    # patch or do something useful.
+
     print "Testing if you have a C compiler\n";
 
     eval { require ExtUtils::CBuilder };
@@ -169,23 +156,22 @@ EOF
 
     close F or return 0;
 
-    my $cc = $Config{cc};
+    my ($cc, $ccflags, $obj_ext) = map { $Config{$_} } qw/cc ccflags obj_ext/;
 
-    my $retval = system( "$cc -c -o test$Config{obj_ext} test.c" );
-    map { unlink $_ if -f $_ } ('test.c',"test$Config{obj_ext}");
+    my $command;
+    if ($^O =~ /(dos|win32)/i && $Config{'cc'} =~ /^cl/) {
+        $command = "$cc $ccflags /c test.c";
+    }
+    elsif ($Config{gccversion}) {
+        $command = "$cc $ccflags -o test$obj_ext test.c";
+    }
+    else {
+        warn "Unsupported system: can't test compiler availability. Patches welcome...";
+        return 0;
+    }
+
+    my $retval = system( $command );
+    map { unlink $_ if -f $_ } ('test.c',"test$obj_ext");
 
     return not($retval); # system returns -1
 }
-
-__DATA__
-#!/usr/bin/perl -w
-use strict;
-use ExtUtils::MakeMaker;
-
-WriteMakefile(
-    NAME                => 'version::vxs',
-    AUTHOR              => 'John Peacock <jpeacock@cpan.org>',
-    VERSION_FROM        => 'lib/version/vxs.pm',
-    OBJECT              => q/$(O_FILES)/,
-    depend              => { qw< vxs.c vxs.inc > },
-);
