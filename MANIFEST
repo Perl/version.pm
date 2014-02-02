@@ -21,6 +21,7 @@ t/09_list_util.t
 t/coretests.pm
 t/survey_locales
 vperl/vpp.pm
+vutil/Makefile.PL
 vutil/lib/version/vxs.pm
 vutil/ppport.h
 vutil/vutil.c
