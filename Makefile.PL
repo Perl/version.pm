@@ -94,6 +94,19 @@ sub write_makefile
                           'hg log --style changelog > Changes'
                        ),
                    },
+                   META_MERGE => {
+                       "meta-spec" => { version => 2 },
+                       resources => {
+                           repository => {
+                               type => 'hg',
+                               url => 'https://bitbucket.org/jpeacock/version'
+                           },
+                           bugtracker => {
+                               web => 'http://rt.cpan.org/Public/Dist/Display.html?version',
+                               mailto => 'bug-version@rt.cpan.org',
+                           },
+                       },
+                   },
                  );
 }
 
