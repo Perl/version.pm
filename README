@@ -1,17 +1,30 @@
 version 0.9908
 ==================================
 
-Full version object support, with patch for bug in Perl 5.10.0 core
-version support.
+Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
+the core version code for all Perl releases from 5.10.0 onwards.  
+
+Although this code has been fully integrated into the latest Perl release
+itself (e.g. bleadperl), the CPAN release is considered upstream.  The source
+code itself is available from two mirrors:
+
+    https://bitbucket.org/jpeacock/version (primary)
+    https://github.com/JohnPeacock/version.git (secondary)
+
+and a bug queue here:
+
+   https://rt.cpan.org/Dist/Display.html?Queue=version
+
+Patches welcomed.
+
+IMPORTANT NOTE - 0.9906 is the last release that fully supports Perl
+releases prior to 5.6.2.  It is just too much trouble to continue to
+fight to maintain full backward compatibility.
 
 YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
-
-IMPORTANT NOTE - 0.9906 is the last release that fully supports Perl
-releases prior to 5.6.2.  It is just too much trouble to continue to
-fight to maintain full backward compatibility.
 
 Major Changes in 0.9908 - 2014-02-02
 =====================================
