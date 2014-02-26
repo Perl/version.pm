@@ -592,6 +592,13 @@ SKIP: {
 	eval {my $v = $CLASS->new({1 => 2}) };
 	like $@, qr/Invalid version format/, 'Do not crash for garbage';
     }
+    { # https://rt.cpan.org/Ticket/Display.html?id=93340
+	eval{$CLASS->$method(q[2.6_01])->normal()};
+	like $@, qr/Invalid version method call/, 'Cannot call normal on non-qv alpha';
+	eval{$CLASS->$method(q[v2.6_01])->normal()};
+	unlike $@, qr/Invalid version method call/, 'Cannot call normal on non-qv alpha';
+	isnt $@, 'No error';
+    }
 
 }
 

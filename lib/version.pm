@@ -23,6 +23,8 @@ $CLASS = 'version';
 	*version::_VERSION = \&version::vpp::_VERSION;
 	*version::vcmp = \&version::vpp::vcmp;
 	*version::new = \&version::vpp::new;
+	*version::numify = \&version::vpp::numify;
+	*version::normal = \&version::vpp::normal;
 	if ($] >= 5.009000) {
 	    no strict 'refs';
 	    *version::stringify = \&version::vpp::stringify;
@@ -39,6 +41,8 @@ $CLASS = 'version';
 	*version::_VERSION = \&version::vxs::_VERSION;
 	*version::vcmp = \&version::vxs::VCMP;
 	*version::new = \&version::vxs::new;
+	*version::numify = \&version::vxs::numify;
+	*version::normal = \&version::vxs::normal;
 	if ($] >= 5.009000) {
 	    no strict 'refs';
 	    *version::stringify = \&version::vxs::stringify;
