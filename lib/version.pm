@@ -3,6 +3,8 @@ package version;
 
 use 5.006002;
 use strict;
+use warnings::register;
+warnings::register_categories(qw/version/);
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 
