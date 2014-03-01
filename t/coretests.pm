@@ -593,11 +593,10 @@ SKIP: {
 	like $@, qr/Invalid version format/, 'Do not crash for garbage';
     }
     { # https://rt.cpan.org/Ticket/Display.html?id=93340
-	eval{$CLASS->$method(q[2.6_01])->normal()};
-	like $@, qr/Invalid version method call/, 'Cannot call normal on non-qv alpha';
-	eval{$CLASS->$method(q[v2.6_01])->normal()};
-	unlike $@, qr/Invalid version method call/, 'Cannot call normal on non-qv alpha';
-	isnt $@, 'No error';
+	my $v = $CLASS->$method(q[2.6_01])->normal();
+	is $v, "v2.601.0", 'Normalized alphas are lossy';
+	$v = $CLASS->$method(q[v2.6_01])->normal();
+	is $v, "v2.6.1", 'Normalized alphas are lossy';
     }
 
 }
