@@ -119,6 +119,8 @@ package version::vpp;
 
 use 5.006002;
 use strict;
+use warnings::register;
+warnings::register_categories(qw/version/);
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT);
@@ -147,16 +149,6 @@ use overload (
     '/='        => \&vnoop,
     'abs'      => \&vnoop,
 );
-
-eval "use warnings";
-if ($@) {
-    eval '
-	package
-	warnings;
-	sub enabled {return $^W;}
-	1;
-    ';
-}
 
 sub import {
     no strict 'refs';
@@ -196,7 +188,7 @@ sub import {
     }
 
     if (exists($args{'UNIVERSAL::VERSION'})) {
-	local $^W;
+	no warnings qw/redefine/;
 	*UNIVERSAL::VERSION
 		= \&{$CLASS.'::_VERSION'};
     }
@@ -717,6 +709,10 @@ sub numify {
     my $digit = $self->{version}[0];
     my $string = sprintf("%d.", $digit );
 
+    if ($alpha and warnings::enabled()) {
+	warnings::warn('version', 'alpha->numify() is lossy');
+    }
+
     for ( my $i = 1 ; $i < $len ; $i++ ) {
 	$digit = $self->{version}[$i];
 	if ( $width < 3 ) {
@@ -756,6 +752,10 @@ sub normal {
     my $len = $#{$self->{version}};
     my $digit = $self->{version}[0];
     my $string = sprintf("v%d", $digit );
+
+    if ($alpha and warnings::enabled()) {
+	warnings::warn('version', 'alpha->normal() is lossy');
+    }
 
     for ( my $i = 1 ; $i < $len ; $i++ ) {
 	$digit = $self->{version}[$i];
