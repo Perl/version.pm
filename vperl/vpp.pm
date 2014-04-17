@@ -930,16 +930,16 @@ sub _is_non_alphanumeric {
 sub _un_vstring {
     my $value = shift;
     # may be a v-string
-    if ( length($value) >= 3 && $value !~ /[._]/
+    if ( length($value) >= 1 && $value !~ /[,._]/
 	&& _is_non_alphanumeric($value)) {
 	my $tvalue;
-	if ( $] ge 5.008_001 ) {
+	if ( $] >= 5.008_001 ) {
 	    $tvalue = _find_magic_vstring($value);
 	    $value = $tvalue if length $tvalue;
 	}
-	elsif ( $] ge 5.006_000 ) {
+	elsif ( $] >= 5.006_000 ) {
 	    $tvalue = sprintf("v%vd",$value);
-	    if ( $tvalue =~ /^v\d+(\.\d+){2,}$/ ) {
+	    if ( $tvalue =~ /^v\d+(\.\d+)*$/ ) {
 		# must be a v-string
 		$value = $tvalue;
 	    }

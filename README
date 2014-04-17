@@ -30,9 +30,11 @@ Major Changes in 0.9909 - 2014-04-17
 =====================================
 Ensure that calling either normal() or numify() on an alpha version
 is explicitly a lossy operation, and add a warning to that effect.  Forbid
-trailing bare decimal for dotted-decimal versions.  Resolves:
+trailing bare decimal for dotted-decimal versions.  Change heuristic in vpp
+to better resolve v-string versions. Resolves:
 
     https://rt.cpan.org/Ticket/Display.html?id=93603
+    https://rt.cpan.org/Ticket/Display.html?id=93715
 
 Major Changes in 0.9908 - 2014-02-02
 =====================================

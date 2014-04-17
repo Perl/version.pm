@@ -613,6 +613,12 @@ SKIP: {
 	eval {my $v = $CLASS->$method('.1.2.')};
 	like $@, qr/trailing decimal/, 'Forbid trailing decimals';
     }
+    { # https://rt.cpan.org/Ticket/Display.html?id=93715
+	eval {my $v = $CLASS->new(v1.2)};
+	unlike $@, qr/non-numeric data/, 'Handle short v-strings';
+	eval {my $v = $CLASS->new(v1)};
+	unlike $@, qr/non-numeric data/, 'Handle short v-strings';
+    }
 
 }
 
