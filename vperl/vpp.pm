@@ -435,6 +435,10 @@ version_prescan_finish:
 	# trailing non-numeric data
 	return BADVERSION($s,$errstr,"Invalid version format (non-numeric data)");
     }
+    if ($saw_decimal > 1 && ($d-1) eq '.') {
+	# no trailing period allowed
+	return BADVERSION($s,$errstr,"Invalid version format (trailing decimal)");
+    }
 
     if (defined $sqv) {
 	$$sqv = $qv;
