@@ -1,4 +1,4 @@
-version 0.9908
+version 0.9909
 ==================================
 
 Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
@@ -25,6 +25,11 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.9909 - 2014-04-17
+=====================================
+Ensure that calling either normal() or numify() on an alpha version
+is explicitly a lossy operation, and add a warning to that effect.
 
 Major Changes in 0.9908 - 2014-02-02
 =====================================
