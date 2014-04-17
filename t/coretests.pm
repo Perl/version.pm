@@ -607,6 +607,12 @@ SKIP: {
 	is $v->numify(), '2.006_001', 'Numified alphas are lossy';
 	like $warning, qr/alpha->numify\(\) is lossy/, 'Heed my warning';
     }
+    { # https://rt.cpan.org/Ticket/Display.html?id=93603
+	eval {my $v = $CLASS->$method('.1.')};
+	like $@, qr/trailing decimal/, 'Forbid trailing decimals';
+	eval {my $v = $CLASS->$method('.1.2.')};
+	like $@, qr/trailing decimal/, 'Forbid trailing decimals';
+    }
 
 }
 

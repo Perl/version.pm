@@ -29,7 +29,10 @@ replacement code will take effect and Perl will not crash.
 Major Changes in 0.9909 - 2014-04-17
 =====================================
 Ensure that calling either normal() or numify() on an alpha version
-is explicitly a lossy operation, and add a warning to that effect.
+is explicitly a lossy operation, and add a warning to that effect.  Forbid
+trailing bare decimal for dotted-decimal versions.  Resolves:
+
+    https://rt.cpan.org/Ticket/Display.html?id=93603
 
 Major Changes in 0.9908 - 2014-02-02
 =====================================

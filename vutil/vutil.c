@@ -224,6 +224,11 @@ version_prescan_finish:
 	/* trailing non-numeric data */
 	BADVERSION(s,errstr,"Invalid version format (non-numeric data)");
     }
+    if (saw_decimal > 1 && d[-1] == '.') {
+	/* no trailing period allowed */
+	BADVERSION(s,errstr,"Invalid version format (trailing decimal)");
+    }
+
 
     if (sqv)
 	*sqv = qv;
