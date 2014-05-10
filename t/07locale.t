@@ -47,7 +47,6 @@ SKIP: {
 	$v = version->new($ver);
 	unlike($warning, qr/Version string '1,23' contains invalid data/,
 	    "Process locale-dependent floating point");
-        diag $v;
 	ok ($v eq "1.23", "Locale doesn't apply to version objects");
 	ok ($v == $ver, "Comparison to locale floating point");
 
