@@ -318,15 +318,15 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     while (isDIGIT(*pos))
 	pos++;
     if (!isALPHA(*pos)) {
-	I32 rev;
+	U32 rev;
 
 	for (;;) {
 	    rev = 0;
 	    {
   		/* this is atoi() that delimits on underscores */
   		const char *end = pos;
-  		I32 mult = 1;
-		I32 orev;
+  		U32 mult = 1;
+		U32 orev;
 
 		/* the following if() will only be true after the decimal
 		 * point of a version originally created with a bare
@@ -491,7 +491,7 @@ Perl_new_version(pTHX_ SV *ver)
 	{
 	    SV ** svp = hv_fetchs(MUTABLE_HV(ver), "width", FALSE);
 	    if(svp) {
-		const I32 width = SvIV(*svp);
+		const U32 width = SvIV(*svp);
 		(void)hv_stores(MUTABLE_HV(hv), "width", newSViv(width));
 	    }
 	}
@@ -505,7 +505,7 @@ Perl_new_version(pTHX_ SV *ver)
 	for ( key = 0; key <= av_len(sav); key++ )
 	{
 	    SV * const sv = *av_fetch(sav, key, FALSE);
-	    const I32 rev = SvIV(sv);
+	    const U32 rev = SvIV(sv);
 	    av_push(av, newSViv(rev));
 	}
 
@@ -768,7 +768,7 @@ Perl_vnumify(pTHX_ SV *vs)
 #endif
 {
     SSize_t i, len;
-    I32 digit;
+    U32 digit;
     int width;
     bool alpha = FALSE;
     SV *sv;
@@ -866,7 +866,7 @@ Perl_vnormal2(pTHX_ SV *vs)
 Perl_vnormal(pTHX_ SV *vs)
 #endif
 {
-    I32 i, len, digit;
+    U32 i, len, digit;
     bool alpha = FALSE;
     bool qv = FALSE;
     SV *sv;
@@ -987,8 +987,8 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
     I32 retval;
     bool lalpha = FALSE;
     bool ralpha = FALSE;
-    I32 left = 0;
-    I32 right = 0;
+    U32 left = 0;
+    U32 right = 0;
     AV *lav, *rav;
 
     PERL_ARGS_ASSERT_VCMP;
