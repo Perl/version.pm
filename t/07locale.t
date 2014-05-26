@@ -20,7 +20,7 @@ SKIP: {
 	    if(!$Config{d_setlocale});
 
 	# test locale handling
-	my $warning;
+	my $warning = '';
 
 	local $SIG{__WARN__} = sub { $warning = $_[0] };
 
@@ -53,8 +53,6 @@ SKIP: {
 	setlocale( LC_ALL, $orig_loc); # reset this before possible skip
 	skip 'Cannot test RT#46921 with Perl < 5.008', 1
 	    if ($] < 5.008);
-	skip 'Cannot test RT#46921 with pure Perl module', 1
-	    if exists $INC{'version/vpp.pm'};
 	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
 	(my $package = basename($filename)) =~ s/\.pm$//;
 	print $fh <<"EOF";
