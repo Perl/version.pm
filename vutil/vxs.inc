@@ -225,7 +225,6 @@ VXS(version_new)
     default:
     case 0:
         Perl_croak_nocontext("Usage: version::new(class, version)");
-        break;
     }
 
     svarg0 = ST(0);
