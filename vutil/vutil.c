@@ -471,7 +471,6 @@ Perl_new_version2(pTHX_ SV *ver)
 Perl_new_version(pTHX_ SV *ver)
 #endif
 {
-    dVAR;
     SV * const rv = newSV(0);
     PERL_ARGS_ASSERT_NEW_VERSION;
     if ( ISA_VERSION_OBJ(ver) ) /* can just copy directly */
