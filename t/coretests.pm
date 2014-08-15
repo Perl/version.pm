@@ -619,7 +619,23 @@ SKIP: {
 	eval {my $v = $CLASS->new(v1)};
 	unlike $@, qr/non-numeric data/, 'Handle short v-strings';
     }
-
+    {
+	my $two31 = '2147483648';
+	my $v = $CLASS->new($two31);
+	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
+	like $warning, qr/Integer overflow in version/, 'Overflow warning';
+	$v = $CLASS->new("1.$two31.$two31");
+	diag Dumper($v);
+	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
+	like $warning, qr/Integer overflow in version/, 'Overflow warning';
+    }
+    {
+	# now as a number
+	$two31 = 2**31;
+	$v = $CLASS->new($two31);
+	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
+	like $warning, qr/Integer overflow in version/, 'Overflow warning';
+    }
 }
 
 1;
