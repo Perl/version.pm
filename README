@@ -1,4 +1,4 @@
-version 0.9908
+version 0.9909
 ==================================
 
 Full version object support, with patch for bug in Perl 5.10.0 core
@@ -12,6 +12,13 @@ replacement code will take effect and Perl will not crash.
 IMPORTANT NOTE - 0.9906 is the last release that fully supports Perl
 releases prior to 5.6.2.  It is just too much trouble to continue to
 fight to maintain full backward compatibility.
+
+Major Changes in 0.9909 - 2014-08-15
+=====================================
+Compatibility release for Perl 5.20.1.  Apply two patches from bleadperl
+(one which shipped with 5.20.0 and one from bleadperl) so that a clean
+release can be applied prior to 5.20.1 being shipped.  Holding back a few
+other improvements, so expect 0.9910 shortly.
 
 Major Changes in 0.9908 - 2014-02-02
 =====================================
