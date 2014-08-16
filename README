@@ -2,7 +2,7 @@ version 0.9910
 ==================================
 
 Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
-the core version code for all Perl releases from 5.10.0 onwards.  
+the core version code for all Perl releases from 5.10.0 onwards.
 
 Although this code has been fully integrated into the latest Perl release
 itself (e.g. bleadperl), the CPAN release is considered upstream.  The source
@@ -26,7 +26,7 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
-Major Changes in 0.9909 - 2014-04-17
+Major Changes in 0.9910 - 2014-08-16
 =====================================
 Ensure that calling either normal() or numify() on an alpha version
 is explicitly a lossy operation, and add a warning to that effect.  Forbid
@@ -36,7 +36,7 @@ to better resolve v-string versions. Resolves:
     https://rt.cpan.org/Ticket/Display.html?id=93603
     https://rt.cpan.org/Ticket/Display.html?id=93715
 
-Major Changes in 0.9910 - 2014-08-15
+Major Changes in 0.9909 - 2014-08-15
 =====================================
 Compatibility release for Perl 5.20.1.  Apply two patches from bleadperl
 (one which shipped with 5.20.0 and one from bleadperl) so that a clean
