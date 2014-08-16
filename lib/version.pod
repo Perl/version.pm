@@ -270,7 +270,7 @@ Returns a value representing the object in a pure decimal form without
 trailing zeroes.
 
  version->declare('v1.2')->numify;  # 1.002
- version->parse('1.2')->numify;     # 1.2
+ version->parse('1.2')->numify;     # 1.200
 
 =head2 stringify()
 

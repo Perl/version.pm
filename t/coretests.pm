@@ -592,7 +592,50 @@ SKIP: {
 	eval {my $v = $CLASS->new({1 => 2}) };
 	like $@, qr/Invalid version format/, 'Do not crash for garbage';
     }
+    { # https://rt.cpan.org/Ticket/Display.html?id=93340
+	my $v = $CLASS->$method(q[2.6_01]);
+	is $v->normal(), 'v2.601.0', 'Normalized alphas are lossy';
+	like $warning, qr/alpha->normal\(\) is lossy/, 'Heed my warning';
 
+	is $v->numify(), '2.601', 'Numified alphas are lossy';
+	like $warning, qr/alpha->numify\(\) is lossy/, 'Heed my warning';
+
+	$v = $CLASS->$method(q[v2.6_01]);
+	is $v->normal(), 'v2.6.1', 'Normalized alphas are lossy';
+	like $warning, qr/alpha->normal\(\) is lossy/, 'Heed my warning';
+
+	is $v->numify(), '2.006_001', 'Numified alphas are lossy';
+	like $warning, qr/alpha->numify\(\) is lossy/, 'Heed my warning';
+    }
+    { # https://rt.cpan.org/Ticket/Display.html?id=93603
+	eval {my $v = $CLASS->$method('.1.')};
+	like $@, qr/trailing decimal/, 'Forbid trailing decimals';
+	eval {my $v = $CLASS->$method('.1.2.')};
+	like $@, qr/trailing decimal/, 'Forbid trailing decimals';
+    }
+    { # https://rt.cpan.org/Ticket/Display.html?id=93715
+	eval {my $v = $CLASS->new(v1.2)};
+	unlike $@, qr/non-numeric data/, 'Handle short v-strings';
+	eval {my $v = $CLASS->new(v1)};
+	unlike $@, qr/non-numeric data/, 'Handle short v-strings';
+    }
+    {
+	my $two31 = '2147483648';
+	my $v = $CLASS->new($two31);
+	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
+	like $warning, qr/Integer overflow in version/, 'Overflow warning';
+	$v = $CLASS->new("1.$two31.$two31");
+	diag Dumper($v);
+	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
+	like $warning, qr/Integer overflow in version/, 'Overflow warning';
+    }
+    {
+	# now as a number
+	$two31 = 2**31;
+	$v = $CLASS->new($two31);
+	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
+	like $warning, qr/Integer overflow in version/, 'Overflow warning';
+    }
 }
 
 1;
