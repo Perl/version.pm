@@ -41,7 +41,7 @@ Perl_prescan_version(pTHX_ const char *s, bool strict,
     bool alpha = FALSE;
     const char *d = s;
 
-    PERL_ARGS_ASSERT_PRESCAN_VERSION;
+    PERL_ARGS_ASSERT_PRESCAN_VERSION; PERL_UNUSED_CONTEXT;
 
     if (qv && isDIGIT(*d))
 	goto dotted_decimal_version;
@@ -224,6 +224,11 @@ version_prescan_finish:
 	/* trailing non-numeric data */
 	BADVERSION(s,errstr,"Invalid version format (non-numeric data)");
     }
+    if (saw_decimal > 1 && d[-1] == '.') {
+	/* no trailing period allowed */
+	BADVERSION(s,errstr,"Invalid version format (trailing decimal)");
+    }
+
 
     if (sqv)
 	*sqv = qv;
@@ -313,15 +318,15 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     while (isDIGIT(*pos))
 	pos++;
     if (!isALPHA(*pos)) {
-	I32 rev;
+	U32 rev;
 
 	for (;;) {
 	    rev = 0;
 	    {
   		/* this is atoi() that delimits on underscores */
   		const char *end = pos;
-  		I32 mult = 1;
-		I32 orev;
+  		U32 mult = 1;
+		U32 orev;
 
 		/* the following if() will only be true after the decimal
 		 * point of a version originally created with a bare
@@ -486,7 +491,7 @@ Perl_new_version(pTHX_ SV *ver)
 	{
 	    SV ** svp = hv_fetchs(MUTABLE_HV(ver), "width", FALSE);
 	    if(svp) {
-		const I32 width = SvIV(*svp);
+		const U32 width = SvIV(*svp);
 		(void)hv_stores(MUTABLE_HV(hv), "width", newSViv(width));
 	    }
 	}
@@ -500,7 +505,7 @@ Perl_new_version(pTHX_ SV *ver)
 	for ( key = 0; key <= av_len(sav); key++ )
 	{
 	    SV * const sv = *av_fetch(sav, key, FALSE);
-	    const I32 rev = SvIV(sv);
+	    const U32 rev = SvIV(sv);
 	    av_push(av, newSViv(rev));
 	}
 
@@ -795,7 +800,7 @@ Perl_vnumify(pTHX_ SV *vs)
 #endif
 {
     SSize_t i, len;
-    I32 digit;
+    U32 digit;
     int width;
     bool alpha = FALSE;
     SV *sv;
@@ -819,6 +824,11 @@ Perl_vnumify(pTHX_ SV *vs)
 	    width = 3;
     }
 
+
+    if (alpha) {
+	Perl_ck_warner(aTHX_ packWARN(WARN_NUMERIC),
+		       "alpha->numify() is lossy");
+    }
 
     /* attempt to retrieve the version array */
     if ( !(av = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE))) ) ) {
@@ -888,8 +898,9 @@ Perl_vnormal2(pTHX_ SV *vs)
 Perl_vnormal(pTHX_ SV *vs)
 #endif
 {
-    I32 i, len, digit;
+    U32 i, len, digit;
     bool alpha = FALSE;
+    bool qv = FALSE;
     SV *sv;
     AV *av;
 
@@ -902,6 +913,14 @@ Perl_vnormal(pTHX_ SV *vs)
 
     if ( hv_exists(MUTABLE_HV(vs), "alpha", 5 ) )
 	alpha = TRUE;
+    if ( hv_exists(MUTABLE_HV(vs), "qv", 2) )
+	qv = TRUE;
+
+    if (alpha) {
+	Perl_ck_warner(aTHX_ packWARN(WARN_NUMERIC),
+		       "alpha->normal() is lossy");
+    }
+
     av = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE)));
 
     len = av_len(av);
@@ -925,10 +944,7 @@ Perl_vnormal(pTHX_ SV *vs)
 	/* handle last digit specially */
 	SV * tsv = *av_fetch(av, len, 0);
 	digit = SvIV(tsv);
-	if ( alpha )
-	    Perl_sv_catpvf(aTHX_ sv, "_%"IVdf, (IV)digit);
-	else
-	    Perl_sv_catpvf(aTHX_ sv, ".%"IVdf, (IV)digit);
+	Perl_sv_catpvf(aTHX_ sv, ".%"IVdf, (IV)digit);
     }
 
     if ( len <= 2 ) { /* short version, must be at least three */
@@ -1003,8 +1019,8 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
     I32 retval;
     bool lalpha = FALSE;
     bool ralpha = FALSE;
-    I32 left = 0;
-    I32 right = 0;
+    U32 left = 0;
+    U32 right = 0;
     AV *lav, *rav;
 
     PERL_ARGS_ASSERT_VCMP;
