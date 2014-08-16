@@ -31,10 +31,16 @@ Major Changes in 0.9910 - 2014-08-16
 Ensure that calling either normal() or numify() on an alpha version
 is explicitly a lossy operation, and add a warning to that effect.  Forbid
 trailing bare decimal for dotted-decimal versions.  Change heuristic in vpp
-to better resolve v-string versions. Resolves:
+to better resolve v-string versions.  Various cleanups.
+
+Resolves:
 
     https://rt.cpan.org/Ticket/Display.html?id=93603
     https://rt.cpan.org/Ticket/Display.html?id=93715
+    https://rt.cpan.org/Ticket/Display.html?id=93721
+    https://rt.cpan.org/Ticket/Display.html?id=95896
+    https://rt.cpan.org/Ticket/Display.html?id=96100
+    https://rt.cpan.org/Ticket/Display.html?id=96620
 
 Major Changes in 0.9909 - 2014-08-15
 =====================================
