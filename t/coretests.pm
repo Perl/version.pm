@@ -625,7 +625,6 @@ SKIP: {
 	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
 	like $warning, qr/Integer overflow in version/, 'Overflow warning';
 	$v = $CLASS->new("1.$two31.$two31");
-	diag Dumper($v);
 	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
 	like $warning, qr/Integer overflow in version/, 'Overflow warning';
     }
