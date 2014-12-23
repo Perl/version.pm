@@ -353,17 +353,24 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
   		}
  		else {
  		    while (--end >= s) {
-			orev = rev;
- 			rev += (*end - '0') * mult;
- 			mult *= 10;
-			if (   (PERL_ABS(orev) > PERL_ABS(rev)) 
-			    || (PERL_ABS(rev) > VERSION_MAX )) {
+			int i  = (*end - '0');
+                        if (   (mult == VERSION_MAX)
+                            || (i > VERSION_MAX / mult)
+                            || (i * mult > VERSION_MAX - rev))
+                        {
 			    Perl_ck_warner(aTHX_ packWARN(WARN_OVERFLOW), 
 					   "Integer overflow in version");
 			    end = s - 1;
 			    rev = VERSION_MAX;
 			    vinf = 1;
 			}
+                        else
+                            rev += i * mult;
+
+                        if (mult > VERSION_MAX / 10)
+                            mult = VERSION_MAX;
+                        else
+                            mult *= 10;
  		    }
  		} 
   	    }

@@ -42,6 +42,11 @@ Resolves:
     https://rt.cpan.org/Ticket/Display.html?id=96100
     https://rt.cpan.org/Ticket/Display.html?id=96620
 
+Patch from Dave Mitchell to rewrite the parser and avoid warnings
+from clang.  Resolves
+
+    https://rt.cpan.org/Ticket/Display.html?id=101501
+
 Major Changes in 0.9909 - 2014-08-15
 =====================================
 Compatibility release for Perl 5.20.1.  Apply two patches from bleadperl
