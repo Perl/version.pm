@@ -5,3 +5,7 @@ version-.*\.tar\.gz
 Changes
 META\.yml
 blib/.*
+MYMETA.json
+Makefile
+vutil/MYMETA.json
+vutil/Makefile

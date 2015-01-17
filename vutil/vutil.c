@@ -353,17 +353,24 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
   		}
  		else {
  		    while (--end >= s) {
-			orev = rev;
- 			rev += (*end - '0') * mult;
- 			mult *= 10;
-			if (   (PERL_ABS(orev) > PERL_ABS(rev)) 
-			    || (PERL_ABS(rev) > VERSION_MAX )) {
+			int i  = (*end - '0');
+                        if (   (mult == VERSION_MAX)
+                            || (i > VERSION_MAX / mult)
+                            || (i * mult > VERSION_MAX - rev))
+                        {
 			    Perl_ck_warner(aTHX_ packWARN(WARN_OVERFLOW), 
 					   "Integer overflow in version");
 			    end = s - 1;
 			    rev = VERSION_MAX;
 			    vinf = 1;
 			}
+                        else
+                            rev += i * mult;
+
+                        if (mult > VERSION_MAX / 10)
+                            mult = VERSION_MAX;
+                        else
+                            mult *= 10;
  		    }
  		} 
   	    }
@@ -464,7 +471,6 @@ Perl_new_version2(pTHX_ SV *ver)
 Perl_new_version(pTHX_ SV *ver)
 #endif
 {
-    dVAR;
     SV * const rv = newSV(0);
     PERL_ARGS_ASSERT_NEW_VERSION;
     if ( ISA_VERSION_OBJ(ver) ) /* can just copy directly */
@@ -626,6 +632,7 @@ VER_NV:
 #endif
         { /* Braces needed because macro just below declares a variable */
         STORE_NUMERIC_LOCAL_SET_STANDARD();
+        LOCK_NUMERIC_STANDARD();
 	if (sv) {
 	    Perl_sv_catpvf(aTHX_ sv, "%.9"NVff, SvNVX(ver));
 	    len = SvCUR(sv);
@@ -635,6 +642,7 @@ VER_NV:
 	    len = my_snprintf(tbuf, sizeof(tbuf), "%.9"NVff, SvNVX(ver));
 	    buf = tbuf;
 	}
+        UNLOCK_NUMERIC_STANDARD();
         RESTORE_NUMERIC_LOCAL();
         }
 	while (buf[len-1] == '0' && len > 0) len--;
@@ -1098,3 +1106,5 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
     }
     return retval;
 }
+
+/* ex: set ro: */
