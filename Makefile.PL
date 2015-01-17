@@ -52,7 +52,7 @@ sub write_makefile
         'parent'                => 0.221,
     );
 
-    WriteMakefile( VERSION_FROM    => 'lib/version.pm',
+    WriteMakefile( VERSION         => '0.9910',
                    NAME            => 'version',
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,
