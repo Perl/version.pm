@@ -9,7 +9,7 @@ use Test::More qw/no_plan/;
 BEGIN {
     (my $coretests = $0) =~ s'[^/]+\.t'coretests.pm';
     require $coretests;
-    use_ok('version::vpp', 0.9910);
+    use_ok('version::vpp', 0.9911);
 }
 
 BaseTests("version::vpp","new","qv");

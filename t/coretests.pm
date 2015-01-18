@@ -593,19 +593,11 @@ SKIP: {
 	like $@, qr/Invalid version format/, 'Do not crash for garbage';
     }
     { # https://rt.cpan.org/Ticket/Display.html?id=93340
-	my $v = $CLASS->$method(q[2.6_01]);
-	is $v->normal(), 'v2.601.0', 'Normalized alphas are lossy';
-	like $warning, qr/alpha->normal\(\) is lossy/, 'Heed my warning';
-
-	is $v->numify(), '2.601', 'Numified alphas are lossy';
-	like $warning, qr/alpha->numify\(\) is lossy/, 'Heed my warning';
-
-	$v = $CLASS->$method(q[v2.6_01]);
-	is $v->normal(), 'v2.6.1', 'Normalized alphas are lossy';
-	like $warning, qr/alpha->normal\(\) is lossy/, 'Heed my warning';
-
-	is $v->numify(), '2.006_001', 'Numified alphas are lossy';
-	like $warning, qr/alpha->numify\(\) is lossy/, 'Heed my warning';
+	eval{$CLASS->$method(q[2.6_01])->normal()};
+	like $@, qr/Invalid version method call/, 'Cannot call normal on non-qv alpha';
+	eval{$CLASS->$method(q[v2.6_01])->normal()};
+	unlike $@, qr/Invalid version method call/, 'Cannot call normal on non-qv alpha';
+	isnt $@, 'No error';
     }
     { # https://rt.cpan.org/Ticket/Display.html?id=93603
 	eval {my $v = $CLASS->$method('.1.')};
