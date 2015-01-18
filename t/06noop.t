@@ -7,7 +7,7 @@
 use Test::More qw/no_plan/;
 
 BEGIN {
-    use_ok('version', 0.9910);
+    use_ok('version', 0.9912);
 }
 
 my $v1 = version->new('1.2');
