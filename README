@@ -1,4 +1,4 @@
-version 0.9910
+version 0.9912
 ==================================
 
 Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
@@ -25,6 +25,19 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in 0.9912 - 2015-01-18
+=====================================
+
+Restore behavior change to normal/numify for alpha versions, now that
+Module::Build has been patched.  Minor change to report the correct
+rt.cpan.org URL, resolves:
+
+    https://rt.cpan.org/Public/Bug/Display.html?id=101600
+
+Major Change in 0.9911 - 2015-01-17
+=====================================
+Backout change to normal() and numify() because it breaks Module::Build
 
 Major Changes in 0.9910 - 2015-01-17
 =====================================
