@@ -836,7 +836,7 @@ Perl_vnumify(pTHX_ SV *vs)
 
     if (alpha) {
 	Perl_ck_warner(aTHX_ packWARN(WARN_NUMERIC),
-		       "version alpha->numify() is lossy");
+		       "Version alpha->numify() is lossy");
     }
 
     /* attempt to retrieve the version array */
@@ -927,7 +927,7 @@ Perl_vnormal(pTHX_ SV *vs)
 
     if (alpha) {
 	Perl_ck_warner(aTHX_ packWARN(WARN_NUMERIC),
-		       "version alpha->normal() is lossy");
+		       "Version alpha->normal() is lossy");
     }
 
     av = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE)));
