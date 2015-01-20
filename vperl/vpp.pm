@@ -713,7 +713,7 @@ sub numify {
     my $string = sprintf("%d.", $digit );
 
     if ($alpha and warnings::enabled()) {
-	warnings::warn('numeric', 'version alpha->numify() is lossy');
+	warnings::warn('numeric', 'Version alpha->numify() is lossy');
     }
 
     for ( my $i = 1 ; $i < $len ; $i++ ) {
@@ -757,7 +757,7 @@ sub normal {
     my $string = sprintf("v%d", $digit );
 
     if ($alpha and warnings::enabled()) {
-	warnings::warn('numeric', 'version alpha->normal() is lossy');
+	warnings::warn('numeric', 'Version alpha->normal() is lossy');
     }
 
     for ( my $i = 1 ; $i < $len ; $i++ ) {
