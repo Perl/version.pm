@@ -122,15 +122,9 @@ use strict;
 use warnings::register;
 
 use Config;
-use vars qw($VERSION $CLASS @ISA $LAX $STRICT $WARN_CATEGORY);
+use vars qw($VERSION $CLASS @ISA $LAX $STRICT);
 $VERSION = 0.9912;
 $CLASS = 'version::vpp';
-if ($] > 5.015) {
-    warnings::register_categories(qw/version/);
-    $WARN_CATEGORY = 'version';
-} else {
-    $WARN_CATEGORY = 'numeric';
-}
 
 require version::regex;
 *version::vpp::is_strict = \&version::regex::is_strict;
@@ -719,7 +713,7 @@ sub numify {
     my $string = sprintf("%d.", $digit );
 
     if ($alpha and warnings::enabled()) {
-	warnings::warn($WARN_CATEGORY, 'alpha->numify() is lossy');
+	warnings::warn('numeric', 'version alpha->numify() is lossy');
     }
 
     for ( my $i = 1 ; $i < $len ; $i++ ) {
@@ -763,7 +757,7 @@ sub normal {
     my $string = sprintf("v%d", $digit );
 
     if ($alpha and warnings::enabled()) {
-	warnings::warn($WARN_CATEGORY, 'alpha->normal() is lossy');
+	warnings::warn('numeric', 'version alpha->normal() is lossy');
     }
 
     for ( my $i = 1 ; $i < $len ; $i++ ) {
