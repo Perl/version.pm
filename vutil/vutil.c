@@ -41,7 +41,8 @@ Perl_prescan_version(pTHX_ const char *s, bool strict,
     bool alpha = FALSE;
     const char *d = s;
 
-    PERL_ARGS_ASSERT_PRESCAN_VERSION; PERL_UNUSED_CONTEXT;
+    PERL_ARGS_ASSERT_PRESCAN_VERSION;
+    PERL_UNUSED_CONTEXT;
 
     if (qv && isDIGIT(*d))
 	goto dotted_decimal_version;
@@ -835,7 +836,7 @@ Perl_vnumify(pTHX_ SV *vs)
 
     if (alpha) {
 	Perl_ck_warner(aTHX_ packWARN(WARN_NUMERIC),
-		       "alpha->numify() is lossy");
+		       "version alpha->numify() is lossy");
     }
 
     /* attempt to retrieve the version array */
@@ -926,7 +927,7 @@ Perl_vnormal(pTHX_ SV *vs)
 
     if (alpha) {
 	Perl_ck_warner(aTHX_ packWARN(WARN_NUMERIC),
-		       "alpha->normal() is lossy");
+		       "version alpha->normal() is lossy");
     }
 
     av = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE)));
