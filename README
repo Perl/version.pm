@@ -26,6 +26,26 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+Major Changes in 0.9912 - 2015-01-20
+=====================================
+
+Complete reverting the ill-conceived alpha->normal() code, resolves:
+
+    https://rt.cpan.org/Ticket/Display.html?id=101632
+
+Skip leading zeros when parsing dotted-decimal versions after the
+first element, resolves:
+
+    https://rt.cpan.org/Ticket/Display.html?id=101628
+
+Minor change to report the correct rt.cpan.org URL, resolves:
+
+    https://rt.cpan.org/Public/Bug/Display.html?id=101600
+
+Major Change in 0.9911 - 2015-01-17
+=====================================
+Backout change to normal() and numify() because it breaks Module::Build
+
 Major Changes in 0.9910 - 2015-01-17
 =====================================
 Ensure that calling either normal() or numify() on an alpha version
