@@ -757,11 +757,7 @@ sub normal {
     }
     my $alpha = $self->{alpha} || "";
     my $qv = $self->{qv} || "";
-    if ($alpha and not $qv) {
-	# can't do this
-	require Carp;
-	Carp::croak("Invalid version method call");
-    }
+
     my $len = $#{$self->{version}};
     my $digit = $self->{version}[0];
     my $string = sprintf("v%d", $digit );

@@ -918,8 +918,6 @@ Perl_vnormal(pTHX_ SV *vs)
 	alpha = TRUE;
     if ( hv_exists(MUTABLE_HV(vs), "qv", 2) )
 	qv = TRUE;
-    if (alpha && ! qv)
-	Perl_croak(aTHX_ "Invalid version method call");
 
     av = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE)));
 
