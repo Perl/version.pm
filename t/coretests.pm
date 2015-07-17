@@ -132,8 +132,8 @@ sub BaseTests {
     ok ( $version != $new_version, '$version != $new_version' );
 
     $version = $CLASS->$method("1.2.4");
-    ok ( $version > $new_version, '$version > $new_version' );
-    ok ( $new_version < $version, '$new_version < $version' );
+    ok ( $version < $new_version, '$version < $new_version' );
+    ok ( $new_version > $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
 
     # now test with alpha version form with object
@@ -146,24 +146,22 @@ sub BaseTests {
     ok ( $new_version->is_alpha, '$new_version->is_alpha');
 
     $version = $CLASS->$method("1.2.4");
-    ok ( $version > $new_version, '$version > $new_version' );
-    ok ( $new_version < $version, '$new_version < $version' );
+    ok ( $version < $new_version, '$version < $new_version' );
+    ok ( $new_version > $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
 
-    $version = $CLASS->$method("1.2.3.4");
+    $version = $CLASS->$method("1.2.34");
     $new_version = $CLASS->$method("1.2.3_4");
-    ok ( $version > $new_version, '$version > $new_version' );
-    ok ( $new_version < $version, '$new_version < $version' );
-    ok ( $version != $new_version, '$version != $new_version' );
+    ok ( $version == $new_version, '$version == $new_version' );
 
-    $version = $CLASS->$method("v1.2.3");
-    $new_version = $CLASS->$method("1.2.3.0");
+    $version = $CLASS->$method("v1.2.30");
+    $new_version = $CLASS->$method("1.2.30.0");
     ok ( $version == $new_version, '$version == $new_version' );
     $new_version = $CLASS->$method("1.2.3_0");
     ok ( $version == $new_version, '$version == $new_version' );
-    $new_version = $CLASS->$method("1.2.3.1");
+    $new_version = $CLASS->$method("1.2.30.1");
     ok ( $version < $new_version, '$version < $new_version' );
-    $new_version = $CLASS->$method("1.2.3_1");
+    $new_version = $CLASS->$method("1.2.30_1");
     ok ( $version < $new_version, '$version < $new_version' );
     $new_version = $CLASS->$method("1.1.999");
     ok ( $version > $new_version, '$version > $new_version' );

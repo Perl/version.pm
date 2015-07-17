@@ -500,7 +500,7 @@ sub scan_version {
 	$$rv->{width} = $width;
     }
 
-    while (isDIGIT($pos)) {
+    while (isDIGIT($pos) || $pos eq '_') {
 	$pos++;
     }
     if (!isALPHA($pos)) {
@@ -521,6 +521,7 @@ sub scan_version {
  		if ( !$qv && $s > $start && $saw_decimal == 1 ) {
 		    $mult *= 100;
  		    while ( $s < $end ) {
+			next if $s eq '_';
 			$orev = $rev;
  			$rev += $s * $mult;
  			$mult /= 10;
@@ -540,6 +541,7 @@ sub scan_version {
   		}
  		else {
  		    while (--$end >= $s) {
+			next if $end eq '_';
 			$orev = $rev;
  			$rev += $end * $mult;
  			$mult *= 10;
@@ -577,7 +579,7 @@ sub scan_version {
 		last;
 	    }
 	    if ( $qv ) {
-		while ( isDIGIT($pos) ) {
+		while ( isDIGIT($pos) || $pos eq '_') {
 		    $pos++;
 		}
 	    }
@@ -728,7 +730,7 @@ sub numify {
 	    my $denom = 10**(3-$width);
 	    my $quot = int($digit/$denom);
 	    my $rem = $digit - ($quot * $denom);
-	    $string .= sprintf("%0".$width."d_%d", $quot, $rem);
+	    $string .= sprintf("%0".$width."d%d", $quot, $rem);
 	}
 	else {
 	    $string .= sprintf("%03d", $digit);
@@ -756,26 +758,14 @@ sub normal {
 	require Carp;
 	Carp::croak("Invalid version object");
     }
-    my $alpha = $self->{alpha} || "";
-    my $qv = $self->{qv} || "";
 
     my $len = $#{$self->{version}};
     my $digit = $self->{version}[0];
     my $string = sprintf("v%d", $digit );
 
-    for ( my $i = 1 ; $i < $len ; $i++ ) {
+    for ( my $i = 1 ; $i <= $len ; $i++ ) {
 	$digit = $self->{version}[$i];
 	$string .= sprintf(".%d", $digit);
-    }
-
-    if ( $len > 0 ) {
-	$digit = $self->{version}[$len];
-	if ( $alpha ) {
-	    $string .= sprintf("_%0d", $digit);
-	}
-	else {
-	    $string .= sprintf(".%0d", $digit);
-	}
     }
 
     if ( $len <= 2 ) {
@@ -829,20 +819,6 @@ sub vcmp {
     while ( $i <= $m && $retval == 0 ) {
 	$retval = $left->{version}[$i] <=> $right->{version}[$i];
 	$i++;
-    }
-
-    # tiebreaker for alpha with identical terms
-    if ( $retval == 0
-	&& $l == $r
-	&& $left->{version}[$m] == $right->{version}[$m]
-	&& ( $lalpha || $ralpha ) ) {
-
-	if ( $lalpha && !$ralpha ) {
-	    $retval = -1;
-	}
-	elsif ( $ralpha && !$lalpha) {
-	    $retval = +1;
-	}
     }
 
     # possible match except for trailing 0's
