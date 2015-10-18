@@ -839,6 +839,11 @@ Perl_vnumify(pTHX_ SV *vs)
     }
 
 
+    if (alpha) {
+	Perl_ck_warner(aTHX_ packWARN(WARN_NUMERIC),
+		       "alpha->numify() is lossy");
+    }
+
     /* attempt to retrieve the version array */
     if ( !(av = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE))) ) ) {
 	return newSVpvs("0");

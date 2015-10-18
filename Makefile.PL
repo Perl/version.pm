@@ -102,7 +102,7 @@ sub write_makefile
                                url => 'https://bitbucket.org/jpeacock/version'
                            },
                            bugtracker => {
-                               web => 'http://rt.cpan.org/Public/Dist/Display.html?version',
+                               web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=version',
                                mailto => 'bug-version@rt.cpan.org',
                            },
                        },
