@@ -561,14 +561,7 @@ sub scan_version {
 		last;
 	    }
 	    elsif ( $pos eq '.' ) {
-		$pos++;
-		if ($qv) {
-		    # skip leading zeros
-		    while ($pos eq '0') {
-			$pos++;
-		    }
-		}
-		$s = $pos;
+		$s = ++$pos;
 	    }
 	    elsif ( $pos eq '_' && isDIGIT($pos+1) ) {
 		$s = ++$pos;
