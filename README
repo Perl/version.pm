@@ -1,4 +1,4 @@
-version 0.9912
+version '0.9912_01'
 ==================================
 
 Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
@@ -25,6 +25,22 @@ YOU SHOULD INSTALL THIS RELEASE WHEN USING VERSION OBJECTS IN PERL 5.10.0.
 There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
+
+Major Changes in '0.9912_01' - 2015-12-31
+=========================================
+
+Apply patch to implement Lyon Consensus:
+    https://gist.github.com/dagolden/9559280
+
+Also resolve the following tickets:
+    https://rt.cpan.org/Ticket/Display.html?id=101647
+    https://rt.cpan.org/Ticket/Display.html?id=101841
+    https://rt.cpan.org/Ticket/Display.html?id=105315
+    https://rt.cpan.org/Ticket/Display.html?id=106782
+    https://rt.cpan.org/Ticket/Display.html?id=107113
+    https://rt.cpan.org/Ticket/Display.html?id=107114
+    https://rt.cpan.org/Ticket/Display.html?id=98744
+    https://rt.cpan.org/Ticket/Display.html?id=102272
 
 Major Changes in 0.9912 - 2015-01-20
 =====================================

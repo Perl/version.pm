@@ -1,6 +1,6 @@
 #! perl
 
-use Test::More;
+use Test::More qw/no_plan/;
 
 use version;
 
@@ -39,5 +39,3 @@ TODO: {
     local $TODO = 'Stringification of dotted decimal alpha versions is ambiguous';
     is(version->new(v1.2.3_0)->stringify, "v1.2.30");
 }
-
-done_testing;

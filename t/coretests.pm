@@ -10,7 +10,7 @@ if ($Test::More::VERSION < 0.48) { # Fix for RT#48268
     *main::use_ok = sub ($;@) {
 	my ($pkg, $req, @args) = @_;
 	eval "use $pkg $req ".join(' ',@args);
-	is ${"$pkg\::VERSION"}, $req, 'Had to manually use version';
+	is ${"$pkg\::VERSION"}, eval($req), 'Had to manually use version';
 	# If we made it this far, we are ok.
     };
 }
@@ -346,6 +346,7 @@ SKIP: 	{
 	skip 'Cannot test bare alpha v-strings with Perl < 5.8.1', 2
 		if $] lt 5.008_001;
 	$version = $CLASS->$method(v1.2.3_4);
+	$DB::single = 1;
 	is($version, "v1.2.3_4", '"$version" eq "v1.2.3_4"');
 	$version = $CLASS->$method(eval "v1.2.3_4");
 	is($version, "v1.2.3_4", '"$version" eq "v1.2.3_4" (from eval)');
