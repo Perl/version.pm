@@ -315,7 +315,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     if ( !qv && width < 3 )
 	(void)hv_stores(MUTABLE_HV(hv), "width", newSViv(width));
 
-    while (isDIGIT(*pos))
+    while (isDIGIT(*pos) || *pos == '_')
 	pos++;
     if (!isALPHA(*pos)) {
 	I32 rev;
@@ -335,6 +335,8 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 		if ( !qv && s > start && saw_decimal == 1 ) {
 		    mult *= 100;
  		    while ( s < end ) {
+			if (*s == '_')
+			    continue;
 			orev = rev;
  			rev += (*s - '0') * mult;
  			mult /= 10;
@@ -353,6 +355,8 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
   		}
  		else {
  		    while (--end >= s) {
+			if (*end == '_')
+			    continue;
 			int i  = (*end - '0');
                         if (   (mult == VERSION_MAX)
                             || (i > VERSION_MAX / mult)
@@ -400,7 +404,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 		break;
 	    }
 	    if ( qv ) {
-		while ( isDIGIT(*pos) )
+		while ( isDIGIT(*pos) || *pos == '_')
 		    pos++;
 	    }
 	    else {
@@ -867,7 +871,7 @@ Perl_vnumify(pTHX_ SV *vs)
 	if ( width < 3 ) {
 	    const int denom = (width == 2 ? 10 : 100);
 	    const div_t term = div((int)PERL_ABS(digit),denom);
-	    Perl_sv_catpvf(aTHX_ sv, "%0*d_%d", width, term.quot, term.rem);
+	    Perl_sv_catpvf(aTHX_ sv, "%0*d%d", width, term.quot, term.rem);
 	}
 	else {
 	    Perl_sv_catpvf(aTHX_ sv, "%0*d", width, (int)digit);
@@ -878,8 +882,6 @@ Perl_vnumify(pTHX_ SV *vs)
     {
 	SV * tsv = *av_fetch(av, len, 0);
 	digit = SvIV(tsv);
-	if ( alpha && width == 3 ) /* alpha version */
-	    sv_catpvs(sv,"_");
 	Perl_sv_catpvf(aTHX_ sv, "%0*d", width, (int)digit);
     }
     else /* len == 0 */
@@ -942,21 +944,10 @@ Perl_vnormal(pTHX_ SV *vs)
 	digit = SvIV(tsv);
     }
     sv = Perl_newSVpvf(aTHX_ "v%"IVdf, (IV)digit);
-    for ( i = 1 ; i < len ; i++ ) {
+    for ( i = 1 ; i <= len ; i++ ) {
 	SV * tsv = *av_fetch(av, i, 0);
 	digit = SvIV(tsv);
 	Perl_sv_catpvf(aTHX_ sv, ".%"IVdf, (IV)digit);
-    }
-
-    if ( len > 0 )
-    {
-	/* handle last digit specially */
-	SV * tsv = *av_fetch(av, len, 0);
-	digit = SvIV(tsv);
-	if ( alpha )
-	    Perl_sv_catpvf(aTHX_ sv, "_%"IVdf, (IV)digit);
-	else
-	    Perl_sv_catpvf(aTHX_ sv, ".%"IVdf, (IV)digit);
     }
 
     if ( len <= 2 ) { /* short version, must be at least three */
@@ -1070,19 +1061,6 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
 	if ( left > right )
 	    retval = +1;
 	i++;
-    }
-
-    /* tiebreaker for alpha with identical terms */
-    if ( retval == 0 && l == r && left == right && ( lalpha || ralpha ) )
-    {
-	if ( lalpha && !ralpha )
-	{
-	    retval = -1;
-	}
-	else if ( ralpha && !lalpha)
-	{
-	    retval = +1;
-	}
     }
 
     if ( l != r && retval == 0 ) /* possible match except for trailing 0's */

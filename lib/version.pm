@@ -34,6 +34,7 @@ $CLASS = 'version';
 	    *version::stringify = \&version::vpp::stringify;
 	    *{'version::(""'} = \&version::vpp::stringify;
 	    *{'version::(<=>'} = \&version::vpp::vcmp;
+	    *{'version::(cmp'} = \&version::vpp::vcmp;
 	    *version::parse = \&version::vpp::parse;
 	}
     }
@@ -52,6 +53,7 @@ $CLASS = 'version';
 	    *version::stringify = \&version::vxs::stringify;
 	    *{'version::(""'} = \&version::vxs::stringify;
 	    *{'version::(<=>'} = \&version::vxs::VCMP;
+	    *{'version::(cmp'} = \&version::vxs::VCMP;
 	    *version::parse = \&version::vxs::parse;
 	}
     }
