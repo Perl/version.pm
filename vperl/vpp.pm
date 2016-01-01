@@ -739,9 +739,6 @@ sub numify {
 
     if ( $len > 0 ) {
 	$digit = $self->{version}[$len];
-	if ( $alpha && $width == 3 ) {
-	    $string .= "_";
-	}
 	$string .= sprintf("%0".$width."d", $digit);
     }
     else # $len = 0
