@@ -10,3 +10,9 @@ MYMETA.json
 Makefile
 vutil/MYMETA.json
 vutil/Makefile
+pm_to_blib
+vutil/pm_to_blib
+vutil/vutil.o
+vutil/vxs.bs
+vutil/vxs.c
+vutil/vxs.o

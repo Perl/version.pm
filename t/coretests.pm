@@ -618,6 +618,12 @@ SKIP: {
 	is "$v", 'v.Inf', 'Element Exceeds VERSION_MAX';
 	like $warning, qr/Integer overflow in version/, 'Overflow warning';
     }
+    { # https://rt.cpan.org/Ticket/Display.html?id=101628
+	undef $warning;
+	$v = $CLASS->new('1.1.00000000010');
+	is $v->normal, "v1.1.10", 'Ignore leading zeros';
+	unlike $warning, qr/Integer overflow in version/, 'No overflow warning';
+    }
 }
 
 1;

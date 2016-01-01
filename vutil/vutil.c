@@ -385,8 +385,14 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
 		s = last;
 		break;
 	    }
-	    else if ( *pos == '.' )
-		s = ++pos;
+	    else if ( *pos == '.' ) {
+		pos++;
+		if (qv) {
+		    while (*pos == '0')
+			++pos;
+		}
+		s = pos;
+	    }
 	    else if ( *pos == '_' && isDIGIT(pos[1]) )
 		s = ++pos;
 	    else if ( *pos == ',' && isDIGIT(pos[1]) )
