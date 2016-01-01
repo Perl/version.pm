@@ -610,6 +610,14 @@ VER_NV:
 	char tbuf[64];
 	SV *sv = SvNVX(ver) > 10e50 ? newSV(64) : 0;
 	char *buf;
+
+#if PERL_VERSION_GE(5,19,0)
+	if (SvPOK(ver)) {
+	    /* dualvar? */
+	    goto VER_PV;
+	}
+#endif
+
 #ifdef USE_LOCALE_NUMERIC
         const char * const cur_numeric = setlocale(LC_NUMERIC, NULL);
         assert(cur_numeric);
@@ -669,9 +677,7 @@ VER_NV:
     }
 #endif
     else if ( SvPOK(ver))/* must be a string or something like a string */
-#if PERL_VERSION_LT(5,17,2)
 VER_PV:
-#endif
     {
 	STRLEN len;
 	version = savepvn(SvPV(ver,len), SvCUR(ver));
