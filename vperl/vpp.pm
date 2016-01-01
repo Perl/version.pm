@@ -714,7 +714,6 @@ sub numify {
 	require Carp;
 	Carp::croak("Invalid version object");
     }
-    my $width = $self->{width} || 3;
     my $alpha = $self->{alpha} || "";
     my $len = $#{$self->{version}};
     my $digit = $self->{version}[0];
@@ -724,25 +723,12 @@ sub numify {
 	warnings::warn($WARN_CATEGORY, 'alpha->numify() is lossy');
     }
 
-    for ( my $i = 1 ; $i < $len ; $i++ ) {
+    for ( my $i = 1 ; $i <= $len ; $i++ ) {
 	$digit = $self->{version}[$i];
-	if ( $width < 3 ) {
-	    my $denom = 10**(3-$width);
-	    my $quot = int($digit/$denom);
-	    my $rem = $digit - ($quot * $denom);
-	    $string .= sprintf("%0".$width."d%d", $quot, $rem);
-	}
-	else {
-	    $string .= sprintf("%03d", $digit);
-	}
+	$string .= sprintf("%03d", $digit);
     }
 
-    if ( $len > 0 ) {
-	$digit = $self->{version}[$len];
-	$string .= sprintf("%0".$width."d", $digit);
-    }
-    else # $len = 0
-    {
+    if ( $len == 0 ) {
 	$string .= sprintf("000");
     }
 

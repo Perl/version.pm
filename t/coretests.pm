@@ -628,6 +628,10 @@ SKIP: {
 	$v = $CLASS->parse(q[2.6_01]);
 	is $v->normal, 'v2.601.0', 'Normal strips underscores from alphas'
     }
+    { # https://rt.cpan.org/Ticket/Display.html?id=98744
+	$v = $CLASS->new("1.02_003");
+	is $v->numify, '1.020030', 'Ignore underscores for numify';
+    }
 }
 
 1;
