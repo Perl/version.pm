@@ -699,7 +699,7 @@ sub new {
     my $s = scan_version($value, \$self, $qv);
 
     if ($s) { # must be something left over
-	warn("Version string '%s' contains invalid data; "
+	warn(sprintf "Version string '%s' contains invalid data; "
 		   ."ignoring: '%s'", $value, $s);
     }
 
