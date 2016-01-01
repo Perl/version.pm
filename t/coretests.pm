@@ -624,6 +624,10 @@ SKIP: {
 	is $v->normal, "v1.1.10", 'Ignore leading zeros';
 	unlike $warning, qr/Integer overflow in version/, 'No overflow warning';
     }
+    { # https://rt.cpan.org/Ticket/Display.html?id=93340
+	$v = $CLASS->parse(q[2.6_01]);
+	is $v->normal, 'v2.601.0', 'Normal strips underscores from alphas'
+    }
 }
 
 1;
