@@ -916,7 +916,6 @@ Perl_vnormal(pTHX_ SV *vs)
 {
     I32 i, len, digit;
     bool alpha = FALSE;
-    bool qv = FALSE;
     SV *sv;
     AV *av;
 
@@ -929,8 +928,6 @@ Perl_vnormal(pTHX_ SV *vs)
 
     if ( hv_exists(MUTABLE_HV(vs), "alpha", 5 ) )
 	alpha = TRUE;
-    if ( hv_exists(MUTABLE_HV(vs), "qv", 2) )
-	qv = TRUE;
 
     av = MUTABLE_AV(SvRV(*hv_fetchs(MUTABLE_HV(vs), "version", FALSE)));
 
