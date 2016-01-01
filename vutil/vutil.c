@@ -819,7 +819,6 @@ Perl_vnumify(pTHX_ SV *vs)
 {
     SSize_t i, len;
     I32 digit;
-    int width;
     bool alpha = FALSE;
     SV *sv;
     AV *av;
@@ -834,14 +833,6 @@ Perl_vnumify(pTHX_ SV *vs)
     /* see if various flags exist */
     if ( hv_exists(MUTABLE_HV(vs), "alpha", 5 ) )
 	alpha = TRUE;
-    {
-	SV ** svp = hv_fetchs(MUTABLE_HV(vs), "width", FALSE);
-	if ( svp )
-	    width = SvIV(*svp);
-	else
-	    width = 3;
-    }
-
 
     if (alpha) {
 	Perl_ck_warner(aTHX_ packWARN(WARN_NUMERIC),
@@ -864,28 +855,14 @@ Perl_vnumify(pTHX_ SV *vs)
 	digit = SvIV(tsv);
     }
     sv = Perl_newSVpvf(aTHX_ "%d.", (int)PERL_ABS(digit));
-    for ( i = 1 ; i < len ; i++ )
+    for ( i = 1 ; i <= len ; i++ )
     {
 	SV * tsv = *av_fetch(av, i, 0);
 	digit = SvIV(tsv);
-	if ( width < 3 ) {
-	    const int denom = (width == 2 ? 10 : 100);
-	    const div_t term = div((int)PERL_ABS(digit),denom);
-	    Perl_sv_catpvf(aTHX_ sv, "%0*d%d", width, term.quot, term.rem);
-	}
-	else {
-	    Perl_sv_catpvf(aTHX_ sv, "%0*d", width, (int)digit);
-	}
+	Perl_sv_catpvf(aTHX_ sv, "%03d", (int)digit);
     }
 
-    if ( len > 0 )
-    {
-	SV * tsv = *av_fetch(av, len, 0);
-	digit = SvIV(tsv);
-	Perl_sv_catpvf(aTHX_ sv, "%0*d", width, (int)digit);
-    }
-    else /* len == 0 */
-    {
+    if ( len == 0 ) {
 	sv_catpvs(sv, "000");
     }
     return sv;
