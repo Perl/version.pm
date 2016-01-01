@@ -106,6 +106,9 @@ sub write_makefile
                                mailto => 'bug-version@rt.cpan.org',
                            },
                        },
+                       no_index => {
+                           package => ['charstar'],
+                       },
                    },
                  );
 }
