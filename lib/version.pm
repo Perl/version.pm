@@ -10,7 +10,8 @@ if ($] >= 5.015) {
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 
-$VERSION = 0.9912;
+$VERSION = '0.9912_01';
+$VERSION = eval $VERSION;
 $CLASS = 'version';
 
 # !!!!Delete this next block completely when adding to Perl core!!!!
@@ -34,6 +35,7 @@ $CLASS = 'version';
 	    *version::stringify = \&version::vpp::stringify;
 	    *{'version::(""'} = \&version::vpp::stringify;
 	    *{'version::(<=>'} = \&version::vpp::vcmp;
+	    *{'version::(cmp'} = \&version::vpp::vcmp;
 	    *version::parse = \&version::vpp::parse;
 	}
     }
@@ -52,6 +54,7 @@ $CLASS = 'version';
 	    *version::stringify = \&version::vxs::stringify;
 	    *{'version::(""'} = \&version::vxs::stringify;
 	    *{'version::(<=>'} = \&version::vxs::VCMP;
+	    *{'version::(cmp'} = \&version::vxs::VCMP;
 	    *version::parse = \&version::vxs::parse;
 	}
     }

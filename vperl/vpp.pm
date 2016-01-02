@@ -123,7 +123,8 @@ use warnings::register;
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT $WARN_CATEGORY);
-$VERSION = 0.9912;
+$VERSION = '0.9912_01';
+$VERSION = eval $VERSION;
 $CLASS = 'version::vpp';
 if ($] > 5.015) {
     warnings::register_categories(qw/version/);
@@ -500,7 +501,7 @@ sub scan_version {
 	$$rv->{width} = $width;
     }
 
-    while (isDIGIT($pos)) {
+    while (isDIGIT($pos) || $pos eq '_') {
 	$pos++;
     }
     if (!isALPHA($pos)) {
@@ -521,6 +522,7 @@ sub scan_version {
  		if ( !$qv && $s > $start && $saw_decimal == 1 ) {
 		    $mult *= 100;
  		    while ( $s < $end ) {
+			next if $s eq '_';
 			$orev = $rev;
  			$rev += $s * $mult;
  			$mult /= 10;
@@ -540,6 +542,7 @@ sub scan_version {
   		}
  		else {
  		    while (--$end >= $s) {
+			next if $end eq '_';
 			$orev = $rev;
  			$rev += $end * $mult;
  			$mult *= 10;
@@ -561,14 +564,7 @@ sub scan_version {
 		last;
 	    }
 	    elsif ( $pos eq '.' ) {
-		$pos++;
-		if ($qv) {
-		    # skip leading zeros
-		    while ($pos eq '0') {
-			$pos++;
-		    }
-		}
-		$s = $pos;
+		$s = ++$pos;
 	    }
 	    elsif ( $pos eq '_' && isDIGIT($pos+1) ) {
 		$s = ++$pos;
@@ -584,7 +580,7 @@ sub scan_version {
 		last;
 	    }
 	    if ( $qv ) {
-		while ( isDIGIT($pos) ) {
+		while ( isDIGIT($pos) || $pos eq '_') {
 		    $pos++;
 		}
 	    }
@@ -704,7 +700,7 @@ sub new {
     my $s = scan_version($value, \$self, $qv);
 
     if ($s) { # must be something left over
-	warn("Version string '%s' contains invalid data; "
+	warn(sprintf "Version string '%s' contains invalid data; "
 		   ."ignoring: '%s'", $value, $s);
     }
 
@@ -719,7 +715,6 @@ sub numify {
 	require Carp;
 	Carp::croak("Invalid version object");
     }
-    my $width = $self->{width} || 3;
     my $alpha = $self->{alpha} || "";
     my $len = $#{$self->{version}};
     my $digit = $self->{version}[0];
@@ -729,28 +724,12 @@ sub numify {
 	warnings::warn($WARN_CATEGORY, 'alpha->numify() is lossy');
     }
 
-    for ( my $i = 1 ; $i < $len ; $i++ ) {
+    for ( my $i = 1 ; $i <= $len ; $i++ ) {
 	$digit = $self->{version}[$i];
-	if ( $width < 3 ) {
-	    my $denom = 10**(3-$width);
-	    my $quot = int($digit/$denom);
-	    my $rem = $digit - ($quot * $denom);
-	    $string .= sprintf("%0".$width."d_%d", $quot, $rem);
-	}
-	else {
-	    $string .= sprintf("%03d", $digit);
-	}
+	$string .= sprintf("%03d", $digit);
     }
 
-    if ( $len > 0 ) {
-	$digit = $self->{version}[$len];
-	if ( $alpha && $width == 3 ) {
-	    $string .= "_";
-	}
-	$string .= sprintf("%0".$width."d", $digit);
-    }
-    else # $len = 0
-    {
+    if ( $len == 0 ) {
 	$string .= sprintf("000");
     }
 
@@ -763,26 +742,14 @@ sub normal {
 	require Carp;
 	Carp::croak("Invalid version object");
     }
-    my $alpha = $self->{alpha} || "";
-    my $qv = $self->{qv} || "";
 
     my $len = $#{$self->{version}};
     my $digit = $self->{version}[0];
     my $string = sprintf("v%d", $digit );
 
-    for ( my $i = 1 ; $i < $len ; $i++ ) {
+    for ( my $i = 1 ; $i <= $len ; $i++ ) {
 	$digit = $self->{version}[$i];
 	$string .= sprintf(".%d", $digit);
-    }
-
-    if ( $len > 0 ) {
-	$digit = $self->{version}[$len];
-	if ( $alpha ) {
-	    $string .= sprintf("_%0d", $digit);
-	}
-	else {
-	    $string .= sprintf(".%0d", $digit);
-	}
     }
 
     if ( $len <= 2 ) {
@@ -808,7 +775,6 @@ sub stringify {
 }
 
 sub vcmp {
-    require UNIVERSAL;
     my ($left,$right,$swap) = @_;
     my $class = ref($left);
     unless ( UNIVERSAL::isa($right, $class) ) {
@@ -836,20 +802,6 @@ sub vcmp {
     while ( $i <= $m && $retval == 0 ) {
 	$retval = $left->{version}[$i] <=> $right->{version}[$i];
 	$i++;
-    }
-
-    # tiebreaker for alpha with identical terms
-    if ( $retval == 0
-	&& $l == $r
-	&& $left->{version}[$m] == $right->{version}[$m]
-	&& ( $lalpha || $ralpha ) ) {
-
-	if ( $lalpha && !$ralpha ) {
-	    $retval = -1;
-	}
-	elsif ( $ralpha && !$lalpha) {
-	    $retval = +1;
-	}
     }
 
     # possible match except for trailing 0's

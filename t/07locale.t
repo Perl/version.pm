@@ -7,11 +7,11 @@
 use File::Basename;
 use File::Temp qw/tempfile/;
 use POSIX qw/locale_h/;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Config;
 
 BEGIN {
-    use_ok('version', 0.9912);
+    use_ok('version', 0.9912_01);
 }
 
 SKIP: {
@@ -50,6 +50,11 @@ SKIP: {
 	ok ($v eq "1.23", "Locale doesn't apply to version objects");
 	ok ($v == $ver, "Comparison to locale floating point");
 
+        TODO: { # Resolve https://rt.cpan.org/Ticket/Display.html?id=102272
+            local $TODO = 'Fails for Perl 5.x.0 < 5.19.0';
+            $ver = version->new($]);
+            is "$ver", "$]", 'Use PV for dualvars';
+        }
 	setlocale( LC_ALL, $orig_loc); # reset this before possible skip
 	skip 'Cannot test RT#46921 with Perl < 5.008', 1
 	    if ($] < 5.008);

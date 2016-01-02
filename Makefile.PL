@@ -52,7 +52,7 @@ sub write_makefile
         'parent'                => 0.221,
     );
 
-    WriteMakefile( VERSION         => '0.9912',
+    WriteMakefile( VERSION         => '0.9912_01',
                    NAME            => 'version',
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,
@@ -105,6 +105,9 @@ sub write_makefile
                                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=version',
                                mailto => 'bug-version@rt.cpan.org',
                            },
+                       },
+                       no_index => {
+                           package => ['charstar'],
                        },
                    },
                  );

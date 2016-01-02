@@ -4,7 +4,7 @@
 #########################
 
 use strict;
-use_ok("version", 0.9912);
+use_ok("version", 0.9912_01);
 use Test::More;
 
 BEGIN {
