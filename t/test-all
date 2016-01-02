@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+
+# test first with Makefile.PL
+foreach my $perl qw(perl5.00504 perl5.6.2 perl5.8.9 perl5.10.0) {
+    foreach my $flag ('', '--perl-only') {
+	system($perl, "Makefile.PL", $flag) == 0 
+	    or die "Couldn't make with $perl";
+	system(qw(make test)) == 0 
+	    or die "Failed to make test with $perl";
+	system(qw(make distclean)) == 0 
+	    or die "Unable to cleanup with $perl";
+    }
+}
+
+# now test first with Build.PL
+foreach my $perl qw(perl5.6.2 perl5.8.9 perl5.10.0) {
+    foreach my $flag ('', '--perl-only') {
+	system($perl, "Build.PL", $flag) == 0 
+	    or die "Couldn't make with $perl";
+	system(qw(./Build test)) == 0 
+	    or die "Failed to make test with $perl";
+	system(qw(./Build distclean)) == 0 
+	    or die "Unable to cleanup with $perl";
+    }
+}
