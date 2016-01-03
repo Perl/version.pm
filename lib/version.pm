@@ -10,7 +10,7 @@ if ($] >= 5.015) {
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 
-$VERSION = '0.9912_01';
+$VERSION = '0.9912_02';
 $VERSION = eval $VERSION;
 $CLASS = 'version';
 
