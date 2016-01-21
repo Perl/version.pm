@@ -3,8 +3,16 @@
 #include "perl.h"
 #include "XSUB.h"
 #define NEED_sv_2pv_nolen_GLOBAL
+/* for vutil.c */
+#define NEED_my_snprintf
+#define NEED_newRV_noinc
+#define NEED_vnewSVpvf
+#define NEED_newSVpvn_flags_GLOBAL
+#define NEED_warner
+/* end vutil.c */
 #include "ppport.h"
 #include "vutil.h"
+#include "vutil.c"
 
 /* --------------------------------------------------
  * $Revision: 2.5 $

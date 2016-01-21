@@ -6,6 +6,5 @@ WriteMakefile(
     NAME                => 'version::vxs',
     AUTHOR              => 'John Peacock <jpeacock@cpan.org>',
     VERSION_FROM        => 'lib/version/vxs.pm',
-    OBJECT              => q/$(O_FILES)/,
     depend              => { qw< vxs.c vxs.inc > },
 );
