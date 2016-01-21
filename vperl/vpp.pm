@@ -123,7 +123,7 @@ use warnings::register;
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT $WARN_CATEGORY);
-$VERSION = '0.9912_02';
+$VERSION = '0.9912_03';
 $VERSION = eval $VERSION;
 $CLASS = 'version::vpp';
 if ($] > 5.015) {
