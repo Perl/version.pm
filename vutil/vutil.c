@@ -1,19 +1,9 @@
 /* This file is part of the "version" CPAN distribution.  Please avoid
    editing it in the perl core. */
 
-#ifndef PERL_CORE
-#  define PERL_NO_GET_CONTEXT
-#  include "EXTERN.h"
-#  include "perl.h"
-#  include "XSUB.h"
-#  define NEED_my_snprintf
-#  define NEED_newRV_noinc
-#  define NEED_vnewSVpvf
-#  define NEED_newSVpvn_flags_GLOBAL
-#  define NEED_warner
-#  include "ppport.h"
+#ifdef PERL_CORE
+#  include "vutil.h"
 #endif
-#include "vutil.h"
 
 #define VERSION_MAX 0x7FFFFFFF
 
