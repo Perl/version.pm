@@ -345,9 +345,10 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
   		}
  		else {
  		    while (--end >= s) {
+			int i;
 			if (*end == '_')
 			    continue;
-			int i  = (*end - '0');
+			i = (*end - '0');
                         if (   (mult == VERSION_MAX)
                             || (i > VERSION_MAX / mult)
                             || (i * mult > VERSION_MAX - rev))
@@ -609,34 +610,36 @@ VER_NV:
 #endif
 
 #ifdef USE_LOCALE_NUMERIC
-        const char * const cur_numeric = setlocale(LC_NUMERIC, NULL);
-        assert(cur_numeric);
+	{
+	    const char * const cur_numeric = setlocale(LC_NUMERIC, NULL);
+	    assert(cur_numeric);
 
-        /* XS code can set the locale without us knowing.  To protect the
-         * version number parsing, which requires the radix character to be a
-         * dot, update our records as to what the locale is, so that our
-         * existing macro mechanism can correctly change it to a dot and back
-         * if necessary.  This code is extremely unlikely to be in a loop, so
-         * the extra work will have a negligible performance impact.  See [perl
-         * #121930].
-         *
-         * If the current locale is a standard one, but we are expecting it to
-         * be a different, underlying locale, update our records to make the
-         * underlying locale this (standard) one.  If the current locale is not
-         * a standard one, we should be expecting a non-standard one, the same
-         * one that we have recorded as the underlying locale.  If not, update
-         * our records. */
-        if (strEQ(cur_numeric, "C") || strEQ(cur_numeric, "POSIX")) {
-            if (! PL_numeric_standard) {
-                new_numeric(cur_numeric);
-            }
-        }
-        else if (PL_numeric_standard
-                 || ! PL_numeric_name
-                 || strNE(PL_numeric_name, cur_numeric))
-        {
-            new_numeric(cur_numeric);
-        }
+	    /* XS code can set the locale without us knowing.  To protect the
+	     * version number parsing, which requires the radix character to be a
+	     * dot, update our records as to what the locale is, so that our
+	     * existing macro mechanism can correctly change it to a dot and back
+	     * if necessary.  This code is extremely unlikely to be in a loop, so
+	     * the extra work will have a negligible performance impact.  See [perl
+	     * #121930].
+	     *
+	     * If the current locale is a standard one, but we are expecting it to
+	     * be a different, underlying locale, update our records to make the
+	     * underlying locale this (standard) one.  If the current locale is not
+	     * a standard one, we should be expecting a non-standard one, the same
+	     * one that we have recorded as the underlying locale.  If not, update
+	     * our records. */
+	    if (strEQ(cur_numeric, "C") || strEQ(cur_numeric, "POSIX")) {
+		if (! PL_numeric_standard) {
+		    new_numeric(cur_numeric);
+		}
+	    }
+	    else if (PL_numeric_standard
+		     || ! PL_numeric_name
+		     || strNE(PL_numeric_name, cur_numeric))
+	    {
+		new_numeric(cur_numeric);
+	    }
+	}
 #endif
         { /* Braces needed because macro just below declares a variable */
         STORE_NUMERIC_LOCAL_SET_STANDARD();
