@@ -2,6 +2,7 @@
 .*\.bak
 .*\.orig
 .*\.patch
+tags
 version-.*\.tar\.gz
 Changes
 META\.yml

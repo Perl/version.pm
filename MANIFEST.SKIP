@@ -6,6 +6,7 @@
 .+\.orig
 .hg
 .shipit
+tags
 Makefile$
 MYMETA.yml
 version-.+\.tar\.gz
