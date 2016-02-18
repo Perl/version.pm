@@ -123,7 +123,8 @@ use warnings::register;
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT $WARN_CATEGORY);
-$VERSION = 0.9913;
+$VERSION = '0.9913_01';
+$VERSION = eval $VERSION;
 $CLASS = 'version::vpp';
 if ($] > 5.015) {
     warnings::register_categories(qw/version/);
@@ -924,6 +925,7 @@ sub _find_magic_vstring {
 	    $magic = $magic->MOREMAGIC;
 	}
     }
+    $tvalue =~ tr/_//d;
     return $tvalue;
 }
 

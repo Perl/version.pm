@@ -347,9 +347,9 @@ SKIP: 	{
 		if $] lt 5.008_001;
 	$version = $CLASS->$method(v1.2.3_4);
 	$DB::single = 1;
-	is($version, "v1.2.3_4", '"$version" eq "v1.2.3_4"');
+	is($version, "v1.2.34", '"$version" eq "v1.2.34"');
 	$version = $CLASS->$method(eval "v1.2.3_4");
-	is($version, "v1.2.3_4", '"$version" eq "v1.2.3_4" (from eval)');
+	is($version, "v1.2.34", '"$version" eq "v1.2.34" (from eval)');
     }
 
     # trailing zero testing (reported by Andreas Koenig).
