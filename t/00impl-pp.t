@@ -12,7 +12,7 @@ BEGIN {
         (File::Spec->splitpath($0))[0,1], 'coretests.pm'
     );
     require $coretests;
-    use_ok('version::vpp', '0.991301');
+    use_ok('version::vpp', 0.9914);
 }
 
 BaseTests("version::vpp","new","qv");
