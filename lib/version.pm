@@ -10,8 +10,7 @@ if ($] >= 5.015) {
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 
-$VERSION = '0.9913_01';
-$VERSION = eval $VERSION;
+$VERSION = 0.9914;
 $CLASS = 'version';
 
 # !!!!Delete this next block completely when adding to Perl core!!!!
