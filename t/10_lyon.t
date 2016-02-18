@@ -39,7 +39,6 @@ is(version->new("v1.2.3_0")->stringify, "v1.2.3_0");
 is(version->new(1.0203)->stringify, "1.0203");
 is(version->new(1.02_03)->stringify, "1.0203");
 is(version->new(v1.2.30)->stringify, "v1.2.30");
-TODO: {
-    local $TODO = 'Stringification of dotted decimal alpha versions is ambiguous';
+if ($] >= 5.008_001) {
     is(version->new(v1.2.3_0)->stringify, "v1.2.30");
 }

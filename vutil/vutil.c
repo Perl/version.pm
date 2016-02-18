@@ -525,7 +525,16 @@ Perl_new_version(pTHX_ SV *ver)
 	if ( mg ) { /* already a v-string */
 	    const STRLEN len = mg->mg_len;
 	    const char * const version = (const char*)mg->mg_ptr;
+	    char *raw, *under;
+	    static const char underscore[] = "_";
 	    sv_setpvn(rv,version,len);
+	    raw = SvPV_nolen(rv);
+	    under = ninstr(raw, raw+len, underscore, underscore + 1);
+	    if (under) {
+		Move(under + 1, under, raw + len - under - 1, char);
+		SvCUR(rv)--;
+		*SvEND(rv) = '\0';
+	    }
 	    /* this is for consistency with the pure Perl class */
 	    if ( isDIGIT(*version) )
 		sv_insert(rv, 0, 0, "v", 1);
