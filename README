@@ -1,4 +1,4 @@
-version 0.9914
+version 0.9915
 ==================================
 
 Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
@@ -26,6 +26,30 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+
+Major Changes in 0.9915 - 2016-03-05
+=========================================
+Clarify details of Lyon Compromise:
+  https://gist.github.com/dagolden/9559280
+
+- version comparision should be done irrespective of the presence of
+  underscores in the string used to initialize the version object
+
+- underscore should no longer be used as a tuple separator in vstrings or
+  vstring-like strings; vstrings are converted to tuples by splitting into
+  *characters* (not bytes) and converting to codepoints; any elements after
+  the first must be in the range 0-999
+
+- numify/normal should produce a standarized string representation without
+  underscores
+
+- stringify should produce the best possible representation of the value
+  used to initialize the version object; it should include underscores
+  only if the initializing value was a non-vstring string.
+
+- floating point numbers used as initializers are converted to a decimal
+  string form at the precision limit of the architecture; people will be
+  warned about this in the documentation
 
 Major Changes in 0.9914 - 2016-02-18
 =========================================
@@ -386,17 +410,12 @@ and it will install the Perl only version.
 
 DEPENDENCIES
 
-The same C compiler used to build Perl (or not).  Module::Build 0.2611
-or better.
-
-Module::Build installs fine under 5.005_03 or better, though the optional
-dependency Archive::Tar doesn't.  If you install Module::Build without any
-of the optional dependencies, you can safely install version.pm.
+The same C compiler used to build Perl (or not).
 
 
 COPYRIGHT AND LICENCE
 
 This module can be distributed under the same terms as Perl.
 
-Copyright (C) 2004-2010 John Peacock
+Copyright (C) 2004-2015 John Peacock
 
