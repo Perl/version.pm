@@ -11,7 +11,7 @@ use Test::More tests => 8;
 use Config;
 
 BEGIN {
-    use_ok('version', 0.9915);
+    use_ok('version', 0.9916);
 }
 
 SKIP: {
@@ -51,7 +51,7 @@ SKIP: {
 	ok ($v == $ver, "Comparison to locale floating point");
 
         TODO: { # Resolve https://rt.cpan.org/Ticket/Display.html?id=102272
-            local $TODO = 'Fails for Perl 5.x.0 < 5.19.0';
+            local $TODO = 'Fails for Perl 5.x.0 < 5.19.0' if $] < 5.019000;
             $ver = version->new($]);
             is "$ver", "$]", 'Use PV for dualvars';
         }
