@@ -1,4 +1,4 @@
-version 0.9915
+version 0.9916
 ==================================
 
 Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
@@ -26,6 +26,9 @@ There was a bug caused by objects serialized by YAML that will cause Perl
 5.10.0 to segfault.  As long as some module calls 'use version', then the
 replacement code will take effect and Perl will not crash.
 
+Major Changes in 0.9916 - 2016-03-18
+=========================================
+Incorporate changes from bleadperl (destined to be 5.24.0)
 
 Major Changes in 0.9915 - 2016-03-05
 =========================================
