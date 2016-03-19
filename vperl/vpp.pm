@@ -123,7 +123,7 @@ use warnings::register;
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT $WARN_CATEGORY);
-$VERSION = 0.9915;
+$VERSION = 0.9916;
 $CLASS = 'version::vpp';
 if ($] > 5.015) {
     warnings::register_categories(qw/version/);
