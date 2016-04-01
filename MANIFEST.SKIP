@@ -1,0 +1,14 @@
+\.lwpcookies
+\.releaserc
+.+\.diff
+.+\.bak
+.+~
+.+\.orig
+.hg
+.shipit
+tags
+Makefile$
+MYMETA.yml
+version-.+\.tar\.gz
+vutil/Makefile\.PL
+t/test-all
