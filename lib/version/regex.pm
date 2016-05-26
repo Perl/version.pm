@@ -81,7 +81,7 @@ $STRICT =
 # decimal-point
 
 my $LAX_DECIMAL_VERSION =
-    qr/ $LAX_INTEGER_PART (?: \. | $FRACTION_PART $LAX_ALPHA_PART? )?
+    qr/ $LAX_INTEGER_PART (?: $FRACTION_PART | \. )? $LAX_ALPHA_PART?
 	|
 	$FRACTION_PART $LAX_ALPHA_PART?
     /x;
@@ -106,7 +106,7 @@ my $LAX_DOTTED_DECIMAL_VERSION =
 # of return values from ExtUtils::MM->parse_version
 
 $LAX =
-    qr/ undef | $LAX_DECIMAL_VERSION | $LAX_DOTTED_DECIMAL_VERSION /x;
+    qr/ undef | $LAX_DOTTED_DECIMAL_VERSION | $LAX_DECIMAL_VERSION /x;
 
 #--------------------------------------------------------------------------#
 
