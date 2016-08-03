@@ -124,5 +124,36 @@ sub import {
     }
 }
 
+# Helper methods
+sub elements {
+    my ($self) = @_;
+    return ($self->{version});
+}
 
+sub epoch {
+    my ($self) = @_;
+    my @elements = @{$self->elements};
+    return 'v'.$elements[0];
+}
+
+sub major {
+    my ($self) = @_;
+    my @elements = @{$self->elements};
+    push @elements, 0 while $#elements < 2;
+    return 'v'.join('.', @elements[0,1]);
+}
+
+sub minor {
+    my ($self) = @_;
+    my @elements = @{$self->elements};
+    push @elements, 0 while $#elements < 3;
+    return 'v'.join('.', @elements[0,1,2]);
+}
+
+sub patch {
+    my ($self) = @_;
+    my @elements = @{$self->elements};
+    push @elements, 0 while $#elements < 4;
+    return 'v'.join('.', @elements[0,1,2,3]);
+}
 1;
