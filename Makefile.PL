@@ -90,9 +90,6 @@ sub write_makefile
                    dist            => {
                        COMPRESS => 'gzip -9f',
                        SUFFIX => 'gz',
-                       PREOP  => (
-                          'hg log --style changelog > Changes'
-                       ),
                    },
                    META_MERGE => {
                        "meta-spec" => { version => 2 },
