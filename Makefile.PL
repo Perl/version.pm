@@ -50,6 +50,7 @@ sub write_makefile
         'Test::More'            => 0.45,
         'File::Temp'            => 0.13,
         'parent'                => 0.221,
+        'Test::Taint'           => 1.06,
     );
 
     WriteMakefile( VERSION         => '0.9917',
