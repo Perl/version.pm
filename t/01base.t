@@ -8,8 +8,10 @@ use Test::More qw/no_plan/;
 use File::Spec;
 
 BEGIN {
-    my $coretests = File::Spec->catpath(
-        (File::Spec->splitpath($0))[0,1], 'coretests.pm'
+    my $coretests = File::Spec->rel2abs(
+        File::Spec->catpath(
+            (File::Spec->splitpath($0))[0,1], 'coretests.pm'
+        )
     );
     require $coretests;
     use_ok('version', 0.9917);
