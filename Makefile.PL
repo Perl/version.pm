@@ -46,14 +46,10 @@ write_makefile();
 sub write_makefile
 {
     my %test_prereq = (
-        'ExtUtils::MakeMaker'   => 6.17,
         'Test::More'            => 0.45,
         'File::Temp'            => 0.13,
         'parent'                => 0.221,
     );
-
-    eval "use Test::Taint; 1" and
-        $test_prereq{'Test::Taint'} = $Test::Taint::VERSION;
 
     WriteMakefile( VERSION         => '0.9917',
                    NAME            => 'version',
