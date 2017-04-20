@@ -45,19 +45,21 @@ write_makefile();
 
 sub write_makefile
 {
-    my %prereq = (
+    my %test_prereq = (
         'ExtUtils::MakeMaker'   => 6.17,
         'Test::More'            => 0.45,
         'File::Temp'            => 0.13,
         'parent'                => 0.221,
-        'Test::Taint'           => 1.06,
     );
+
+    eval "use Test::Taint; 1" and
+        $test_prereq{'Test::Taint'} = $Test::Taint::VERSION;
 
     WriteMakefile( VERSION         => '0.9917',
                    NAME            => 'version',
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,
-                   PREREQ_PM       => \%prereq,
+                   TEST_REQUIRES   => \%test_prereq,
                    NORECURS        => $no_xs,
                    ABSTRACT    => 'Structured version objects',
                    AUTHOR      => 'John Peacock <jpeacock@cpan.org>',
