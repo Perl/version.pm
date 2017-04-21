@@ -4,6 +4,23 @@ This is not a complete list of changes.  See repository for full details:
 
     https://bitbucket.org/jpeacock/version (primary)
 
+0.9918 - 2017-04-15
+
+  * Fix compiling under C++11
+	https://rt.cpan.org/Ticket/Display.html?id=118846
+
+  * Make version::regex variables public for better reuse
+	https://rt.cpan.org/Ticket/Display.html?id=119669
+
+  * Use rel2abs for require in tests to support 5.26.0 @INC
+	https://rt.cpan.org/Ticket/Display.html?id=121148
+
+  * Move change list to standard CHANGES out of README
+	https://rt.cpan.org/Ticket/Display.html?id=119123
+
+  * Better taint handling for Perl < 5.17.2 with tests
+	https://rt.cpan.org/Ticket/Display.html?id=118087
+
 0.9917 - 2016-05-29
 
   * Fix version::regex captures, resolves:
