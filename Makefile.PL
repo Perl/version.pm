@@ -16,7 +16,8 @@ to support an earlier Perl release.
 EOL
 }
 
-use vars qw ($no_xs $force_xs);
+my ($no_xs, $force_xs);
+
 unlink 'pm_to_blib'; # belts and braces
 
 if ($ENV{PERL_ONLY}) {
