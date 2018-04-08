@@ -4,6 +4,10 @@ This is not a complete list of changes.  See repository for full details:
 
     https://bitbucket.org/jpeacock/version (primary)
 
+0.9921 - 2018-04-##
+  * Silence overly compulsive GCC 7 warning
+	https://rt.cpan.org/Ticket/Display.html?id=123477
+
 0.9919 - 2018-04-08
 
   * Core improvements to locale handling
