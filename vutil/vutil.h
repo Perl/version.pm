@@ -255,32 +255,4 @@ const char * Perl_prescan_version(pTHX_ const char *s, bool strict, const char**
 #define UNLOCK_NUMERIC_STANDARD()
 #endif
 
-#ifndef LOCK_LC_NUMERIC_STANDARD
-/* Lock/unlock to the C locale until unlock is called.  This needs to be
- * recursively callable.  [perl #128207] */
-#  define LOCK_LC_NUMERIC_STANDARD()                                        \
-        STMT_START {                                                        \
-            DEBUG_Lv(PerlIO_printf(Perl_debug_log,                          \
-                      "%s: %d: lock lc_numeric_standard: new depth=%d\n",   \
-                      __FILE__, __LINE__, PL_numeric_standard + 1));        \
-            __ASSERT_(PL_numeric_standard)                                  \
-            PL_numeric_standard++;                                          \
-        } STMT_END
-#endif
-
-#ifndef UNLOCK_LC_NUMERIC_STANDARD
-#  define UNLOCK_LC_NUMERIC_STANDARD()                                      \
-        STMT_START {                                                        \
-            if (PL_numeric_standard > 1) {                                  \
-                PL_numeric_standard--;                                      \
-            }                                                               \
-            else {                                                          \
-                assert(0);                                                  \
-            }                                                               \
-            DEBUG_Lv(PerlIO_printf(Perl_debug_log,                          \
-            "%s: %d: lc_numeric_standard decrement lock, new depth=%d\n",   \
-            __FILE__, __LINE__, PL_numeric_standard));                      \
-        } STMT_END
-#endif
-
 /* ex: set ro: */
