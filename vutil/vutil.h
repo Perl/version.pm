@@ -115,7 +115,7 @@ S_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)
             Perl_croak_nocontext("Usage: %s(%s)", gvname, params);
     } else {
         /* Pants. I don't think that it should be possible to get here. */
-        Perl_croak_nocontext("Usage: CODE(0x%" UVxf ")(%s)", PTR2UV(cv), params);
+        Perl_croak_nocontext("Usage: CODE(0x%"UVxf")(%s)", PTR2UV(cv), params);
     }
 }
 
@@ -223,20 +223,27 @@ const char * Perl_prescan_version(pTHX_ const char *s, bool strict, const char**
 #endif
 
 
+#if PERL_VERSION_LT(5,27,9)
+#  define LC_NUMERIC_LOCK
+#  define LC_NUMERIC_UNLOCK
 #if PERL_VERSION_LT(5,19,0)
-# undef STORE_NUMERIC_LOCAL_SET_STANDARD
-# undef RESTORE_NUMERIC_LOCAL
+#   undef STORE_LC_NUMERIC_SET_STANDARD
+#   undef RESTORE_LC_NUMERIC
+#   undef DECLARATION_FOR_LC_NUMERIC_MANIPULATION
 # ifdef USE_LOCALE
-#  define STORE_NUMERIC_LOCAL_SET_STANDARD()\
-	char *loc = savepv(setlocale(LC_NUMERIC, NULL)); \
+#    define DECLARATION_FOR_LC_NUMERIC_MANIPULATION char *loc
+#    define STORE_NUMERIC_SET_STANDARD()\
+	loc = savepv(setlocale(LC_NUMERIC, NULL));  \
 	SAVEFREEPV(loc); \
 	setlocale(LC_NUMERIC, "C");
 
-#  define RESTORE_NUMERIC_LOCAL()\
+#    define RESTORE_LC_NUMERIC()\
 	setlocale(LC_NUMERIC, loc);
 # else
-#  define STORE_NUMERIC_LOCAL_SET_STANDARD()
-#  define RESTORE_NUMERIC_LOCAL()
+#    define DECLARATION_FOR_LC_NUMERIC_MANIPULATION
+#    define STORE_LC_NUMERIC_SET_STANDARD()
+#    define RESTORE_LC_NUMERIC()
+#   endif
 # endif
 #endif
 
