@@ -15,7 +15,7 @@ BEGIN {
         )
     );
     require $coretests;
-    use_ok("version", 0.9921);
+    use_ok("version", 0.9922);
     # If we made it this far, we are ok.
 }
 
