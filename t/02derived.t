@@ -51,8 +51,7 @@ print $fh <<"EOF";
 # This is an empty subclass
 package $package;
 use parent 'version';
-use vars '\$VERSION';
-\$VERSION=0.001;
+our \$VERSION = 0.001;
 EOF
 close $fh;
 
