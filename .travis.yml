@@ -1,0 +1,57 @@
+sudo: false
+addons:
+  apt:
+    packages:
+      - aspell
+language: perl
+perl:
+  # Make sure that very old + very new + one threaded perl is
+  # amongst the first five --- travis-ci tests only five
+  # configurations at a time.
+  - stable      # latest stable release
+  - "5.8"
+  - "5.10"
+  - "5.26"
+  - "5.24"
+  - "5.24-shrplib"
+  - blead       # builds perl from git
+  - dev         # latest point release
+  - "5.22"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+# notifications:
+#   irc:
+#     channels:
+#       - "irc.perl.org#toolchain"
+#     on_success: change
+#     on_failure: always
+env:
+  global:
+    - AUTOMATED_TESTING=1
+matrix:
+  include:
+    - perl: stable
+      env: AUTHOR_TESTING=1 RELEASE_TESTING=1
+  allow_failures:
+    - perl: blead
+    - perl: dev
+    - perl: stable
+      env: AUTHOR_TESTING=1 RELEASE_TESTING=1
+before_install:
+  # * global defaults (allows project network-side overloads [for non-AUTHOR build flexibility])
+  - export AUTHOR_TESTING=${AUTHOR_TESTING:=0}
+  - export RELEASE_TESTING=${RELEASE_TESTING:=0}
+  #
+  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+  - source ~/travis-perl-helpers/init
+  - build-perl
+  - perl -V
+install:
+  # * CORE module; should have no non-CORE dependencies
+  - true
+script:
+  - perl Makefile.PL
+  - make test
