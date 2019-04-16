@@ -693,7 +693,7 @@ VER_NV:
 #endif
 
 	if (sv) {
-                Perl_sv_catpvf(aTHX_ sv, "%.9" NVff, SvNVX(ver));
+                Perl_sv_setpvf(aTHX_ sv, "%.9" NVff, SvNVX(ver));
 	    len = SvCUR(sv);
 	    buf = SvPVX(sv);
 	}
