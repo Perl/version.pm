@@ -15,8 +15,8 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'No locale testing for Perl < 5.6.0', 6 if $] < 5.006;
-	skip 'No locale testing without d_setlocale', 6
+	skip 'No locale testing for Perl < 5.6.0', 7 if $] < 5.006;
+	skip 'No locale testing without d_setlocale', 7
 	    if(!$Config{d_setlocale});
 
 	# test locale handling
