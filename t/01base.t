@@ -47,3 +47,9 @@ ok defined($v), 'Fix for RT #47980';
     like $@, qr'Usage: version::new\(class, version\)',
 	'No implicit object creation when called as function';
 }
+
+{
+    eval { version::vcmp($^V) };
+    like $@, qr{Usage: version::\S+\(lobj, \.\.\.\)},
+	'vcmp method throws error on single argument';
+}
