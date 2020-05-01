@@ -313,7 +313,7 @@ VXS(version_vcmp)
 {
      dXSARGS;
      if (items < 2)
-	 croak_xs_usage(cv, "lobj, ...");
+	 croak_xs_usage(cv, "lobj, robj, ...");
      SP -= items;
      {
 	  SV *	lobj;
