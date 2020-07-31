@@ -638,6 +638,8 @@ VER_NV:
             if (   strNE(locale_name_on_entry, "C")
                 && strNE(locale_name_on_entry, "POSIX"))
             {
+                /* the setlocale() call might free or overwrite the name */
+                locale_name_on_entry = savepv(locale_name_on_entry);
                 setlocale(LC_NUMERIC, "C");
             }
             else {  /* This value indicates to the restore code that we didn't
@@ -661,6 +663,8 @@ VER_NV:
                 if (   strNE(locale_name_on_entry, "C")
                     && strNE(locale_name_on_entry, "POSIX"))
                 {
+                    /* the setlocale() call might free or overwrite the name */
+                    locale_name_on_entry = savepv(locale_name_on_entry);
                     setlocale(LC_NUMERIC, "C");
                 }
                 else {  /* This value indicates to the restore code that we
@@ -710,6 +714,7 @@ VER_NV:
 
             if (locale_name_on_entry) {
                 setlocale(LC_NUMERIC, locale_name_on_entry);
+                Safefree(locale_name_on_entry);
             }
 
             LC_NUMERIC_UNLOCK;  /* End critical section */
@@ -718,6 +723,7 @@ VER_NV:
 
             if (locale_name_on_entry) {
                 setlocale(LC_NUMERIC, locale_name_on_entry);
+                Safefree(locale_name_on_entry);
                 LC_NUMERIC_UNLOCK;
             }
             else if (locale_obj_on_entry == PL_underlying_numeric_obj) {
