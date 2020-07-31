@@ -312,8 +312,8 @@ VXS(version_normal)
 VXS(version_vcmp)
 {
      dXSARGS;
-     if (items < 1)
-	 croak_xs_usage(cv, "lobj, ...");
+     if (items < 2)
+	 croak_xs_usage(cv, "lobj, robj, ...");
      SP -= items;
      {
 	  SV *	lobj;
@@ -322,7 +322,7 @@ VXS(version_vcmp)
 	       SV	*rs;
 	       SV	*rvs;
 	       SV * robj = ST(1);
-	       const IV	 swap = (IV)SvIV(ST(2));
+	       const int swap = items > 2 ? SvTRUE(ST(2)) : 0;
 
 	       if ( !ISA_VERSION_OBJ(robj) )
 	       {
