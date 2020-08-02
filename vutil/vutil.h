@@ -75,6 +75,7 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
 #  endif
 #endif
 
+#ifndef PERL_VERSION_GE
 #define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
 #define PERL_DECIMAL_VERSION \
 	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
@@ -82,6 +83,7 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
 	(PERL_DECIMAL_VERSION < PERL_VERSION_DECIMAL(r,v,s))
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#endif
 
 #if PERL_VERSION_LT(5,15,4)
 #  define ISA_VERSION_OBJ(v) (sv_isobject(v) && sv_derived_from(v,"version"))
