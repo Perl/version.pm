@@ -139,7 +139,7 @@ VXS(universal_version)
 			   HEKfARG(name), HEKfARG(name));
 	    }
 	    else {
-#if PERL_VERSION >= 8
+#if PERL_VERSION_GE(5,8,0)
 		Perl_croak(aTHX_
 			     "%" SVf " defines neither package nor VERSION--"
                              "version check failed",
