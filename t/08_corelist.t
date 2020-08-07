@@ -13,6 +13,7 @@ SKIP: {
     skip 'No tied hash in Modules::CoreList in Perl', 2
 	if $@;
 
+    no if $] < 5.9, warnings => 'reserved';
     my $foo = version->parse($Module::CoreList::version{5.008_000}{base});
 
     is $foo, 1.03, 'Correctly handle tied hash';
