@@ -777,6 +777,7 @@ sub stringify {
 
 sub vcmp {
     my ($left,$right,$swap) = @_;
+    die "Usage: version::vcmp(lobj, robj, ...)" if @_ < 2;
     my $class = ref($left);
     unless ( UNIVERSAL::isa($right, $class) ) {
 	$right = $class->new($right);
