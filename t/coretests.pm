@@ -435,7 +435,7 @@ SKIP: {
     (my $package = basename($filename)) =~ s/\.pm$//;
     print $fh <<"EOF";
 package $package;
-use parent $CLASS;
+use base $CLASS;
 1;
 EOF
     close $fh;

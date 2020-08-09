@@ -49,7 +49,7 @@ sub write_makefile
     my %test_prereq = (
         'Test::More'            => 0.45,
         'File::Temp'            => 0.13,
-        'parent'                => 0.221,
+        'base'                  => 0,
     );
 
     WriteMakefile( VERSION         => '0.99_25',
