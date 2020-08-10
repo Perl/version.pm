@@ -44,7 +44,7 @@ SKIP: {
 	setlocale(LC_NUMERIC, $loc);
 	$ver = 1.23;  # has to be floating point number
 	ok ($ver eq "1,23", "Using locale: $loc");
-	$v = version->new($ver);
+	$v = 'version'->new($ver);
 	unlike($warning, qr/Version string '1,23' contains invalid data/,
 	    "Process locale-dependent floating point");
 	ok ($v eq "1.23", "Locale doesn't apply to version objects");
@@ -52,7 +52,7 @@ SKIP: {
 
         TODO: { # Resolve https://rt.cpan.org/Ticket/Display.html?id=102272
             local $TODO = 'Fails for Perl 5.x.0 < 5.19.0' if $] < 5.019000;
-            $ver = version->new($]);
+            $ver = 'version'->new($]);
             is "$ver", "$]", 'Use PV for dualvars';
         }
 	setlocale( LC_ALL, $orig_loc); # reset this before possible skip
