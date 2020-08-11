@@ -2,6 +2,12 @@
    editing it in the perl core. */
 
 #ifndef PERL_CORE
+#define NEED_croak_xs_usage
+#define NEED_my_snprintf
+#define NEED_newRV_noinc
+#define NEED_newSVpvn_flags_GLOBAL
+#define NEED_sv_2pv_nolen_GLOBAL
+#define NEED_vnewSVpvf
 #  include "ppport.h"
 #endif
 
@@ -151,33 +157,33 @@ static const char * Perl_prescan_version2(pTHX_ const char *s, bool strict, cons
 
 #else
 
-const char * Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv);
-SV * Perl_new_version(pTHX_ SV *ver);
-SV * Perl_upg_version(pTHX_ SV *sv, bool qv);
-SV * Perl_vverify(pTHX_ SV *vs);
-SV * Perl_vnumify(pTHX_ SV *vs);
-SV * Perl_vnormal(pTHX_ SV *vs);
-SV * Perl_vstringify(pTHX_ SV *vs);
-int Perl_vcmp(pTHX_ SV *lsv, SV *rsv);
-const char * Perl_prescan_version(pTHX_ const char *s, bool strict, const char** errstr, bool *sqv, int *ssaw_decimal, int *swidth, bool *salpha);
+const char * scan_version(pTHX_ const char *s, SV *rv, bool qv);
+SV * new_version(pTHX_ SV *ver);
+SV * upg_version(pTHX_ SV *sv, bool qv);
+SV * vverify(pTHX_ SV *vs);
+SV * vnumify(pTHX_ SV *vs);
+SV * vnormal(pTHX_ SV *vs);
+SV * vstringify(pTHX_ SV *vs);
+int vcmp(pTHX_ SV *lsv, SV *rsv);
+const char * prescan_version(pTHX_ const char *s, bool strict, const char** errstr, bool *sqv, int *ssaw_decimal, int *swidth, bool *salpha);
 
-#  define SCAN_VERSION(a,b,c)	Perl_scan_version(aTHX_ a,b,c)
-#  define NEW_VERSION(a)	Perl_new_version(aTHX_ a)
-#  define UPG_VERSION(a,b)	Perl_upg_version(aTHX_ a, b)
-#  define VSTRINGIFY(a)		Perl_vstringify(aTHX_ a)
-#  define VVERIFY(a)		Perl_vverify(aTHX_ a)
-#  define VNUMIFY(a)		Perl_vnumify(aTHX_ a)
-#  define VNORMAL(a)		Perl_vnormal(aTHX_ a)
-#  define VCMP(a,b)		Perl_vcmp(aTHX_ a,b)
+#  define SCAN_VERSION(a,b,c)	scan_version(a,b,c)
+#  define NEW_VERSION(a)	new_version(a)
+#  define UPG_VERSION(a,b)	upg_version(a, b)
+#  define VSTRINGIFY(a)		vstringify(a)
+#  define VVERIFY(a)		vverify(a)
+#  define VNUMIFY(a)		vnumify(a)
+#  define VNORMAL(a)		vnormal(a)
+#  define VCMP(a,b)		vcmp(a,b)
 
-#  define PRESCAN_VERSION(a,b,c,d,e,f,g)	Perl_prescan_version(aTHX_ a,b,c,d,e,f,g)
+#  define PRESCAN_VERSION(a,b,c,d,e,f,g)	prescan_version(a,b,c,d,e,f,g)
 #  ifndef is_LAX_VERSION
 #    define is_LAX_VERSION(a,b) \
-	(a != Perl_prescan_version(aTHX_ a, FALSE, b, NULL, NULL, NULL, NULL))
+	(a != prescan_version(a, FALSE, b, NULL, NULL, NULL, NULL))
 #  endif
 #  ifndef is_STRICT_VERSION
 #    define is_STRICT_VERSION(a,b) \
-	(a != Perl_prescan_version(aTHX_ a, TRUE, b, NULL, NULL, NULL, NULL))
+	(a != prescan_version(a, TRUE, b, NULL, NULL, NULL, NULL))
 #  endif
 
 #endif

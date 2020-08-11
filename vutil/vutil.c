@@ -21,7 +21,7 @@ const char *
 #ifdef VUTIL_REPLACE_CORE
 Perl_prescan_version2(pTHX_ const char *s, bool strict,
 #else
-Perl_prescan_version(pTHX_ const char *s, bool strict,
+prescan_version(pTHX_ const char *s, bool strict,
 #endif
 		     const char **errstr,
 		     bool *sqv, int *ssaw_decimal, int *swidth, bool *salpha) {
@@ -258,7 +258,7 @@ const char *
 #ifdef VUTIL_REPLACE_CORE
 Perl_scan_version2(pTHX_ const char *s, SV *rv, bool qv)
 #else
-Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
+scan_version(pTHX_ const char *s, SV *rv, bool qv)
 #endif
 {
     const char *start = s;
@@ -470,7 +470,7 @@ SV *
 #ifdef VUTIL_REPLACE_CORE
 Perl_new_version2(pTHX_ SV *ver)
 #else
-Perl_new_version(pTHX_ SV *ver)
+new_version(pTHX_ SV *ver)
 #endif
 {
     SV * const rv = newSV(0);
@@ -568,7 +568,7 @@ SV *
 #ifdef VUTIL_REPLACE_CORE
 Perl_upg_version2(pTHX_ SV *ver, bool qv)
 #else
-Perl_upg_version(pTHX_ SV *ver, bool qv)
+upg_version(pTHX_ SV *ver, bool qv)
 #endif
 {
     const char *version, *s;
@@ -853,7 +853,7 @@ SV *
 #ifdef VUTIL_REPLACE_CORE
 Perl_vverify2(pTHX_ SV *vs)
 #else
-Perl_vverify(pTHX_ SV *vs)
+vverify(pTHX_ SV *vs)
 #endif
 {
     SV *sv;
@@ -894,7 +894,7 @@ SV *
 #ifdef VUTIL_REPLACE_CORE
 Perl_vnumify2(pTHX_ SV *vs)
 #else
-Perl_vnumify(pTHX_ SV *vs)
+vnumify(pTHX_ SV *vs)
 #endif
 {
     SSize_t i, len;
@@ -968,7 +968,7 @@ SV *
 #ifdef VUTIL_REPLACE_CORE
 Perl_vnormal2(pTHX_ SV *vs)
 #else
-Perl_vnormal(pTHX_ SV *vs)
+vnormal(pTHX_ SV *vs)
 #endif
 {
     I32 i, len, digit;
@@ -1024,7 +1024,7 @@ SV *
 #ifdef VUTIL_REPLACE_CORE
 Perl_vstringify2(pTHX_ SV *vs)
 #else
-Perl_vstringify(pTHX_ SV *vs)
+vstringify(pTHX_ SV *vs)
 #endif
 {
     SV ** svp;
@@ -1069,7 +1069,7 @@ int
 #ifdef VUTIL_REPLACE_CORE
 Perl_vcmp2(pTHX_ SV *lhv, SV *rhv)
 #else
-Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
+vcmp(pTHX_ SV *lhv, SV *rhv)
 #endif
 {
     SSize_t i,l,m,r;
