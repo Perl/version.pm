@@ -1,10 +1,6 @@
 /* This file is part of the "version" CPAN distribution.  Please avoid
    editing it in the perl core. */
 
-#ifndef PERL_CORE
-#  include "ppport.h"
-#endif
-
 /* The MUTABLE_*() macros cast pointers to the types shown, in such a way
  * (compiler permitting) that casting away const-ness will give a warning;
  * e.g.:
