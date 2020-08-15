@@ -4,7 +4,7 @@ package version::vxs;
 use v5.10;
 use strict;
 
-our $VERSION = 0.99_25;
+our $VERSION = 0.99_26;
 our $CLASS = 'version::vxs';
 our @ISA;
 
