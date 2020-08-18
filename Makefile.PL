@@ -96,8 +96,8 @@ sub write_makefile
                        resources => {
                            repository => {
                                type => 'git',
-                               url => 'git://github.com/JohnPeacock/version.pm.git',
-                               web  => 'http://github.com/JohnPeacock/version.pm',
+                               url => 'git://github.com/Perl/version.pm.git',
+                               web  => 'https://github.com/Perl/version.pm',
                            },
                            bugtracker => {
                                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=version',

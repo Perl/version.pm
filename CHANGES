@@ -2,7 +2,7 @@ Major changes for Perl module version
 
 This is not a complete list of changes.  See repository for full details:
 
-    https://github.com/JohnPeacock/version.pm.git
+    https://github.com/Perl/version.pm
 
 0.99_26
   * Add usage error to pure-perl vcmp
