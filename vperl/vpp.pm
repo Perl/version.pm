@@ -123,7 +123,7 @@ use warnings::register;
 
 use Config;
 
-our $VERSION = 0.99_26;
+our $VERSION = 0.9927;
 our $CLASS = 'version::vpp';
 our ($LAX, $STRICT, $WARN_CATEGORY);
 

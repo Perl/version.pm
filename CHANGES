@@ -4,6 +4,9 @@ This is not a complete list of changes.  See repository for full details:
 
     https://github.com/Perl/version.pm
 
+0.9927
+  * Released 0.99_26 as 0.9927
+
 0.99_26
   * Add usage error to pure-perl vcmp
   * Quote version classname in test for 5.8 compatability
