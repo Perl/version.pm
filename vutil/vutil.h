@@ -223,7 +223,7 @@ const char * Perl_prescan_version(pTHX_ const char *s, bool strict, const char**
 
 
 #if PERL_VERSION_LT(5,27,9)
-#  define LC_NUMERIC_LOCK
+#  define LC_NUMERIC_LOCK(cond)
 #  define LC_NUMERIC_UNLOCK
 #  if PERL_VERSION_LT(5,19,0)
 #    undef STORE_LC_NUMERIC_SET_STANDARD
