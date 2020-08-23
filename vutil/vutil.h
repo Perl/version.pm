@@ -16,12 +16,24 @@
 #  else
 #    define MUTABLE_PTR(p) ((void *) (p))
 #  endif
+#endif
 
+#ifndef MUTABLE_AV
 #  define MUTABLE_AV(p)	((AV *)MUTABLE_PTR(p))
+#endif
+#ifndef MUTABLE_CV
 #  define MUTABLE_CV(p)	((CV *)MUTABLE_PTR(p))
+#endif
+#ifndef MUTABLE_GV
 #  define MUTABLE_GV(p)	((GV *)MUTABLE_PTR(p))
+#endif
+#ifndef MUTABLE_HV
 #  define MUTABLE_HV(p)	((HV *)MUTABLE_PTR(p))
+#endif
+#ifndef MUTABLE_IO
 #  define MUTABLE_IO(p)	((IO *)MUTABLE_PTR(p))
+#endif
+#ifndef MUTABLE_SV
 #  define MUTABLE_SV(p)	((SV *)MUTABLE_PTR(p))
 #endif
 
