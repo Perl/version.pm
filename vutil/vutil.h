@@ -111,21 +111,4 @@ const char * Perl_prescan_version(pTHX_ const char *s, bool strict, const char**
 	assert(pat)
 #endif
 
-
-#ifndef LOCK_NUMERIC_STANDARD
-#  define LOCK_NUMERIC_STANDARD()
-#endif
-
-#ifndef UNLOCK_NUMERIC_STANDARD
-#  define UNLOCK_NUMERIC_STANDARD()
-#endif
-
-/* The names of these changed in 5.28 */
-#ifndef LOCK_LC_NUMERIC_STANDARD
-#  define LOCK_LC_NUMERIC_STANDARD() LOCK_NUMERIC_STANDARD()
-#endif
-#ifndef UNLOCK_LC_NUMERIC_STANDARD
-#  define UNLOCK_LC_NUMERIC_STANDARD() UNLOCK_NUMERIC_STANDARD()
-#endif
-
 /* ex: set ro: */
