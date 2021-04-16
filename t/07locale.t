@@ -11,7 +11,7 @@ use Test::More tests => 8;
 use Config;
 
 BEGIN {
-    use_ok('version', 0.9928);
+    use_ok('version', 0.9929);
 }
 
 SKIP: {
