@@ -880,6 +880,19 @@ sub tuple {
     return @{ $self->{version} };
 }
 
+sub from_tuple {
+    my ($proto, @args) = @_;
+    my $class = ref($proto) || $proto;
+
+    my @version = map 0+$_, @args;
+    die if @args < 1;
+    return bless {
+	version => \@version,
+	qv => !!1,
+	'v' . join('.', @version),
+    }, $class;
+}
+
 sub _verify {
     my ($self) = @_;
     if ( ref($self)

@@ -73,6 +73,7 @@
     {VXS_CLASS "::declare", VXSp(version_qv), VXSXSDP(NULL)},
     {VXS_CLASS "::is_qv", VXSp(version_is_qv), VXSXSDP(NULL)},
     {VXS_CLASS "::tuple", VXSp(version_tuple), VXSXSDP(NULL)},
+    {VXS_CLASS "::from_tuple", VXSp(version_from_tuple), VXSXSDP(NULL)},
 #else
 
 #ifndef dVAR
@@ -507,6 +508,40 @@ VXS(version_tuple)
 	}
 	PUTBACK;
      }
+}
+
+VXS(version_from_tuple)
+{
+    dXSARGS;
+    SV *lobj;
+    int i;
+    if (items < 2)
+	croak_xs_usage(cv, "lobj, ...");
+    lobj = ST(0);
+    SP -= items;
+
+    AV* versions = newAV();
+    SV* original = newSVpvs("v");
+
+    for (i = 1; i < items; ++i) {
+	if (SvIV(ST(i)) < 0)
+	    Perl_croak(aTHX_ "Value %d in version is negative", SvIV(ST(i)));
+	UV value = SvUV(ST(i));
+	av_push(versions, newSVuv(value));
+	if (i != 1)
+	    sv_catpvs(original, ".");
+	sv_catpvf(original, "%" UVuf, value);
+    }
+
+    HV* hash = newHV();
+    (void)hv_stores(hash, "version", newRV_noinc(MUTABLE_SV(versions)));
+    (void)hv_stores(hash, "original", original);
+    (void)hv_stores(hash, "qv", newSVsv(&PL_sv_yes));
+
+    HV* stash = SvROK(lobj) ? SvSTASH(lobj) : gv_stashsv(lobj, GV_ADD);
+    SV* result = sv_bless(newRV_noinc(MUTABLE_SV(hash)), stash);
+    XPUSHs(result);
+    PUTBACK;
 }
 
 #endif

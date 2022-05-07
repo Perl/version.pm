@@ -289,6 +289,12 @@ This turns the components of the version into a list. E.g.
 
  version->parse('1.2.3')->tuple; # (1, 2, 3)
 
+=head2 from_tuple(...)
+
+This takes a list of components and creates a dotted decimal version out of it. E.g.
+
+ version->from_tuple(1, 2, 3) # v1.2.3
+
 =head2 stringify()
 
 Returns a string that is as close to the original representation as possible.

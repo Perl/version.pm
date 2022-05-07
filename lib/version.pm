@@ -31,6 +31,7 @@ our (@ISA, $STRICT, $LAX);
 	*version::to_decimal = \&version::vpp::to_decimal;
 	*version::to_dotted_decimal = \&version::vpp::to_dotted_decimal;
 	*version::tuple = \&version::vpp::tuple;
+	*version::from_tuple = \&version::vpp::from_tuple;
 	if ($] >= 5.009000) {
 	    no strict 'refs';
 	    *version::stringify = \&version::vpp::stringify;
@@ -53,6 +54,7 @@ our (@ISA, $STRICT, $LAX);
 	*version::to_decimal = \&version::vxs::to_decimal;
 	*version::to_dotted_decimal = \&version::vxs::to_dotted_decimal;
 	*version::tuple = \&version::vxs::tuple;
+	*version::from_tuple = \&version::vxs::from_tuple;
 	if ($] >= 5.009000) {
 	    no strict 'refs';
 	    *version::stringify = \&version::vxs::stringify;
