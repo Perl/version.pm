@@ -71,6 +71,7 @@
     {VXS_CLASS "::declare", VXSp(version_qv), VXSXSDP(NULL)},
     {VXS_CLASS "::is_qv", VXSp(version_is_qv), VXSXSDP(NULL)},
     {VXS_CLASS "::tuple", VXSp(version_tuple), VXSXSDP(NULL)},
+    {VXS_CLASS "::from_tuple", VXSp(version_from_tuple), VXSXSDP(NULL)},
 #else
 
 #ifndef dVAR
@@ -474,6 +475,48 @@ VXS(version_tuple)
 	}
 	PUTBACK;
      }
+}
+
+VXS(version_from_tuple)
+{
+    dXSARGS;
+    SV *lobj;
+    int i;
+    if (items < 2)
+	croak_xs_usage(cv, "lobj, ...");
+    lobj = ST(0);
+    SP -= items;
+
+    HV* hash = newHV();
+    AV* versions = newAV();
+    (void)hv_stores(hash, "version", newRV_noinc(MUTABLE_SV(versions)));
+    SV* original = newSVpvs("");
+    (void)hv_stores(hash, "original", original);
+
+    if (items > 3) {
+	(void)hv_stores(hash, "qv", newSVsv(&PL_sv_yes));
+	sv_catpvs(original, "v");
+
+	for (i = 1; i < items; ++i) {
+	    UV value = SvUV(ST(i));
+	    av_push(versions, newSVuv(value));
+	    if (i != 1)
+		sv_catpvs(original, ".");
+	    sv_catpvf(original, "%" UVuf, value);
+	}
+    } else if (items == 3) {
+	sv_catpvf(original, "%" UVuf ".%03" UVuf, SvUV(ST(1)), SvUV(ST(2)));
+	av_push(versions, newSVuv(SvUV(ST(1))));
+	av_push(versions, newSVuv(SvUV(ST(2))));
+    } else {
+	sv_catpvf(original, "%" UVuf, SvUV(ST(1)));
+    }
+
+
+    HV* stash = SvROK(lobj) ? SvSTASH(lobj) : gv_stashsv(lobj, GV_ADD);
+    SV* result = sv_bless(newRV_noinc(MUTABLE_SV(hash)), stash);
+    XPUSHs(result);
+    PUTBACK;
 }
 
 #endif

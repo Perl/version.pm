@@ -51,6 +51,7 @@ sub BaseTests {
 
     my $version = version->$method("v1.2.3.4");
     is_deeply ([ $version->tuple ], [1, 2, 3, 4], 'Tuple seems to work');
+    is_deeply ($version, version->from_tuple(1, 2, 3, 4), 'Equals from_tuple');
 
     # test illegal formats
     eval {my $version = $CLASS->$method("1.2_3_4")};
