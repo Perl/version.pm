@@ -49,6 +49,9 @@ sub BaseTests {
     $version = $CLASS->$method("v1.2.3_4");
     is ( "$version" , "v1.2.3_4" , 'alpha version 1.2.3_4 eq v1.2.3_4' );
 
+    my $version = version->$method("v1.2.3.4");
+    is_deeply ([ $version->tuple ], [1, 2, 3, 4], 'Tuple seems to work');
+
     # test illegal formats
     eval {my $version = $CLASS->$method("1.2_3_4")};
     like($@, qr/multiple underscores/,
