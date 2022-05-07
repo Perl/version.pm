@@ -283,6 +283,12 @@ This returns a new version object for the normalized version, much like C<< vers
 
  version->parse('1.002')->to_dotted_decimal; # v1.2.0
 
+=head2 tuple()
+
+This turns the components of the version into a list. E.g.
+
+ version->parse('1.2.3')->tuple; # (1, 2, 3)
+
 =head2 stringify()
 
 Returns a string that is as close to the original representation as possible.
@@ -293,6 +299,11 @@ a version object is interpolated into a string.
  version->declare('v1.2')->stringify;    # v1.2
  version->parse('1.200')->stringify;     # 1.2
  version->parse(1.02_30)->stringify;     # 1.023
+
+=head2 tuple
+
+Returns an array of non-negative integers that is used for comparison purposes with
+other version objects.
 
 =head1 EXPORTED FUNCTIONS
 

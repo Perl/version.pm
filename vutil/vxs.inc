@@ -72,6 +72,7 @@
     {VXS_CLASS "::qv", VXSp(version_qv), VXSXSDP(NULL)},
     {VXS_CLASS "::declare", VXSp(version_qv), VXSXSDP(NULL)},
     {VXS_CLASS "::is_qv", VXSp(version_is_qv), VXSXSDP(NULL)},
+    {VXS_CLASS "::tuple", VXSp(version_tuple), VXSXSDP(NULL)},
 #else
 
 #ifndef dVAR
@@ -477,6 +478,35 @@ VXS(version_qv)
 VXS(version_is_qv)
 {
     S_version_check_key(aTHX_ cv, "qv", 2);
+}
+
+VXS(version_tuple)
+{
+    dXSARGS;
+    if (items != 1)
+	croak_xs_usage(cv, "lobj");
+    SP -= items;
+    {
+	SV * lobj;
+	int i;
+	VTYPECHECK(lobj, ST(0), "lobj");
+
+	SV** avptr = hv_fetchs(MUTABLE_HV(lobj), "version", 0);
+	if (!avptr || !SvROK(*avptr) || SvTYPE(SvRV(*avptr)) != SVt_PVAV) {
+	    PUTBACK;
+	    return;
+	}
+	AV* version = MUTABLE_AV(SvRV(*avptr));
+	for (i = 0; i < av_count(version); ++i) {
+	    SV** svptr = av_fetch(version, i, 0);
+	    if (!svptr || !*svptr) {
+		PUTBACK;
+		return;
+	    }
+	    XPUSHs(*svptr);
+	}
+	PUTBACK;
+     }
 }
 
 #endif

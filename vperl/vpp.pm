@@ -875,6 +875,10 @@ sub is_qv {
     return (exists $self->{qv});
 }
 
+sub tuple {
+    my ($self) = @_;
+    return @{ $self->{version} };
+}
 
 sub _verify {
     my ($self) = @_;
