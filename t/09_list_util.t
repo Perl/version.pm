@@ -10,9 +10,9 @@ use Test::More;
 BEGIN {
     eval "use List::Util qw(reduce)";
     if ($@) {
-	plan skip_all => "No List::Util::reduce() available";
+        plan skip_all => "No List::Util::reduce() available";
     } else {
-	plan tests => 3;
+        plan tests => 3;
     }
 }
 
@@ -22,9 +22,9 @@ use List::Util qw(reduce);
 {
     my $fail = 0;
     my $ret = reduce {
-	version->parse($a);
-	$fail++ unless defined $a;
-	1
+        version->parse($a);
+        $fail++ unless defined $a;
+        1
     } "0.039", "0.035";
     is $fail, 0, 'reduce() with parse';
 }
@@ -32,9 +32,9 @@ use List::Util qw(reduce);
 {
     my $fail = 0;
     my $ret = reduce {
-	version->qv($a);
-	$fail++ unless defined $a;
-	1
+        version->qv($a);
+        $fail++ unless defined $a;
+        1
     } "0.039", "0.035";
     is $fail, 0, 'reduce() with qv';
 }

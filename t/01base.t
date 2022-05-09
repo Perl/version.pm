@@ -39,17 +39,17 @@ ok defined($v), 'Fix for RT #47980';
 { # https://rt.cpan.org/Ticket/Display.html?id=81085
     eval { version::new() };
     like $@, qr'Usage: version::new\(class, version\)',
-	'No bus err when called as function';
+        'No bus err when called as function';
     eval { $x = 1; print version::new };
     like $@, qr'Usage: version::new\(class, version\)',
-	'No implicit object creation when called as function';
+        'No implicit object creation when called as function';
     eval { $x = "version"; print version::new };
     like $@, qr'Usage: version::new\(class, version\)',
-	'No implicit object creation when called as function';
+        'No implicit object creation when called as function';
 }
 
 {
     eval { version::vcmp($^V) };
     like $@, qr{Usage: version::\S+\(lobj, robj, \.\.\.\)},
-	'vcmp method throws error on single argument';
+        'vcmp method throws error on single argument';
 }
