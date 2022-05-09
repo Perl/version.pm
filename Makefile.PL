@@ -64,14 +64,14 @@ sub write_makefile
                      ( INSTALLDIRS => 'perl' ) :
                      ()
                    ),
-		   ( ($] < 5.012
-		       && ! $ENV{PERL_NO_HIGHLANDER}
-		       && ! ( $ENV{PERL_MM_OPT}
-			   && $ENV{PERL_MM_OPT} =~ /(?:INSTALL_BASE|PREFIX)/ )
-		       && ! grep { /INSTALL_BASE/ || /PREFIX/ } @ARGV ) ?
-		     ( UNINST => 1 ) :
-		     ()
-		   ),
+                   ( ($] < 5.012
+                      && ! $ENV{PERL_NO_HIGHLANDER}
+                      && ! ( $ENV{PERL_MM_OPT}
+                      && $ENV{PERL_MM_OPT} =~ /(?:INSTALL_BASE|PREFIX)/ )
+                      && ! grep { /INSTALL_BASE/ || /PREFIX/ } @ARGV ) ?
+                    ( UNINST => 1 ) :
+                    ()
+                   ),
                    PM              =>
                        {'lib/version.pm'  => '$(INST_LIBDIR)/version.pm',
                         'lib/version.pod' => '$(INST_LIBDIR)/version.pod',
@@ -83,10 +83,10 @@ sub write_makefile
                         },
                    PL_FILES        => {},
                    C               => [],
-		   ( $no_xs ?
-		       () :
-		       ( DIR       => ['vutil'])
-		   ),
+                   ( $no_xs ?
+                      () :
+                      ( DIR       => ['vutil'])
+                   ),
                    dist            => {
                        COMPRESS => 'gzip -9f',
                        SUFFIX => 'gz',

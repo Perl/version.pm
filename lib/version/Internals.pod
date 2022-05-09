@@ -197,16 +197,16 @@ and do not contain either anchors or implicit groupings, so they can be
 included in your own regular expressions freely.  For example, consider
 the following code:
 
-	($pkg, $ver) =~ /
-		^[ \t]*
-		use [ \t]+($PKGNAME)
-		(?:[ \t]+($version::STRICT))?
-		[ \t]*;
-	/x;
+    ($pkg, $ver) =~ /
+        ^[ \t]*
+        use [ \t]+($PKGNAME)
+        (?:[ \t]+($version::STRICT))?
+        [ \t]*;
+    /x;
 
 This would match a line of the form:
 
-	use Foo::Bar::Baz v1.2.3;	# legal only in Perl 5.8.1+
+    use Foo::Bar::Baz v1.2.3;   # legal only in Perl 5.8.1+
 
 where C<$PKGNAME> is another regular expression that defines the legal
 forms for package names.
@@ -318,10 +318,10 @@ components:
       'alpha' => 1,
       'qv' => 1,
       'version' => [
-	1,
-	2,
-	3,
-	4
+        1,
+        2,
+        3,
+        4
       ]
     }, 'version' );
 

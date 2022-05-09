@@ -47,16 +47,16 @@ VERSIONCHECK: DISABLE
 BOOT:
     {
 #if PERL_VERSION_LT(5,9,0)
-	char* file = __FILE__;
+        char* file = __FILE__;
 #else
-	const char* file = __FILE__;
+        const char* file = __FILE__;
 #endif
-	const struct xsub_details *xsub = details;
-	const struct xsub_details *end
-		= details + sizeof(details) / sizeof(details[0]);
+        const struct xsub_details *xsub = details;
+        const struct xsub_details *end
+            = details + sizeof(details) / sizeof(details[0]);
         /* register the overloading (type 'A') magic */
         PL_amagic_generation++;
-	do {
-	    newXS((char*)xsub->name, xsub->xsub, file);
-	} while (++xsub < end);
+        do {
+            newXS((char*)xsub->name, xsub->xsub, file);
+        } while (++xsub < end);
     }

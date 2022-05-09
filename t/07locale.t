@@ -15,52 +15,52 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'No locale testing for Perl < 5.6.0', 7 if $] < 5.006;
-	skip 'No locale testing without d_setlocale', 7
-	    if(!$Config{d_setlocale});
+    skip 'No locale testing for Perl < 5.6.0', 7 if $] < 5.006;
+    skip 'No locale testing without d_setlocale', 7
+        if(!$Config{d_setlocale});
 
-	# test locale handling
-	my $warning = '';
+    # test locale handling
+    my $warning = '';
 
-	local $SIG{__WARN__} = sub { $warning = $_[0] };
+    local $SIG{__WARN__} = sub { $warning = $_[0] };
 
-	my $ver = 1.23;  # has to be floating point number
-	my $loc;
-	my $orig_loc = setlocale(LC_NUMERIC);
-	ok ($ver eq "1.23", 'Not using locale yet');  # Don't use is(),
-						      # because have to
-						      # evaluate in current
-						      # scope
-	use if $^O !~ /android/, 'locale';
+    my $ver = 1.23;  # has to be floating point number
+    my $loc;
+    my $orig_loc = setlocale(LC_NUMERIC);
+    ok ($ver eq "1.23", 'Not using locale yet');  # Don't use is(),
+                                                  # because have to
+                                                  # evaluate in current
+                                                  # scope
+    use if $^O !~ /android/, 'locale';
 
-	while (<DATA>) {
-	    chomp;
-	    $loc = setlocale( LC_ALL, $_);
-	    last if $loc && localeconv()->{decimal_point} eq ',';
-	}
-	skip 'Cannot test locale handling without a comma locale', 6
-	    unless $loc and localeconv()->{decimal_point} eq ',';
+    while (<DATA>) {
+        chomp;
+        $loc = setlocale( LC_ALL, $_);
+        last if $loc && localeconv()->{decimal_point} eq ',';
+    }
+    skip 'Cannot test locale handling without a comma locale', 6
+        unless $loc and localeconv()->{decimal_point} eq ',';
 
-	setlocale(LC_NUMERIC, $loc);
-	$ver = 1.23;  # has to be floating point number
-	ok ($ver eq "1,23", "Using locale: $loc");
-	$v = 'version'->new($ver);
-	unlike($warning, qr/Version string '1,23' contains invalid data/,
-	    "Process locale-dependent floating point");
-	ok ($v eq "1.23", "Locale doesn't apply to version objects");
-	ok ($v == $ver, "Comparison to locale floating point");
+    setlocale(LC_NUMERIC, $loc);
+    $ver = 1.23;  # has to be floating point number
+    ok ($ver eq "1,23", "Using locale: $loc");
+    $v = 'version'->new($ver);
+    unlike($warning, qr/Version string '1,23' contains invalid data/,
+        "Process locale-dependent floating point");
+    ok ($v eq "1.23", "Locale doesn't apply to version objects");
+    ok ($v == $ver, "Comparison to locale floating point");
 
-        TODO: { # Resolve https://rt.cpan.org/Ticket/Display.html?id=102272
-            local $TODO = 'Fails for Perl 5.x.0 < 5.19.0' if $] < 5.019000;
-            $ver = 'version'->new($]);
-            is "$ver", "$]", 'Use PV for dualvars';
-        }
-	setlocale( LC_ALL, $orig_loc); # reset this before possible skip
-	skip 'Cannot test RT#46921 with Perl < 5.008', 1
-	    if ($] < 5.008);
-	my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
-	(my $package = basename($filename)) =~ s/\.pm$//;
-	print $fh <<"EOF";
+    TODO: { # Resolve https://rt.cpan.org/Ticket/Display.html?id=102272
+        local $TODO = 'Fails for Perl 5.x.0 < 5.19.0' if $] < 5.019000;
+        $ver = 'version'->new($]);
+        is "$ver", "$]", 'Use PV for dualvars';
+    }
+    setlocale( LC_ALL, $orig_loc); # reset this before possible skip
+    skip 'Cannot test RT#46921 with Perl < 5.008', 1
+        if ($] < 5.008);
+    my ($fh, $filename) = tempfile('tXXXXXXX', SUFFIX => '.pm', UNLINK => 1);
+    (my $package = basename($filename)) =~ s/\.pm$//;
+    print $fh <<"EOF";
 package $package;
 use locale;
 use POSIX qw(locale_h);
@@ -72,11 +72,11 @@ eval "use Socket 1.7";
 setlocale( LC_ALL, '$orig_loc');
 1;
 EOF
-	close $fh;
+    close $fh;
 
-	eval "use lib '.'; use $package;";
-	unlike($warning, qr"Version string '1,7' contains invalid data",
-	    'Handle locale action-at-a-distance');
+    eval "use lib '.'; use $package;";
+    unlike($warning, qr"Version string '1,7' contains invalid data",
+        'Handle locale action-at-a-distance');
 }
 
 __DATA__

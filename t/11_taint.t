@@ -5,9 +5,9 @@ use version;
 BEGIN {
     eval "use Test::Taint";
     if ($@) {
-	plan skip_all => "No Test::Taint available";
+        plan skip_all => "No Test::Taint available";
     } else {
-	plan tests => 6;
+        plan tests => 6;
     }
 }
 

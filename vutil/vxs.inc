@@ -24,12 +24,12 @@
    PUTBACK; return; */
 
 #define VXS_RETURN_M_SV(sv) \
-    STMT_START {							\
-	SV * sv_vtc = sv;						\
-	PUSHs(sv_vtc);							\
-	PUTBACK;							\
-	sv_2mortal(sv_vtc);						\
-	return;								\
+    STMT_START {                            \
+        SV * sv_vtc = sv;                   \
+        PUSHs(sv_vtc);                      \
+        PUTBACK;                            \
+        sv_2mortal(sv_vtc);                 \
+        return;                             \
     } STMT_END
 
 
@@ -79,14 +79,14 @@
 #ifdef HvNAME_HEK
 typedef HEK HVNAME;
 #  ifndef HEKf
-#    define HEKfARG(arg)	((void*)(sv_2mortal(newSVhek(arg))))
-#    define HEKf		SVf
+#    define HEKfARG(arg)    ((void*)(sv_2mortal(newSVhek(arg))))
+#    define HEKf            SVf
 #  endif
 #else
 typedef char HVNAME;
-#  define HvNAME_HEK	HvNAME_get
-#  define HEKfARG(arg)	arg
-#  define HEKf		"s"
+#  define HvNAME_HEK        HvNAME_get
+#  define HEKfARG(arg)      arg
+#  define HEKf              "s"
 #endif
 
 VXS(universal_version)
@@ -118,8 +118,8 @@ VXS(universal_version)
 
     if (gvp && isGV(gv = *gvp) && (sv = GvSV(gv)) && SvOK(sv)) {
         sv = sv_mortalcopy(sv);
-	if ( ! ISA_VERSION_OBJ(sv) )
-	    UPG_VERSION(sv, FALSE);
+        if ( ! ISA_VERSION_OBJ(sv) )
+            UPG_VERSION(sv, FALSE);
         undef = NULL;
     }
     else {
@@ -128,56 +128,56 @@ VXS(universal_version)
     }
 
     if (items > 1) {
-	SV *req = ST(1);
+        SV *req = ST(1);
 
-	if (undef) {
-	    if (pkg) {
-		const HVNAME* const name = HvNAME_HEK(pkg);
-		Perl_croak(aTHX_
-			   "%" HEKf " does not define $%" HEKf
-			   "::VERSION--version check failed",
-			   HEKfARG(name), HEKfARG(name));
-	    }
-	    else {
+        if (undef) {
+            if (pkg) {
+                const HVNAME* const name = HvNAME_HEK(pkg);
+                Perl_croak(aTHX_
+                      "%" HEKf " does not define $%" HEKf
+                      "::VERSION--version check failed",
+                      HEKfARG(name), HEKfARG(name));
+            }
+            else {
 #if PERL_VERSION_GE(5,8,0)
-		Perl_croak(aTHX_
-			     "%" SVf " defines neither package nor VERSION--"
-                             "version check failed",
-			     (void*)(ST(0)) );
+                Perl_croak(aTHX_
+                      "%" SVf " defines neither package nor VERSION--"
+                      "version check failed",
+                      (void*)(ST(0)) );
 #else
-		Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
-			   SvPVx_nolen_const(ST(0)),
-			   SvPVx_nolen_const(ST(0)) );
+                Perl_croak(aTHX_ "%s does not define $%s::VERSION--version check failed",
+                      SvPVx_nolen_const(ST(0)),
+                      SvPVx_nolen_const(ST(0)) );
 #endif
-	    }
-	}
+            }
+        }
 
-	if ( ! ISA_VERSION_OBJ(req) ) {
-	    /* req may very well be R/O, so create a new object */
-	    req = sv_2mortal( NEW_VERSION(req) );
-	}
+        if ( ! ISA_VERSION_OBJ(req) ) {
+            /* req may very well be R/O, so create a new object */
+            req = sv_2mortal( NEW_VERSION(req) );
+        }
 
-	if ( VCMP( req, sv ) > 0 ) {
-	    if ( hv_exists(MUTABLE_HV(SvRV(req)), "qv", 2 ) ) {
-		req = VNORMAL(req);
-		sv  = VNORMAL(sv);
-	    }
-	    else {
-		req = VSTRINGIFY(req);
-		sv  = VSTRINGIFY(sv);
-	    }
-	    Perl_croak(aTHX_ "%" HEKf " version %" SVf " required--"
-		"this is only version %" SVf, HEKfARG(HvNAME_HEK(pkg)),
-		SVfARG(sv_2mortal(req)),
-		SVfARG(sv_2mortal(sv)));
-	}
+        if ( VCMP( req, sv ) > 0 ) {
+            if ( hv_exists(MUTABLE_HV(SvRV(req)), "qv", 2 ) ) {
+                req = VNORMAL(req);
+                sv  = VNORMAL(sv);
+            }
+            else {
+                req = VSTRINGIFY(req);
+                sv  = VSTRINGIFY(sv);
+            }
+            Perl_croak(aTHX_ "%" HEKf " version %" SVf " required--"
+                "this is only version %" SVf, HEKfARG(HvNAME_HEK(pkg)),
+                SVfARG(sv_2mortal(req)),
+                SVfARG(sv_2mortal(sv)));
+        }
     }
 
     /* if the package's $VERSION is not undef, it is upgraded to be a version object */
     if (ISA_VERSION_OBJ(sv)) {
-	ST(0) = sv_2mortal(VSTRINGIFY(sv));
+        ST(0) = sv_2mortal(VSTRINGIFY(sv));
     } else {
-	ST(0) = sv;
+        ST(0) = sv;
     }
 
     XSRETURN(1);
@@ -224,17 +224,17 @@ VXS(version_new)
 
     svarg0 = ST(0);
     if ( sv_isobject(svarg0) ) {
-	/* get the class if called as an object method */
-	const HV * stash = SvSTASH(SvRV(svarg0));
-	classname = HvNAME_get(stash);
-	len	  = HvNAMELEN_get(stash);
+        /* get the class if called as an object method */
+        const HV * stash = SvSTASH(SvRV(svarg0));
+        classname = HvNAME_get(stash);
+        len       = HvNAMELEN_get(stash);
 #ifdef HvNAMEUTF8
-	flags	  = HvNAMEUTF8(stash) ? SVf_UTF8 : 0;
+        flags     = HvNAMEUTF8(stash) ? SVf_UTF8 : 0;
 #endif
     }
     else {
-	classname = SvPV_nomg(svarg0, len);
-	flags     = SvUTF8(svarg0);
+        classname = SvPV_nomg(svarg0, len);
+        flags     = SvUTF8(svarg0);
     }
 
     rv = NEW_VERSION(vs);
@@ -246,89 +246,89 @@ VXS(version_new)
 }
 
 #define VTYPECHECK(var, val, varname) \
-    STMT_START {							\
-	SV * sv_vtc = val;						\
-	if (ISA_VERSION_OBJ(sv_vtc)) {				\
-	    (var) = SvRV(sv_vtc);						\
-	}								\
-	else								\
-	    Perl_croak_nocontext(varname " is not of type version");	\
+    STMT_START {                                                        \
+        SV * sv_vtc = val;                                              \
+        if (ISA_VERSION_OBJ(sv_vtc)) {                                  \
+            (var) = SvRV(sv_vtc);                                       \
+        }                                                               \
+        else                                                            \
+            Perl_croak_nocontext(varname " is not of type version");    \
     } STMT_END
 
 VXS(version_stringify)
 {
-     dXSARGS;
-     if (items < 1)
-	 croak_xs_usage(cv, "lobj, ...");
-     SP -= items;
-     {
-	  SV *	lobj;
-	  VTYPECHECK(lobj, ST(0), "lobj");
+    dXSARGS;
+    if (items < 1)
+        croak_xs_usage(cv, "lobj, ...");
+    SP -= items;
+    {
+        SV * lobj;
+        VTYPECHECK(lobj, ST(0), "lobj");
 
-	  VXS_RETURN_M_SV(VSTRINGIFY(lobj));
-     }
+        VXS_RETURN_M_SV(VSTRINGIFY(lobj));
+    }
 }
 
 VXS(version_numify)
 {
-     dXSARGS;
-     if (items < 1)
-	 croak_xs_usage(cv, "lobj, ...");
-     SP -= items;
-     {
-	  SV *	lobj;
-	  VTYPECHECK(lobj, ST(0), "lobj");
-	  VXS_RETURN_M_SV(VNUMIFY(lobj));
-     }
+    dXSARGS;
+    if (items < 1)
+        croak_xs_usage(cv, "lobj, ...");
+    SP -= items;
+    {
+        SV * lobj;
+        VTYPECHECK(lobj, ST(0), "lobj");
+        VXS_RETURN_M_SV(VNUMIFY(lobj));
+    }
 }
 
 VXS(version_normal)
 {
-     dXSARGS;
-     if (items != 1)
-	 croak_xs_usage(cv, "ver");
-     SP -= items;
-     {
-	  SV *	ver;
-	  VTYPECHECK(ver, ST(0), "ver");
+    dXSARGS;
+    if (items != 1)
+        croak_xs_usage(cv, "ver");
+    SP -= items;
+    {
+        SV * ver;
+        VTYPECHECK(ver, ST(0), "ver");
 
-	  VXS_RETURN_M_SV(VNORMAL(ver));
-     }
+        VXS_RETURN_M_SV(VNORMAL(ver));
+    }
 }
 
 VXS(version_vcmp)
 {
-     dXSARGS;
-     if (items < 2)
-	 croak_xs_usage(cv, "lobj, robj, ...");
-     SP -= items;
-     {
-	  SV *	lobj;
-	  VTYPECHECK(lobj, ST(0), "lobj");
-	  {
-	       SV	*rs;
-	       SV	*rvs;
-	       SV * robj = ST(1);
-	       const int swap = items > 2 ? SvTRUE(ST(2)) : 0;
+    dXSARGS;
+    if (items < 2)
+        croak_xs_usage(cv, "lobj, robj, ...");
+    SP -= items;
+    {
+        SV * lobj;
+        VTYPECHECK(lobj, ST(0), "lobj");
+        {
+            SV * rs;
+            SV * rvs;
+            SV * robj = ST(1);
+            const int swap = items > 2 ? SvTRUE(ST(2)) : 0;
 
-	       if ( !ISA_VERSION_OBJ(robj) )
-	       {
-		    robj = sv_2mortal(NEW_VERSION(SvOK(robj) ? robj : newSVpvs_flags("0", SVs_TEMP)));
-	       }
-	       rvs = SvRV(robj);
+            if ( !ISA_VERSION_OBJ(robj) )
+            {
+                robj = sv_2mortal(NEW_VERSION(SvOK(robj) ? robj : newSVpvs_flags("0", SVs_TEMP)));
+            }
+            rvs = SvRV(robj);
 
-	       if ( swap )
-	       {
-		    rs = newSViv(VCMP(rvs,lobj));
-	       }
-	       else
-	       {
-		    rs = newSViv(VCMP(lobj,rvs));
-	       }
+            if ( swap )
+            {
+                rs = newSViv(VCMP(rvs,lobj));
+            }
+            else
+            {
+                rs = newSViv(VCMP(lobj,rvs));
+            }
 
-	       VXS_RETURN_M_SV(rs);
-	  }
-     }
+            VXS_RETURN_M_SV(rs);
+        }
+    }
 }
 
 VXS(version_boolean)
@@ -336,18 +336,17 @@ VXS(version_boolean)
     dXSARGS;
     SV *lobj;
     if (items < 1)
-	croak_xs_usage(cv, "lobj, ...");
+        croak_xs_usage(cv, "lobj, ...");
     SP -= items;
     VTYPECHECK(lobj, ST(0), "lobj");
     {
-	SV * const rs =
-	    newSViv( VCMP(lobj,
-			  sv_2mortal(NEW_VERSION(
-					sv_2mortal(newSVpvs("0"))
-				    ))
-			 )
-		   );
-	VXS_RETURN_M_SV(rs);
+        SV * const rs =
+            newSViv( VCMP(lobj,
+                sv_2mortal(NEW_VERSION(
+                    sv_2mortal(newSVpvs("0"))
+                ))
+            ) );
+        VXS_RETURN_M_SV(rs);
     }
 }
 
@@ -355,11 +354,11 @@ VXS(version_noop)
 {
     dXSARGS;
     if (items < 1)
-	croak_xs_usage(cv, "lobj, ...");
+        croak_xs_usage(cv, "lobj, ...");
     if (ISA_VERSION_OBJ(ST(0)))
-	Perl_croak(aTHX_ "operation not supported with version object");
+        Perl_croak(aTHX_ "operation not supported with version object");
     else
-	Perl_croak(aTHX_ "lobj is not of type version");
+        Perl_croak(aTHX_ "lobj is not of type version");
     XSRETURN_EMPTY;
 }
 
@@ -369,18 +368,18 @@ S_version_check_key(pTHX_ CV * cv, const char * key, int keylen)
 {
     dXSARGS;
     if (items != 1)
-	croak_xs_usage(cv, "lobj");
+        croak_xs_usage(cv, "lobj");
     {
-	SV *lobj = POPs;
-	SV *ret;
-	VTYPECHECK(lobj, lobj, "lobj");
-	if ( hv_exists(MUTABLE_HV(lobj), key, keylen ) )
-	    ret = &PL_sv_yes;
-	else
-	    ret = &PL_sv_no;
-	PUSHs(ret);
-	PUTBACK;
-	return;
+        SV *lobj = POPs;
+        SV *ret;
+        VTYPECHECK(lobj, lobj, "lobj");
+        if ( hv_exists(MUTABLE_HV(lobj), key, keylen ) )
+            ret = &PL_sv_yes;
+        else
+            ret = &PL_sv_no;
+        PUSHs(ret);
+        PUTBACK;
+        return;
     }
 }
 
@@ -395,21 +394,21 @@ VXS(version_qv)
     PERL_UNUSED_ARG(cv);
     SP -= items;
     {
-	SV * ver = ST(0);
-	SV * sv0 = ver;
-	SV * rv;
+        SV * ver = ST(0);
+        SV * sv0 = ver;
+        SV * rv;
         STRLEN len = 0;
         const char * classname = "";
         U32 flags = 0;
         if ( items == 2 ) {
-	    SV * sv1 = ST(1);
-	    SvGETMAGIC(sv1);
-	    if (SvOK(sv1)) {
-		ver = sv1;
-	    }
-	    else {
-		Perl_croak(aTHX_ "Invalid version format (version required)");
-	    }
+            SV * sv1 = ST(1);
+            SvGETMAGIC(sv1);
+            if (SvOK(sv1)) {
+                ver = sv1;
+            }
+            else {
+                Perl_croak(aTHX_ "Invalid version format (version required)");
+            }
             if ( sv_isobject(sv0) ) { /* class called as an object method */
                 const HV * stash = SvSTASH(SvRV(sv0));
                 classname = HvNAME_get(stash);
@@ -419,22 +418,22 @@ VXS(version_qv)
 #endif
             }
             else {
-	       classname = SvPV(sv0, len);
+                classname = SvPV(sv0, len);
                 flags     = SvUTF8(sv0);
             }
-	}
-	if ( !SvVOK(ver) ) { /* not already a v-string */
-	    rv = sv_newmortal();
-	    SvSetSV_nosteal(rv,ver); /* make a duplicate */
-	    UPG_VERSION(rv, TRUE);
-	} else {
-	    rv = sv_2mortal(NEW_VERSION(ver));
-	}
-	if ( items == 2 && (len != 7
-                || strcmp(classname,"version")) ) { /* inherited new() */
-	    sv_bless(rv, gv_stashpvn(classname, len, GV_ADD | flags));
         }
-	PUSHs(rv);
+        if ( !SvVOK(ver) ) { /* not already a v-string */
+            rv = sv_newmortal();
+            SvSetSV_nosteal(rv,ver); /* make a duplicate */
+            UPG_VERSION(rv, TRUE);
+        } else {
+            rv = sv_2mortal(NEW_VERSION(ver));
+        }
+        if ( items == 2 && (len != 7
+                || strcmp(classname,"version")) ) { /* inherited new() */
+            sv_bless(rv, gv_stashpvn(classname, len, GV_ADD | flags));
+        }
+        PUSHs(rv);
     }
     PUTBACK;
     return;

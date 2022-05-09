@@ -28,53 +28,53 @@ This is not a complete list of changes.  See repository for full details:
 
 0.9924 - 2018-04-19
   * Revise CPAN metadata to advertise correct repo
-	Patch from Ed <ej_zg@hotmail.com>
+        Patch from Ed <ej_zg@hotmail.com>
 
 0.9923 - 2018-04-15
   * Add back spaces for picky C++ compilers 
-	Patch from Karl Williamson <khw@cpan.org>
+        Patch from Karl Williamson <khw@cpan.org>
 
 0.9922 - 2018-04-12
   * Switch master repo to github
 
 0.9921 - 2018-04-11
   * Silence overly compulsive GCC 7 warning
-	https://rt.cpan.org/Ticket/Display.html?id=123477
+        https://rt.cpan.org/Ticket/Display.html?id=123477
 
   * Improve docs regarding trailing zeros
-	https://rt.cpan.org/Ticket/Display.html?id=122858
+        https://rt.cpan.org/Ticket/Display.html?id=122858
 
 0.9920 - 2018-04-08
 
   * Backwards compatible locale handling
-	https://rt.cpan.org/Ticket/Display.html?id=125042
+        https://rt.cpan.org/Ticket/Display.html?id=125042
 
 0.9919 - 2018-04-08
 
   * Core improvements to locale handling
-	https://rt.cpan.org/Ticket/Display.html?id=124563
+        https://rt.cpan.org/Ticket/Display.html?id=124563
 
 0.9918 - 2017-04-15
 
   * Fix compiling under C++11
-	https://rt.cpan.org/Ticket/Display.html?id=118846
+        https://rt.cpan.org/Ticket/Display.html?id=118846
 
   * Make version::regex variables public for better reuse
-	https://rt.cpan.org/Ticket/Display.html?id=119669
+        https://rt.cpan.org/Ticket/Display.html?id=119669
 
   * Use rel2abs for require in tests to support 5.26.0 @INC
-	https://rt.cpan.org/Ticket/Display.html?id=121148
+        https://rt.cpan.org/Ticket/Display.html?id=121148
 
   * Move change list to standard CHANGES out of README
-	https://rt.cpan.org/Ticket/Display.html?id=119123
+        https://rt.cpan.org/Ticket/Display.html?id=119123
 
   * Better taint handling for Perl < 5.17.2 with tests
-	https://rt.cpan.org/Ticket/Display.html?id=118087
+        https://rt.cpan.org/Ticket/Display.html?id=118087
 
 0.9917 - 2016-05-29
 
   * Fix version::regex captures, resolves:
-	https://rt.cpan.org/Ticket/Display.html?id=114712
+        https://rt.cpan.org/Ticket/Display.html?id=114712
 
 0.9916 - 2016-03-18
 
@@ -125,37 +125,37 @@ This is not a complete list of changes.  See repository for full details:
 0.9912_02 - 2016-01-03
 
   * Fix stupid mistake in locale tests, resolves:
-	https://rt.cpan.org/Ticket/Display.html?id=110852
+        https://rt.cpan.org/Ticket/Display.html?id=110852
 
 0.9912_01 - 2015-12-31
 
   * Apply patch to implement Lyon Consensus:
-	https://gist.github.com/dagolden/9559280
+        https://gist.github.com/dagolden/9559280
 
   * Also resolve the following tickets:
-	https://rt.cpan.org/Ticket/Display.html?id=101647
-	https://rt.cpan.org/Ticket/Display.html?id=101841
-	https://rt.cpan.org/Ticket/Display.html?id=105315
-	https://rt.cpan.org/Ticket/Display.html?id=106782
-	https://rt.cpan.org/Ticket/Display.html?id=107113
-	https://rt.cpan.org/Ticket/Display.html?id=107114
-	https://rt.cpan.org/Ticket/Display.html?id=98744
-	https://rt.cpan.org/Ticket/Display.html?id=102272
+        https://rt.cpan.org/Ticket/Display.html?id=101647
+        https://rt.cpan.org/Ticket/Display.html?id=101841
+        https://rt.cpan.org/Ticket/Display.html?id=105315
+        https://rt.cpan.org/Ticket/Display.html?id=106782
+        https://rt.cpan.org/Ticket/Display.html?id=107113
+        https://rt.cpan.org/Ticket/Display.html?id=107114
+        https://rt.cpan.org/Ticket/Display.html?id=98744
+        https://rt.cpan.org/Ticket/Display.html?id=102272
 
 0.9912 - 2015-01-20
 
   * Complete reverting the ill-conceived alpha->normal() code, resolves:
 
-	https://rt.cpan.org/Ticket/Display.html?id=101632
+        https://rt.cpan.org/Ticket/Display.html?id=101632
 
   * Skip leading zeros when parsing dotted-decimal versions after the
     first element, resolves:
 
-	https://rt.cpan.org/Ticket/Display.html?id=101628
+        https://rt.cpan.org/Ticket/Display.html?id=101628
 
   * Minor change to report the correct rt.cpan.org URL, resolves:
 
-	https://rt.cpan.org/Public/Bug/Display.html?id=101600
+        https://rt.cpan.org/Public/Bug/Display.html?id=101600
 
 0.9911 - 2015-01-17
 
@@ -170,18 +170,18 @@ This is not a complete list of changes.  See repository for full details:
 
     Resolves:
 
-	https://rt.cpan.org/Ticket/Display.html?id=93603
-	https://rt.cpan.org/Ticket/Display.html?id=93715
-	https://rt.cpan.org/Ticket/Display.html?id=93721
-	https://rt.cpan.org/Ticket/Display.html?id=95896
-	https://rt.cpan.org/Ticket/Display.html?id=96100
-	https://rt.cpan.org/Ticket/Display.html?id=96620
-	https://rt.cpan.org/Ticket/Display.html?id=96699
+        https://rt.cpan.org/Ticket/Display.html?id=93603
+        https://rt.cpan.org/Ticket/Display.html?id=93715
+        https://rt.cpan.org/Ticket/Display.html?id=93721
+        https://rt.cpan.org/Ticket/Display.html?id=95896
+        https://rt.cpan.org/Ticket/Display.html?id=96100
+        https://rt.cpan.org/Ticket/Display.html?id=96620
+        https://rt.cpan.org/Ticket/Display.html?id=96699
 
   * Patch from Dave Mitchell to rewrite the parser and avoid warnings
     from clang.  Resolves
 
-	https://rt.cpan.org/Ticket/Display.html?id=101501
+        https://rt.cpan.org/Ticket/Display.html?id=101501
 
 0.9909 - 2014-08-15
 
@@ -194,9 +194,9 @@ This is not a complete list of changes.  See repository for full details:
 
   * More optimizations courtesy of Daniel Dragan (bulk88@hotmail.com).
     Also resolves:
-	https://rt.cpan.org/Ticket/Display.html?id=92438
-	https://rt.cpan.org/Ticket/Display.html?id=92540
-	https://rt.cpan.org/Ticket/Display.html?id=92642
+        https://rt.cpan.org/Ticket/Display.html?id=92438
+        https://rt.cpan.org/Ticket/Display.html?id=92540
+        https://rt.cpan.org/Ticket/Display.html?id=92642
 
 0.9907 - 2014-01-12
 
@@ -204,19 +204,19 @@ This is not a complete list of changes.  See repository for full details:
     (bulk88@hotmail.com).  Lots of minor tweaks as well.
 
     Resolves:
-	https://rt.cpan.org/Ticket/Display.html?id=91892
-	https://rt.cpan.org/Ticket/Display.html?id=91867
-	https://rt.cpan.org/Ticket/Display.html?id=91987
-	https://rt.cpan.org/Ticket/Display.html?id=92051
+        https://rt.cpan.org/Ticket/Display.html?id=91892
+        https://rt.cpan.org/Ticket/Display.html?id=91867
+        https://rt.cpan.org/Ticket/Display.html?id=91987
+        https://rt.cpan.org/Ticket/Display.html?id=92051
 
 0.9906 - 2014-01-04
 
   * Applied C89 compatibility fix from Karl Williamson to vxs.inc.  Added back
     support for $version::LAX and $version::STRICT to resolve:
 
-	https://rt.cpan.org/Ticket/Display.html?id=88458
-	https://rt.cpan.org/Ticket/Display.html?id=91858
-	https://rt.cpan.org/Ticket/Display.html?id=91868
+        https://rt.cpan.org/Ticket/Display.html?id=88458
+        https://rt.cpan.org/Ticket/Display.html?id=91858
+        https://rt.cpan.org/Ticket/Display.html?id=91868
 
 0.9905 - 2014-01-04
 
@@ -233,8 +233,8 @@ This is not a complete list of changes.  See repository for full details:
 
   * Final upstream changes from bleadperl.  Resolves RT tickets:
 
-	https://rt.cpan.org/Ticket/Display.html?id=87513
-	https://rt.cpan.org/Ticket/Display.html?id=87983
+        https://rt.cpan.org/Ticket/Display.html?id=87513
+        https://rt.cpan.org/Ticket/Display.html?id=87983
 
 0.9903 - 2013-08-18
 
@@ -274,29 +274,29 @@ This is not a complete list of changes.  See repository for full details:
   * Restore compatibility in replacement UNIVERSAL::VERSION with the behavior
     of Perl 5.14.x, essentially by reverting the changes in 
 
-	https://rt.perl.org/rt3/Ticket/Display.html?id=95544
+        https://rt.perl.org/rt3/Ticket/Display.html?id=95544
 
   * Fix segfault error with strings that begin with 'v', especially the string
     'version'.  Resolves:
 
-	https://rt.cpan.org/Ticket/Display.html?id=72365
+        https://rt.cpan.org/Ticket/Display.html?id=72365
 
   * Forbid all math operations on version objects in base class (this was
     already the case for XS code but the pure Perl was lacking).  Resolves:
 
-	https://rt.cpan.org/Public/Bug/Display.html?id=70950
+        https://rt.cpan.org/Public/Bug/Display.html?id=70950
 
 0.94 - 2011-08-21
 
   * Clarify documentation on advisability of using leading 'v' (it isn't
     mandatory, but it is much more likely to DTRT).  Resolves:
 
-	https://rt.cpan.org/Public/Bug/Display.html?id=70120
+        https://rt.cpan.org/Public/Bug/Display.html?id=70120
 
   * Use a localized DIE handler when attempting to load the XS code, in case
     the caller has its own DIE handler.  Resolves:
 
-	https://rt.cpan.org/Public/Bug/Display.html?id=70260
+        https://rt.cpan.org/Public/Bug/Display.html?id=70260
 
 0.93 - 2011-07-27
 
@@ -307,7 +307,7 @@ This is not a complete list of changes.  See repository for full details:
   * Forbid negative versions.  Make replacement UNIVERSAL::VERSION return the
     original $VERSION scalar if called without a requested version.  Resolves
 
-      https://rt.perl.org/rt3/Ticket/Display.html?id=95544
+        https://rt.perl.org/rt3/Ticket/Display.html?id=95544
 
     Rewrite code so that we just override all subs for Perl >= 5.9.0 (when
     version.pm was added to the core).
@@ -336,7 +336,7 @@ This is not a complete list of changes.  See repository for full details:
 
   * Fix Makefile.PL to make Strawberry Perl happy.  Resolves:
 
-	https://rt.cpan.org/Public/Bug/Display.html?id=63991
+        https://rt.cpan.org/Public/Bug/Display.html?id=63991
 
 0.87 - 2010-12-09
 
@@ -398,12 +398,12 @@ This is not a complete list of changes.  See repository for full details:
     with Perl 5.8.1, v-strings are now magical and version.pm no longer has
     to guess.  Resolves:
 
-	    https://rt.cpan.org/Ticket/Display.html?id=50347
+        https://rt.cpan.org/Ticket/Display.html?id=50347
 
   * Also resolve the issue where attempting to install CPAN releases on top
     of core releases (e.g. 5.10.0 and 5.10.1) would not DTRT.  Resolves:
 
-	    https://rt.cpan.org/Ticket/Display.html?id=49667
+        https://rt.cpan.org/Ticket/Display.html?id=49667
 
 0.7702 - 2009-09-07
 
@@ -411,7 +411,7 @@ This is not a complete list of changes.  See repository for full details:
     something is a v-string or not for Perl 5.6.0 through 5.8.0 (inclusive).
     Resolves:
 
-	https://rt.cpan.org/Ticket/Display.html?id=49348
+        https://rt.cpan.org/Ticket/Display.html?id=49348
 
 0.7701 - 2009-07-28
 
@@ -420,7 +420,7 @@ This is not a complete list of changes.  See repository for full details:
     they contain a complete broken Test::More::use_ok which doesn't load the
     package into the correct namespace:
 
-	    https://rt.cpan.org/Ticket/Display.html?id=48268
+        https://rt.cpan.org/Ticket/Display.html?id=48268
 
     thus causing mysterious test failures.  No version.pm code was changed at
     all. :(
