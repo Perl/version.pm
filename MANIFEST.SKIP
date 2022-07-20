@@ -10,6 +10,11 @@ tags
 Makefile$
 MYMETA.*
 version-.+\.tar\.gz
-vutil/Makefile\.PL
 vutil/MYMETA.*
 t/test-all
+\bMANIFEST\.bak
+\bblib/
+\bpm_to_blib$
+\bvutil/vxs\.c$
+\.o$
+\.bs$
