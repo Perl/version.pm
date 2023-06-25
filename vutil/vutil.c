@@ -7,6 +7,9 @@
 
 #define VERSION_MAX 0x7FFFFFFF
 
+#ifndef STRLENs
+#  define STRLENs(s)  (sizeof("" s "") - 1)
+#endif
 #ifndef POSIX_SETLOCALE_LOCK
 #  ifdef gwLOCALE_LOCK
 #    define POSIX_SETLOCALE_LOCK    gwLOCALE_LOCK
@@ -662,22 +665,116 @@ VER_NV:
             goto VER_PV;
         }
 #endif
-#ifdef USE_LOCALE_NUMERIC
 
         {
-            /* This may or may not be called from code that has switched
-             * locales without letting perl know, therefore we have to find it
-             * from first principals.  See [perl #121930]. */
 
-#  ifdef USE_POSIX_2008_LOCALE
+#ifdef USE_POSIX_2008_LOCALE
 
             /* With POSIX 2008, all we have to do is toggle to the C locale
              * just long enough to get the value (which should have a dot). */
             const locale_t locale_obj_on_entry = uselocale(PL_C_locale_obj);
             GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
             uselocale(locale_obj_on_entry);
+#else
+            /* Without POSIX 2008, it could be that toggling will zap another
+            * thread's locale.  Avoid that if possible by looking at the NV and
+            * changing a non-dot radix into a dot */
+
+            char * radix = NULL;
+            unsigned int radix_len = 0;
+
+            GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
+
+#  ifndef ARABIC_DECIMAL_SEPARATOR_UTF8
+
+            /* This becomes feasible since there are only very few possible
+             * radix characters in the world.  khw knows of just 3 possible
+             * ones.  If we are being compiled on a perl without the very rare
+             * third one, ARABIC DECIMAL SEPARATOR,  just scan for the other
+             * two: FULL STOP (dot) and COMMA */
+            radix = strpbrk(buf, ".,");
+            if (LIKELY(radix)) {
+                radix_len = 1;
+            }
 #  else
-            const char * locale_name_on_entry;
+            /* Here, we have information about the third one; since it is
+             * multi-byte, it becomes a little more work.  Scan for the dot,
+             * comma, or first byte of the arabic one */
+            radix = strpbrk(buf,
+                            ".,"
+                            ARABIC_DECIMAL_SEPARATOR_UTF8_FIRST_BYTE_s);
+
+            if (LIKELY(radix)) {
+                if (LIKELY(   (* (U8 *) radix)
+                           != ARABIC_DECIMAL_SEPARATOR_UTF8_FIRST_BYTE))
+                {
+                    radix_len = 1;  /* Dot and comma are length 1 */
+                }
+                else {
+
+                    /* Make sure that the rest of the bytes are what we expect
+                     * for the remainder of the arabic radix.  If not, we
+                     * didn't find the radix. */
+                    radix_len = STRLENs(ARABIC_DECIMAL_SEPARATOR_UTF8);
+                    if (   radix + radix_len >= buf + len
+                        || memNEs(radix + 1,
+                                STRLENs(ARABIC_DECIMAL_SEPARATOR_UTF8_TAIL),
+                                ARABIC_DECIMAL_SEPARATOR_UTF8_TAIL))
+                    {
+                        radix = NULL;
+                        radix_len = 0;
+                    }
+                }
+            }
+
+#  endif
+
+            /* Now convert any found radix into a dot (if not already).  This
+            * effectively does:  ver =~ s/radix/dot/   */
+            if (radix) {
+                if (*radix != '.') {
+                    *radix = '.';
+
+                    if (radix_len > 1) {
+                        Move(radix + radix_len,  /* from what follows the radix
+                                                  */
+                            radix + 1,          /* to just after the new dot */
+
+                                /* the number of bytes remaining, plus the NUL
+                                 * */
+                            len - (radix - buf) - radix_len + 1,
+                            char);
+                        len -= radix_len - 1;
+                    }
+                }
+
+                /* Guard against the very unlikely case that the radix is more
+                 * than a single character, like ".."; that is, make sure the
+                 * radix string we found above is the whole radix, and not just
+                 * the prefix of a longer one.   Success is indicated by it
+                 * being at the end of the string, or the next byte should be a
+                 * digit */
+                if (radix < buf + len && ! inRANGE(radix[1], '0', '9')) {
+                    radix = NULL;
+                    radix_len = 0;
+                }
+            }
+
+            if (! radix) {
+
+                /* If we couldn't find what the radix is, or didn't find it in
+                 * the PV, resort to toggling the locale to one known to have a
+                 * dot radix.  This may or may not be called from code that has
+                 * switched locales without letting perl know, therefore we
+                 * have to find it from first principals.  See [perl #121930].
+                 * */
+
+#  if ! defined(LC_NUMERIC) || ! defined(USE_LOCALE_NUMERIC)
+
+                Perl_croak(aTHX_ "panic: Unexpectedly didn't find a dot radix"
+                                 " character in '%s'", buf);
+#  else
+            const char * locale_name_on_entry = NULL;
 
             /* In windows, or not threaded, or not thread-safe, if it isn't C,
              * set it to C. */
@@ -709,10 +806,9 @@ VER_NV:
 
             POSIX_SETLOCALE_UNLOCK;  /* End critical section */
 #  endif
-
+            }
+#endif
         }
-
-#endif  /* USE_LOCALE_NUMERIC */
 
         /* Strip trailing zero's from the version number */
         while (buf[len-1] == '0' && len > 0) len--;
