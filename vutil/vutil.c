@@ -564,6 +564,26 @@ to force this SV to be interpreted as an "extended" version.
 =cut
 */
 
+/* Macro to do the meat of getting the PV of an NV version number.  This is
+ * macroized because can be called from several places */
+#define GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len)                        \
+    STMT_START {                                                            \
+                                                                            \
+        /* We earlier created 'sv' for very large version numbers, to rely  \
+         * on the specialized algorithms SV code has built-in for such      \
+         * values */                                                        \
+        if (sv) {                                                           \
+            Perl_sv_setpvf(aTHX_ sv, "%.9" NVff, SvNVX(ver));               \
+            len = SvCUR(sv);                                                \
+            buf = SvPVX(sv);                                                \
+        }                                                                   \
+        else {                                                              \
+            len = my_snprintf(tbuf, sizeof(tbuf), "%.9" NVff, SvNVX(ver));  \
+            buf = tbuf;                                                     \
+        }                                                                   \
+                                                                            \
+    } STMT_END
+
 SV *
 #ifdef VUTIL_REPLACE_CORE
 Perl_upg_version2(pTHX_ SV *ver, bool qv)
@@ -693,15 +713,7 @@ VER_NV:
             /* Prevent recursed calls from trying to change back */
             LOCK_LC_NUMERIC_STANDARD();
 #endif
-            if (sv) {
-                    Perl_sv_setpvf(aTHX_ sv, "%.9" NVff, SvNVX(ver));
-                len = SvCUR(sv);
-                buf = SvPVX(sv);
-            }
-            else {
-                    len = my_snprintf(tbuf, sizeof(tbuf), "%.9" NVff, SvNVX(ver));
-                buf = tbuf;
-            }
+            GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
 
 #ifdef USE_LOCALE_NUMERIC
 
