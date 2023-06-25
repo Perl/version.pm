@@ -646,12 +646,18 @@ VER_NV:
              * locales without letting perl know, therefore we have to find it
              * from first principals.  See [perl #121930]. */
 
+#  ifdef USE_POSIX_2008_LOCALE
+
+            /* With POSIX 2008, all we have to do is toggle to the C locale
+             * just long enough to get the value (which should have a dot). */
+            const locale_t locale_obj_on_entry = uselocale(PL_C_locale_obj);
+            GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
+            uselocale(locale_obj_on_entry);
+#  else
+            const char * locale_name_on_entry;
+
             /* In windows, or not threaded, or not thread-safe, if it isn't C,
              * set it to C. */
-
-#  ifndef USE_POSIX_2008_LOCALE
-
-            const char * locale_name_on_entry;
 
             LC_NUMERIC_LOCK(0);    /* Start critical section */
 
@@ -681,13 +687,6 @@ VER_NV:
             }
 
             LC_NUMERIC_UNLOCK;  /* End critical section */
-
-#  else
-            /* With POSIX 2008, all we have to do is toggle to the C locale
-             * just long enough to get the value (which should have a dot). */
-            const locale_t locale_obj_on_entry = uselocale(PL_C_locale_obj);
-            GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
-            uselocale(locale_obj_on_entry);
 #  endif
 
         }
