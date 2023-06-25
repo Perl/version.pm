@@ -685,16 +685,19 @@ VER_NV:
             POSIX_SETLOCALE_LOCK;    /* Start critical section */
 
             locale_name_on_entry = setlocale(LC_NUMERIC, NULL);
-            if (   strNE(locale_name_on_entry, "C")
-                && strNE(locale_name_on_entry, "POSIX"))
+            if (   strEQ(locale_name_on_entry, "C")
+                || strEQ(locale_name_on_entry, "C.UTF-8")
+                || strEQ(locale_name_on_entry, "POSIX"))
             {
-                /* the setlocale() call might free or overwrite the name */
+                /* No need to change the locale, since these all are known to
+                 * have a dot radix.  Change the variable to indicate to the
+                 * restore code that nothing needs to be done */
+                locale_name_on_entry = NULL;
+            }
+            else {
+                /* The setlocale() call might free or overwrite the name */
                 locale_name_on_entry = savepv(locale_name_on_entry);
                 setlocale(LC_NUMERIC, "C");
-            }
-            else {  /* This value indicates to the restore code that we didn't
-                       change the locale */
-                locale_name_on_entry = NULL;
             }
 
             GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
