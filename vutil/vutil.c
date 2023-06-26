@@ -7,6 +7,25 @@
 
 #define VERSION_MAX 0x7FFFFFFF
 
+#ifndef POSIX_SETLOCALE_LOCK
+#  ifdef gwLOCALE_LOCK
+#    define POSIX_SETLOCALE_LOCK    gwLOCALE_LOCK
+#    define POSIX_SETLOCALE_UNLOCK  gwLOCALE_UNLOCK
+#  else
+#    define POSIX_SETLOCALE_LOCK    NOOP
+#    define POSIX_SETLOCALE_UNLOCK  NOOP
+#  endif
+#endif
+#ifndef DISABLE_LC_NUMERIC_CHANGES
+#  ifdef LOCK_LC_NUMERIC_STANDARD
+#    define DISABLE_LC_NUMERIC_CHANGES()   LOCK_LC_NUMERIC_STANDARD()
+#    define REENABLE_LC_NUMERIC_CHANGES()  UNLOCK_LC_NUMERIC_STANDARD()
+#  else
+#    define DISABLE_LC_NUMERIC_CHANGES()   NOOP
+#    define REENABLE_LC_NUMERIC_CHANGES()  NOOP
+#  endif
+#endif
+
 /*
 =for apidoc prescan_version
 
@@ -569,6 +588,9 @@ to force this SV to be interpreted as an "extended" version.
 #define GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len)                        \
     STMT_START {                                                            \
                                                                             \
+        /* Prevent callees from trying to change the locale */              \
+        DISABLE_LC_NUMERIC_CHANGES();                                       \
+                                                                            \
         /* We earlier created 'sv' for very large version numbers, to rely  \
          * on the specialized algorithms SV code has built-in for such      \
          * values */                                                        \
@@ -582,6 +604,7 @@ to force this SV to be interpreted as an "extended" version.
             buf = tbuf;                                                     \
         }                                                                   \
                                                                             \
+        REENABLE_LC_NUMERIC_CHANGES();                                      \
     } STMT_END
 
 SV *
@@ -659,7 +682,7 @@ VER_NV:
             /* In windows, or not threaded, or not thread-safe, if it isn't C,
              * set it to C. */
 
-            LC_NUMERIC_LOCK(0);    /* Start critical section */
+            POSIX_SETLOCALE_LOCK;    /* Start critical section */
 
             locale_name_on_entry = setlocale(LC_NUMERIC, NULL);
             if (   strNE(locale_name_on_entry, "C")
@@ -674,19 +697,14 @@ VER_NV:
                 locale_name_on_entry = NULL;
             }
 
-            /* Prevent recursed calls from trying to change back */
-            LOCK_LC_NUMERIC_STANDARD();
-
             GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
-
-            UNLOCK_LC_NUMERIC_STANDARD();
 
             if (locale_name_on_entry) {
                 setlocale(LC_NUMERIC, locale_name_on_entry);
                 Safefree(locale_name_on_entry);
             }
 
-            LC_NUMERIC_UNLOCK;  /* End critical section */
+            POSIX_SETLOCALE_UNLOCK;  /* End critical section */
 #  endif
 
         }
