@@ -774,37 +774,37 @@ VER_NV:
                 Perl_croak(aTHX_ "panic: Unexpectedly didn't find a dot radix"
                                  " character in '%s'", buf);
 #  else
-            const char * locale_name_on_entry = NULL;
+                const char * locale_name_on_entry = NULL;
 
-            /* In windows, or not threaded, or not thread-safe, if it isn't C,
-             * set it to C. */
+                /* In windows, or not threaded, or not thread-safe, if it isn't
+                 * C, set it to C. */
 
-            POSIX_SETLOCALE_LOCK;    /* Start critical section */
+                POSIX_SETLOCALE_LOCK;    /* Start critical section */
 
-            locale_name_on_entry = setlocale(LC_NUMERIC, NULL);
-            if (   strEQ(locale_name_on_entry, "C")
-                || strEQ(locale_name_on_entry, "C.UTF-8")
-                || strEQ(locale_name_on_entry, "POSIX"))
-            {
-                /* No need to change the locale, since these all are known to
-                 * have a dot radix.  Change the variable to indicate to the
-                 * restore code that nothing needs to be done */
-                locale_name_on_entry = NULL;
-            }
-            else {
-                /* The setlocale() call might free or overwrite the name */
-                locale_name_on_entry = savepv(locale_name_on_entry);
-                setlocale(LC_NUMERIC, "C");
-            }
+                locale_name_on_entry = setlocale(LC_NUMERIC, NULL);
+                if (   strEQ(locale_name_on_entry, "C")
+                    || strEQ(locale_name_on_entry, "C.UTF-8")
+                    || strEQ(locale_name_on_entry, "POSIX"))
+                {
+                    /* No need to change the locale, since these all are known
+                     * to have a dot radix.  Change the variable to indicate to
+                     * the restore code that nothing needs to be done */
+                    locale_name_on_entry = NULL;
+                }
+                else {
+                    /* The setlocale() call might free or overwrite the name */
+                    locale_name_on_entry = savepv(locale_name_on_entry);
+                    setlocale(LC_NUMERIC, "C");
+                }
 
-            GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
+                GET_NUMERIC_VERSION(ver, sv, tbuf, buf, len);
 
-            if (locale_name_on_entry) {
-                setlocale(LC_NUMERIC, locale_name_on_entry);
-                Safefree(locale_name_on_entry);
-            }
+                if (locale_name_on_entry) {
+                    setlocale(LC_NUMERIC, locale_name_on_entry);
+                    Safefree(locale_name_on_entry);
+                }
 
-            POSIX_SETLOCALE_UNLOCK;  /* End critical section */
+                POSIX_SETLOCALE_UNLOCK;  /* End critical section */
 #  endif
             }
 #endif
