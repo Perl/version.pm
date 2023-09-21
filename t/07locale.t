@@ -31,6 +31,9 @@ SKIP: {
 	skip 'No locale testing for Perl < 5.6.0', 7 if $] < 5.006;
 	skip 'No locale testing without d_setlocale', 7
 	    if(!$Config{d_setlocale});
+        eval "&POSIX::LC_NUMERIC";
+	skip 'No locale testing without LC_NUMERIC', 7
+            if $@ || $Config{ccflags} =~ /-DNO_LOCALE_NUMERIC\b/;
 
 	# test locale handling
 	my $warning = '';
