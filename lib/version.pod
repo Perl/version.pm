@@ -282,6 +282,11 @@ a version object is interpolated into a string.
  version->parse('1.200')->stringify;     # 1.2
  version->parse(1.02_30)->stringify;     # 1.023
 
+=head2 tuple
+
+Returns an array of non-negative integers that is used for comparison purposes with
+other version objects.
+
 =head1 EXPORTED FUNCTIONS
 
 =head2 qv()
