@@ -271,6 +271,18 @@ Returns a value representing the object in a pure decimal.
  version->declare('v1.2')->numify;  # 1.002000
  version->parse('1.2')->numify;     # 1.200
 
+=head2 to_decimal
+
+This returns a new version object for the numified version, much like C<< version->parse($v->numify) >> would.
+
+ version->parse('v1.2')->to_decimal; # 1.002000
+
+=head2 to_dotted_decimal
+
+This returns a new version object for the normalized version, much like C<< version->parse($v->normal) >> would.
+
+ version->parse('1.002')->to_dotted_decimal; # v1.2.0
+
 =head2 stringify()
 
 Returns a string that is as close to the original representation as possible.

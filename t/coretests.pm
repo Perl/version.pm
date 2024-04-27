@@ -633,6 +633,19 @@ SKIP: {
 	$v = $CLASS->new("1.02_003");
 	is $v->numify, '1.020030', 'Ignore underscores for numify';
     }
+
+    {
+	$v = $CLASS->parse("v1.2.3");
+	$v2 = $v->to_decimal;
+	isa_ok $v2, $CLASS;
+	is $v2, "1.002003";
+    }
+    {
+	$v = $CLASS->parse("1.002003");
+	$v2 = $v->to_dotted_decimal;
+	isa_ok $v2, $CLASS;
+	is "$v2", "v1.2.3";
+    }
 }
 
 1;

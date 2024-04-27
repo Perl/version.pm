@@ -28,6 +28,8 @@ our (@ISA, $STRICT, $LAX);
 	*version::new = \&version::vpp::new;
 	*version::numify = \&version::vpp::numify;
 	*version::normal = \&version::vpp::normal;
+	*version::to_decimal = \&version::vpp::to_decimal;
+	*version::to_dotted_decimal = \&version::vpp::to_dotted_decimal;
 	if ($] >= 5.009000) {
 	    no strict 'refs';
 	    *version::stringify = \&version::vpp::stringify;
@@ -47,6 +49,8 @@ our (@ISA, $STRICT, $LAX);
 	*version::new = \&version::vxs::new;
 	*version::numify = \&version::vxs::numify;
 	*version::normal = \&version::vxs::normal;
+	*version::to_decimal = \&version::vxs::to_decimal;
+	*version::to_dotted_decimal = \&version::vxs::to_dotted_decimal;
 	if ($] >= 5.009000) {
 	    no strict 'refs';
 	    *version::stringify = \&version::vxs::stringify;

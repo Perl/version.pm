@@ -46,6 +46,8 @@
     {VXS_CLASS "::(0+", VXSp(version_numify), VXSXSDP(NULL)},
     {VXS_CLASS "::numify", VXSp(version_numify), VXSXSDP(NULL)},
     {VXS_CLASS "::normal", VXSp(version_normal), VXSXSDP(NULL)},
+    {VXS_CLASS "::to_decimal", VXSp(version_to_decimal), VXSXSDP(NULL)},
+    {VXS_CLASS "::to_dotted_decimal", VXSp(version_to_dotted_decimal), VXSXSDP(NULL)},
     {VXS_CLASS "::(cmp", VXSp(version_vcmp), VXSXSDP(NULL)},
     {VXS_CLASS "::(<=>", VXSp(version_vcmp), VXSXSDP(NULL)},
 #  ifdef PERL_CORE
@@ -293,6 +295,37 @@ VXS(version_normal)
 	  VTYPECHECK(ver, ST(0), "ver");
 
 	  VXS_RETURN_M_SV(VNORMAL(ver));
+     }
+}
+
+VXS(version_to_decimal)
+{
+     dXSARGS;
+     SV* self = ST(0);
+     if (items < 1)
+	 croak_xs_usage(cv, "lobj, ...");
+     SP -= items;
+     {
+	  SV *lobj, *rv;
+	  VTYPECHECK(lobj, self, "lobj");
+          rv = NEW_VERSION(VNUMIFY(lobj));
+	  VXS_RETURN_M_SV(sv_bless(rv, SvSTASH(SvRV(self))));
+     }
+}
+
+VXS(version_to_dotted_decimal)
+{
+     dXSARGS;
+     SV* self = ST(0);
+     if (items != 1)
+	 croak_xs_usage(cv, "ver");
+     SP -= items;
+     {
+	  SV *lobj, *rv;
+	  VTYPECHECK(lobj, self, "lobj");
+          rv = NEW_VERSION(VNORMAL(lobj));
+          sv_bless(rv, SvSTASH(SvRV(self)));
+	  VXS_RETURN_M_SV(sv_bless(rv, SvSTASH(SvRV(self))));
      }
 }
 
