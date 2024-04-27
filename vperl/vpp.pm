@@ -775,6 +775,16 @@ sub stringify {
 	    : $self->numify;
 }
 
+sub to_decimal {
+    my ($self) = @_;
+    return ref($self)->new($self->numify);
+}
+
+sub to_dotted_decimal {
+    my ($self) = @_;
+    return ref($self)->new($self->normal);
+}
+
 sub vcmp {
     my ($left,$right,$swap) = @_;
     die "Usage: version::vcmp(lobj, robj, ...)" if @_ < 2;
