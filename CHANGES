@@ -4,6 +4,7 @@ This is not a complete list of changes.  See repository for full details:
 
     https://github.com/Perl/version.pm
 
+0.9933
   * Fix two warnings in recent code
 
 0.9932
