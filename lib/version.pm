@@ -1,4 +1,3 @@
-#!perl -w
 package version;
 
 use 5.006002;
