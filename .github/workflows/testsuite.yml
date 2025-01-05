@@ -49,13 +49,13 @@ jobs:
             "perl:5.26",
             "perl:5.24",
             "perl:5.22",
-            "perl:5.20",
-            "perl:5.18",
-            "perl:5.16",
-            "perl:5.14",
-            "perl:5.12",
-            "perl:5.10",
-            "perl:5.8",
+            "perl:5.20-buster",
+            "perl:5.18-buster",
+            "perl:5.16-buster",
+            "perl:5.14-buster",
+            "perl:5.12-buster",
+            "perl:5.10-buster",
+            "perl:5.8-buster",
             "perldocker/perl:5.6"
           ]
 
