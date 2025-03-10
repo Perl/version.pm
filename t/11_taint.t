@@ -1,4 +1,6 @@
 #!perl -T
+
+use strict;
 use Test::More;
 use version;
 
