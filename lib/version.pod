@@ -40,7 +40,7 @@ not be used due to incompatible API changes.  Version 0.77 introduces the new
 'parse' and 'declare' methods to standardize usage.  You are strongly urged to
 set 0.77 as a minimum in your code, e.g.
 
-  use version 0.77; # even for Perl v.5.10.0
+  use version 0.77; # even for Perl v5.10.0
 
 =head1 TYPES OF VERSION OBJECTS
 
