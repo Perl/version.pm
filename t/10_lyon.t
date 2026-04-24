@@ -1,5 +1,6 @@
 #! perl
 
+use strict;
 use Test::More qw/no_plan/;
 
 use version;
